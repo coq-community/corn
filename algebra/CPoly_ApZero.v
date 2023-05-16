@@ -444,7 +444,7 @@ Lemma Cpoly_choose_apzero : f [#] [0] -> {i : nat | i <= n | f ! (a_ i) [#] [0]}
 Proof.
  intros H.
  cut (Sum 0 n (fun i : nat => _C_ f ! (a_ i) [*]poly_01 i n) [#] [0]). intros H0.
-  elim (Sum_apzero _ (fun i : nat => _C_ f ! (a_ i) [*]poly_01 i n) 0 n ( le_O_n n) H0).
+  elim (Sum_apzero _ (fun i : nat => _C_ f ! (a_ i) [*]poly_01 i n) 0 n ( Nat.le_0_l n) H0).
   intro i. intro H1.
   elim H1. intros H2 H3. intro H4.
   exists i.

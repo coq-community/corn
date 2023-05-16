@@ -85,11 +85,11 @@ Qed.
 Lemma fact_inc_recurse : forall p n:nat, (n <= p)%nat -> (fact n <= fact p)%nat.
 Proof.
   induction p.
-  - intros. inversion H. apply le_refl.
+  - intros. inversion H. apply Nat.le_refl.
   - intros. apply Nat.le_succ_r in H. destruct H.
     apply (Nat.le_trans (fact n) (fact p)).
     apply IHp, H. apply fact_inc.
-    subst n. apply le_refl.
+    subst n. apply Nat.le_refl.
 Qed.
 
 (**
@@ -305,11 +305,11 @@ Proof.
     2: apply fact_neq_0. 2: apply fact_neq_0.
     apply fact_inc_recurse. 
     apply (Nat.le_trans (Pos.to_nat p) (1 + Pos.to_nat p)).
-    apply le_S, le_refl.
+    apply le_S, Nat.le_refl.
     apply le_n_S.
     rewrite <- (Nat.mul_1_l (Pos.to_nat p)) at 1.
     apply Nat.mul_le_mono_nonneg_r.
-    apply le_0_n. apply le_S, le_refl.
+    apply le_0_n. apply le_S, Nat.le_refl.
 Qed.
 
 End SinSeries.

@@ -234,7 +234,7 @@ Proof.
  generalize F.
  clear H0 F; induction  n as [| n Hrecn]; intros.
   simpl in |- *; apply diffble_imp_inc.
-  exact (Diffble_I_n_imp_diffble _ (lt_n_Sn 0) F H0).
+  exact (Diffble_I_n_imp_diffble _ (Nat.lt_succ_diag_r 0) F H0).
  simpl in |- *.
  elim H0; intros Hf Hf'.
  exists Hf.

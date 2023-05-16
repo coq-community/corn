@@ -54,10 +54,10 @@ Proof.
   do 2 intro.
   rewrite H.
   intros; simpl in |- *; apply eq_symmetric_unfolded.
-  astepr (g 0 (lt_n_Sn 0)); algebra.
+  astepr (g 0 (Nat.lt_succ_diag_r 0)); algebra.
  do 2 intro; rewrite H; intros.
- astepl (Sumx (fun (i : nat) (Hi : i < n) => f i (lt_S _ _ Hi)) [+]f n (lt_n_Sn n)).
- Step_final (Sumx (fun (i : nat) (Hi : i < S n) => g i (lt_S _ _ Hi)) [+] g (S n) (lt_n_Sn (S n))).
+ astepl (Sumx (fun (i : nat) (Hi : i < n) => f i (Nat.lt_lt_succ_r _ _ Hi)) [+]f n (Nat.lt_succ_diag_r n)).
+ Step_final (Sumx (fun (i : nat) (Hi : i < S n) => g i (Nat.lt_lt_succ_r _ _ Hi)) [+] g (S n) (Nat.lt_succ_diag_r (S n))).
 Qed.
 
 Lemma Sumx_weird_lemma :
@@ -84,9 +84,9 @@ Proof.
  intros l Hl.
  rewrite Hl; intros f1 f2 f3 Hf1 Hf2 Hf3 Hf1_f3 Hf2_f3 Hf3_f3.
  apply eq_transitive_unfolded with
-   (Sumx f1[+]Sumx (fun (i : nat) (Hi : i < m) => f2 i (lt_S _ _ Hi)) [+] f2 m (lt_n_Sn m)).
+   (Sumx f1[+]Sumx (fun (i : nat) (Hi : i < m) => f2 i (Nat.lt_lt_succ_r _ _ Hi)) [+] f2 m (Nat.lt_succ_diag_r m)).
   simpl in |- *; algebra.
- astepr (Sumx (fun (i : nat) (Hi : i < l') => f3 i (lt_S _ _ Hi)) [+] f3 l' (lt_n_Sn l')).
+ astepr (Sumx (fun (i : nat) (Hi : i < l') => f3 i (Nat.lt_lt_succ_r _ _ Hi)) [+] f3 l' (Nat.lt_succ_diag_r l')).
  apply bin_op_wd_unfolded.
   apply Hrecm.
         unfold l' in |- *; auto.
@@ -329,11 +329,11 @@ Proof.
  simpl in HN.
  unfold integral_seq, Even_Partition_Sum, Partition_Sum in HN.
  set (f' := fun (i : nat) (H : i < S N) => Part F _ (contin_imp_inc _ _ _ _ contF _
-   (compact_partition_lemma _ _ Hab _ (O_S N) _ (lt_le_weak _ _ H))) [*]
-     (Even_Partition Hab _ (O_S N) _ H[-] Even_Partition Hab _ (O_S N) i (lt_le_weak _ _ H))) in *.
+   (compact_partition_lemma _ _ Hab _ (O_S N) _ (Nat.lt_le_incl _ _ H))) [*]
+     (Even_Partition Hab _ (O_S N) _ H[-] Even_Partition Hab _ (O_S N) i (Nat.lt_le_incl _ _ H))) in *.
  set (g' := fun (i : nat) (H : i < S N) => Part G _ (contin_imp_inc _ _ _ _ contG _
-   (compact_partition_lemma _ _ Hab _ (O_S N) _ (lt_le_weak _ _ H))) [*]
-     (Even_Partition Hab _ (O_S N) _ H[-] Even_Partition Hab _ (O_S N) i (lt_le_weak _ _ H))) in *.
+   (compact_partition_lemma _ _ Hab _ (O_S N) _ (Nat.lt_le_incl _ _ H))) [*]
+     (Even_Partition Hab _ (O_S N) _ H[-] Even_Partition Hab _ (O_S N) i (Nat.lt_le_incl _ _ H))) in *.
  cut (nat_less_n_fun f'); intros.
   cut (nat_less_n_fun g'); intros.
    cut (Sumx f' [#] Sumx g'). intros H1.
@@ -342,7 +342,7 @@ Proof.
     elim Hn; clear Hn; intros Hn H'.
     exists (a[+]nring n[*] (b[-]a[/] nring _[//]nring_ap_zero' _ _ (O_S N))).
      unfold I in |- *; apply compact_partition_lemma; auto.
-     apply lt_le_weak; assumption.
+     apply Nat.lt_le_incl; assumption.
     intros.
     elim (bin_op_strext_unfolded _ _ _ _ _ _ H'); clear H'; intro.
      eapply ap_wdl_unfolded.
@@ -375,11 +375,11 @@ Proof.
  set (f1 := fun (i : nat) (Hi : i < S N) => Part _ _ (contin_imp_inc _ _ _ _ HF1 _
    (Pts_part_lemma _ _ _ _ _ _ (Partition_imp_points_1 _ _ _ _ (Even_Partition Hab _ (O_S N))) i
      Hi)) [*] (Even_Partition Hab _ (O_S N) _ Hi[-]
-       Even_Partition Hab _ (O_S N) _ (lt_le_weak _ _ Hi))) in *.
+       Even_Partition Hab _ (O_S N) _ (Nat.lt_le_incl _ _ Hi))) in *.
  set (f2 := fun (i : nat) (Hi : i < S N) => Part _ _ (contin_imp_inc _ _ _ _ HF2 _
    (Pts_part_lemma _ _ _ _ _ _ (Partition_imp_points_1 _ _ _ _ (Even_Partition Hcd _ (O_S N))) i
      Hi)) [*] (Even_Partition Hcd _ (O_S N) _ Hi[-]
-       Even_Partition Hcd _ (O_S N) _ (lt_le_weak _ _ Hi))) in *.
+       Even_Partition Hcd _ (O_S N) _ (Nat.lt_le_incl _ _ Hi))) in *.
  cut (nat_less_n_fun f1); intros.
   cut (nat_less_n_fun f2); intros.
    elim (Sumx_strext _ _ _ _ H H0 HN).
@@ -760,7 +760,7 @@ Proof.
  rewrite H; clear H; intro.
  elim le_lt_dec; intro; simpl in |- *.
   apply finish.
- exfalso; apply lt_irrefl with n; auto.
+ exfalso; apply Nat.lt_irrefl with n; auto.
 Qed.
 
 Lemma pjf_2' : forall (i : nat) Hi, i = S n -> partition_join_fun i Hi [=] c.
@@ -815,7 +815,7 @@ Proof.
    apply eq_imp_leEq.
    apply eq_transitive_unfolded with c.
     apply finish.
-   apply eq_transitive_unfolded with (Q 0 (le_O_n _)).
+   apply eq_transitive_unfolded with (Q 0 (Nat.le_0_l _)).
     apply eq_symmetric_unfolded; apply start.
    apply prf1; auto with arith.
   exfalso; apply le_not_lt with n i; auto with arith.
@@ -895,7 +895,7 @@ Proof.
  elim le_lt_dec; intro; simpl in |- *.
   elim le_lt_eq_dec; intro; simpl in |- *.
    algebra.
-  exfalso; rewrite b0 in Hi'; apply (lt_irrefl _ Hi').
+  exfalso; rewrite b0 in Hi'; apply (Nat.lt_irrefl _ Hi').
  exfalso; apply le_not_lt with i n; auto with arith.
 Qed.
 
@@ -904,9 +904,9 @@ Proof.
  intros; unfold partition_join_pts in |- *.
  elim le_lt_dec; intro; simpl in |- *.
   elim le_lt_eq_dec; intro; simpl in |- *.
-   exfalso; rewrite H in a1; apply (lt_irrefl _ a1).
+   exfalso; rewrite H in a1; apply (Nat.lt_irrefl _ a1).
   algebra.
- exfalso; rewrite H in b0; apply (lt_irrefl _ b0).
+ exfalso; rewrite H in b0; apply (Nat.lt_irrefl _ b0).
 Qed.
 
 Lemma pjp_3 : forall (i : nat) Hi Hi',
@@ -925,7 +925,7 @@ Lemma partition_join_Pts_in_partition : Points_in_Partition partition_join parti
 Proof.
  red in |- *; intros.
  rename Hi into H.
- cut (forall H', compact (partition_join i (lt_le_weak _ _ H)) (partition_join (S i) H) H'
+ cut (forall H', compact (partition_join i (Nat.lt_le_incl _ _ H)) (partition_join (S i) H) H'
    (partition_join_pts i H)); auto.
  unfold partition_join in |- *; simpl in |- *.
  unfold partition_join_fun in |- *.
@@ -1044,10 +1044,10 @@ Proof.
  apply eq_transitive_unfolded with c; unfold partition_join_fun in |- *;
    elim le_lt_dec; simpl in |- *.
     intro; apply finish.
-   intro; exfalso; apply (lt_irrefl _ b0).
+   intro; exfalso; apply (Nat.lt_irrefl _ b0).
   intro; exfalso; apply (le_Sn_n _ a0).
  intro; apply eq_symmetric_unfolded.
- apply eq_transitive_unfolded with (Q _ (le_O_n _)).
+ apply eq_transitive_unfolded with (Q _ (Nat.le_0_l _)).
   apply prf1; auto with arith.
  apply start.
 Qed.
@@ -1181,7 +1181,7 @@ Proof.
        elim le_lt_dec; intro; simpl in |- *.
         elim le_lt_eq_dec; intro; simpl in |- *.
          apply Partition_imp_points_2; auto.
-        exfalso; rewrite b0 in Hi; apply (lt_irrefl _ Hi).
+        exfalso; rewrite b0 in Hi; apply (Nat.lt_irrefl _ Hi).
        exfalso; apply le_not_lt with i0 (S i); auto with arith.
       apply cg_minus_wd; simpl in |- *.
        apply eq_symmetric_unfolded; apply pjf_1.
@@ -1194,7 +1194,7 @@ Proof.
         exfalso; apply le_Sn_n with (S i); eapply Nat.le_trans.
          2: apply a0.
         auto with arith.
-       exfalso; apply lt_irrefl with (S i); pattern (S i) at 2 in |- *;
+       exfalso; apply Nat.lt_irrefl with (S i); pattern (S i) at 2 in |- *;
          rewrite <- b0; auto with arith.
       unfold Partition_imp_points in |- *; apply prf1.
       auto with arith.

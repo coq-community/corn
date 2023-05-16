@@ -1455,7 +1455,7 @@ Section misc.
 Lemma nring_pos : forall m : nat, 0 < m -> [0] [<] nring (R:=R) m.
 Proof.
  intro m. elim m.
- intro; elim (lt_irrefl 0 H).
+ intro; elim (Nat.lt_irrefl 0 H).
  clear m; intros.
  apply leEq_less_trans with (nring (R:=R) n).
   astepl (nring (R:=R) 0).
@@ -1548,8 +1548,8 @@ Proof.
  intros.
  simpl in |- *.
  apply plus_resp_less_both.
-  astepl (Sumx (fun (i : nat) (l : i < S n1) => f i (lt_S _ _ l))).
-  astepr (Sumx (fun (i : nat) (l : i < S n1) => g i (lt_S _ _ l))).
+  astepl (Sumx (fun (i : nat) (l : i < S n1) => f i (Nat.lt_lt_succ_r _ _ l))).
+  astepr (Sumx (fun (i : nat) (l : i < S n1) => g i (Nat.lt_lt_succ_r _ _ l))).
   apply X0.
    auto with arith.
   intros. apply X1.
@@ -1577,27 +1577,27 @@ Proof.
   simpl in |- *.
   intros.
   exists 0.
-  exists (lt_n_Sn 0).
+  exists (Nat.lt_succ_diag_r 0).
   eapply less_wdr.
    apply X0.
-  astepl (f _ (lt_n_Sn 0)).
+  astepl (f _ (Nat.lt_succ_diag_r 0)).
   apply H; auto.
  simpl in |- *; intros.
  clear X.
- cut ([0] [<] f _ (lt_n_Sn (S n1)) or [0] [<]
-   Sumx (fun (i : nat) (l : i < n1) => f i (lt_S i (S n1) (lt_S i n1 l)))[+]
-     f n1 (lt_S n1 (S n1) (lt_n_Sn n1))).
+ cut ([0] [<] f _ (Nat.lt_succ_diag_r (S n1)) or [0] [<]
+   Sumx (fun (i : nat) (l : i < n1) => f i (Nat.lt_lt_succ_r i (S n1) (Nat.lt_lt_succ_r i n1 l)))[+]
+     f n1 (Nat.lt_lt_succ_r n1 (S n1) (Nat.lt_succ_diag_r n1))).
   intro X.  inversion_clear X.
   exists (S n1).
-   exists (lt_n_Sn (S n1)).
+   exists (Nat.lt_succ_diag_r (S n1)).
    eapply less_wdr.
     apply X2.
    apply H; auto.
-  set (f' := fun (i : nat) (H : i < S n1) => f i (lt_S _ _ H)) in *.
+  set (f' := fun (i : nat) (H : i < S n1) => f i (Nat.lt_lt_succ_r _ _ H)) in *.
   cut {i : nat | {H : i < S n1 | [0] [<] f' i H}}; intros.
    elim X; intros i Hi; elim Hi; clear X2 Hi; intros Hi Hi'.
    exists i.
-   exists (lt_S _ _ Hi).
+   exists (Nat.lt_lt_succ_r _ _ Hi).
    eapply less_wdr.
     apply Hi'.
    unfold f' in |- *; simpl in |- *.
@@ -1633,10 +1633,10 @@ Proof.
   intros; algebra.
  intros.
  simpl in |- *.
- rstepl ([--](Sumx (fun (i : nat) (l : i < n) => f i (lt_S i n l)))[+] [--](f n (lt_n_Sn n))).
+ rstepl ([--](Sumx (fun (i : nat) (l : i < n) => f i (Nat.lt_lt_succ_r i n l)))[+] [--](f n (Nat.lt_succ_diag_r n))).
  apply bin_op_wd_unfolded.
   2: algebra.
- apply Hrecn with (f := fun (i : nat) (l : i < n) => f i (lt_S i n l)).
+ apply Hrecn with (f := fun (i : nat) (l : i < n) => f i (Nat.lt_lt_succ_r i n l)).
  red in |- *; intros; apply H; auto.
 Qed.
 

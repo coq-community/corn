@@ -300,7 +300,7 @@ Lemma maj_upto_eps : forall (F : COrdField) (a : nat -> F) (n : nat) (eps : F),
 Proof.
  intros F a n eps Hn Heps.
  induction  n as [| n Hrecn].
-  elim (lt_irrefl _ Hn).
+  elim (Nat.lt_irrefl _ Hn).
  clear Hrecn Hn.
  induction  n as [| n Hrecn].
   exists 1.

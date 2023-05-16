@@ -560,7 +560,7 @@ Proof.
  intros.
  exists (seq 0).
  apply is_onto_seq_P.
- apply le_O_n.
+ apply Nat.le_0_l.
 Qed.
 
 (*

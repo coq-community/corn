@@ -552,17 +552,17 @@ Proof.
 Qed.
 
 Lemma Taylor_lemma9 : forall n Hf Hf',
-  Derivative_I Hab' (Taylor_seq'_aux n Hf) (funct_aux n Hf' n (lt_n_Sn n)).
+  Derivative_I Hab' (Taylor_seq'_aux n Hf) (funct_aux n Hf' n (Nat.lt_succ_diag_r n)).
 Proof.
  intro; induction  n as [| n Hrecn].
   intros.
   unfold Taylor_seq'_aux in |- *; simpl in |- *.
-  apply Derivative_I_wdl with (funct_i' 0 Hf 0 (lt_n_Sn 0)).
+  apply Derivative_I_wdl with (funct_i' 0 Hf 0 (Nat.lt_succ_diag_r 0)).
    apply eq_imp_Feq.
      split; split; simpl in |- *; auto.
     split; split; split; simpl in |- *; auto.
    intros; simpl in |- *.
-   apply eq_transitive_unfolded with ([0][+] fi 0 Hf 0 (lt_n_Sn 0)
+   apply eq_transitive_unfolded with ([0][+] fi 0 Hf 0 (Nat.lt_succ_diag_r 0)
      (Build_subcsetoid_crr _ _ _ (ProjIR1 (ProjIR1 Hx))) [*]
        ([1][/] [0][+][1][//]nring_fac_ap_zero IR 0) [*][1]).
     simpl in |- *; rational.
@@ -576,7 +576,7 @@ Proof.
  generalize Hf Hf'; clear Hf Hf'.
  rewrite <- H0; intros.
  cut (Diffble_I_n Hab' n F); [ intro H1 | apply le_imp_Diffble_I with (S n); [ lia | assumption ] ].
- apply Derivative_I_wdl with (Taylor_seq'_aux n H1{+}funct_i' _ Hf _ (lt_n_Sn (S n))).
+ apply Derivative_I_wdl with (Taylor_seq'_aux n H1{+}funct_i' _ Hf _ (Nat.lt_succ_diag_r (S n))).
   unfold Taylor_seq'_aux in |- *.
   apply eq_imp_Feq.
     repeat (split; auto). try rename X into H2.
@@ -601,38 +601,38 @@ Proof.
     repeat (split; auto).
    intros x0 H4; intros; simpl in |- *.
    repeat apply mult_wdl.
-   apply eq_transitive_unfolded with (PartInt (fi n H1 i (lt_S _ _ H3)) x0 H4).
+   apply eq_transitive_unfolded with (PartInt (fi n H1 i (Nat.lt_lt_succ_r _ _ H3)) x0 H4).
     simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
-   apply eq_transitive_unfolded with (PartInt (fi (S n) Hf i (lt_S _ _ (lt_S _ _ H'))) x0 H4).
+   apply eq_transitive_unfolded with (PartInt (fi (S n) Hf i (Nat.lt_lt_succ_r _ _ (Nat.lt_lt_succ_r _ _ H'))) x0 H4).
     2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
    apply Feq_imp_eq with (Compact Hab).
     unfold Hab in |- *; apply Derivative_I_n_unique with i F; apply Taylor_lemma1.
    auto.
-  apply eq_transitive_unfolded with (PartInt (fi n H1 n (lt_n_Sn _)) x H2).
-   2: apply eq_transitive_unfolded with (PartInt (fi (S n) Hf n (lt_S _ _ (lt_n_Sn _))) x H2).
+  apply eq_transitive_unfolded with (PartInt (fi n H1 n (Nat.lt_succ_diag_r _)) x H2).
+   2: apply eq_transitive_unfolded with (PartInt (fi (S n) Hf n (Nat.lt_lt_succ_r _ _ (Nat.lt_succ_diag_r _))) x H2).
     simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
    2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
   apply Feq_imp_eq with (Compact Hab).
    unfold Hab in |- *; apply Derivative_I_n_unique with n F; apply Taylor_lemma1.
   auto.
- apply Derivative_I_wdr with (funct_aux (S n) Hf' (pred (S n)) (lt_5 _ _ (lt_n_Sn (S n))) {+}
-   (funct_aux _ Hf' _ (lt_n_Sn (S n)) {-}
-     funct_aux (S n) Hf' (pred (S n)) (lt_5 _ _ (lt_n_Sn (S n))))).
+ apply Derivative_I_wdr with (funct_aux (S n) Hf' (pred (S n)) (lt_5 _ _ (Nat.lt_succ_diag_r (S n))) {+}
+   (funct_aux _ Hf' _ (Nat.lt_succ_diag_r (S n)) {-}
+     funct_aux (S n) Hf' (pred (S n)) (lt_5 _ _ (Nat.lt_succ_diag_r (S n))))).
   Opaque funct_aux.
   FEQ.
    Transparent funct_aux.
    repeat (split; auto).
   repeat (split; auto).
  apply Derivative_I_plus.
-  apply Derivative_I_wdr with (funct_aux n Hf n (lt_n_Sn n)).
+  apply Derivative_I_wdr with (funct_aux n Hf n (Nat.lt_succ_diag_r n)).
    apply eq_imp_Feq.
      repeat (split; auto).
     repeat (split; auto).
    intros x H2 Hx Hx'; simpl in |- *.
    repeat apply mult_wdl.
-   apply eq_transitive_unfolded with (PartInt (fi (S n) Hf (S n) (lt_n_S _ _ (lt_n_Sn _))) x H2).
+   apply eq_transitive_unfolded with (PartInt (fi (S n) Hf (S n) (lt_n_S _ _ (Nat.lt_succ_diag_r _))) x H2).
     2: apply eq_transitive_unfolded with (PartInt
-      (fi (S (S n)) Hf' (S n) (lt_n_S _ _ (lt_5 _ _ (lt_n_Sn (S n))))) x H2).
+      (fi (S (S n)) Hf' (S n) (lt_n_S _ _ (lt_5 _ _ (Nat.lt_succ_diag_r (S n))))) x H2).
      simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
     2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
    apply Feq_imp_eq with (Compact Hab).
@@ -644,14 +644,14 @@ Proof.
 Qed.
 
 Let g' n Hf Hf' Hab :=
- [-C-] (Taylor_rem n Hf[/] (b[-]a) [//]Hab) {-}funct_aux n Hf' n (lt_n_Sn n).
+ [-C-] (Taylor_rem n Hf[/] (b[-]a) [//]Hab) {-}funct_aux n Hf' n (Nat.lt_succ_diag_r n).
 
 Lemma Taylor_lemma10 : forall n Hf Hf' Hab (H : a [#] b),
  Derivative_I Hab' (g n Hf Hab) (g' n Hf Hf' Hab).
 Proof.
  unfold g, g' in |- *.
  intros.
- cut (Derivative_I Hab' (Taylor_seq'_aux n Hf) (funct_aux n Hf' n (lt_n_Sn n)));
+ cut (Derivative_I Hab' (Taylor_seq'_aux n Hf) (funct_aux n Hf' n (Nat.lt_succ_diag_r n)));
    [ intro | apply Taylor_lemma9; assumption ].
  Opaque Taylor_rem funct_aux.
  New_Deriv.
@@ -773,7 +773,7 @@ Proof.
  elim H0; intros c Hc' Hc; clear H0; exists c.
   auto.
  intro.
- cut (Dom (funct_aux n Hf' n (lt_n_Sn n)) c). intro H0.
+ cut (Dom (funct_aux n Hf' n (Nat.lt_succ_diag_r n)) c). intro H0.
   apply leEq_wdl with (AbsIR (((Taylor_rem n Hf[/] _[//]H) [-]Part _ _ H0) [*] (b[-]a))).
    eapply leEq_wdl.
     2: apply eq_symmetric_unfolded; apply AbsIR_resp_mult.
@@ -808,7 +808,7 @@ Proof.
       ([1][/] _[//]nring_fac_ap_zero _ n) [*] (b[-]c) [^]n).
      repeat apply mult_wdl; apply pfwdef; algebra.
     repeat apply mult_wdl.
-    apply eq_transitive_unfolded with (PartInt (fi (S n) Hf' (S n) (lt_n_S _ _ (lt_n_Sn _))) c Hc').
+    apply eq_transitive_unfolded with (PartInt (fi (S n) Hf' (S n) (lt_n_S _ _ (Nat.lt_succ_diag_r _))) c Hc').
      2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
     apply Feq_imp_eq with (Compact Hab).
      unfold Hab in |- *; apply Derivative_I_n_unique with (S n) F.

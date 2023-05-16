@@ -36,7 +36,7 @@ Proof.
  intro m; destruct m.
   intro H; inversion H.
  destruct m.
-  intro H; destruct (lt_irrefl _ H).
+  intro H; destruct (Nat.lt_irrefl _ H).
  reflexivity.
 Qed.
 

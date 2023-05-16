@@ -78,7 +78,7 @@ Proof.
       unfold Qle, Qnum, Qden.
       do 2 rewrite Z.mul_1_l. apply Pos2Z.pos_le_pos, Pos2Nat.inj_le.
       rewrite Nat2Pos.id. apply (Nat.le_trans _ _ _ H).
-      apply le_S, le_refl. discriminate.
+      apply le_S, Nat.le_refl. discriminate.
       apply CRmin_glb. apply CRabs_pos.
       apply CR_of_Q_le. discriminate.
 Defined.

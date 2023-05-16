@@ -500,8 +500,8 @@ Proof.
       destruct H.
       specialize (IHn x) as [H0 _].
       destruct (H0 H). exists x0. split. apply (Nat.le_trans _ n).
-      apply H1. apply le_S, le_refl. apply H1.
-      exists (S n). split. apply le_refl. apply H.
+      apply H1. apply le_S, Nat.le_refl. apply H1.
+      exists (S n). split. apply Nat.le_refl. apply H.
     + intros. destruct H as [p [pxp H]].
       apply Nat.le_succ_r in pxp. destruct pxp.
       (* p <= n *)
@@ -518,13 +518,13 @@ Lemma applyIntersectIterate
 Proof.
   induction n.
   - split. intros. simpl in H. inversion H0. subst p. exact H.
-    intros. simpl. apply H. apply le_refl.
+    intros. simpl. apply H. apply Nat.le_refl.
   - split.
     + intros. apply Nat.le_succ_r in H0. destruct H0.
       apply IHn. apply H. exact H0. subst p. apply H.
     + intros. split. apply IHn. intros. apply H.
-      apply (Nat.le_trans _ _ _ H0). apply le_S, le_refl.
-      apply H. apply le_refl.
+      apply (Nat.le_trans _ _ _ H0). apply le_S, Nat.le_refl.
+      apply H. apply Nat.le_refl.
 Qed.
 
 Definition IntegrableSetUnionIterate
@@ -685,7 +685,7 @@ Lemma CharacFuncStationary
 Proof.
   intros. destruct (H 2%positive) as [p pcv]. auto. exists p.
   intros. simpl. simpl in pcv.
-  specialize (pcv p n (le_refl _) H0).
+  specialize (pcv p n (Nat.le_refl _) H0).
   assert (CR_of_Q R (1 # 2) < 1).
   { apply CR_of_Q_lt. reflexivity. }
   destruct (xn p), (xn n). reflexivity. 3: reflexivity.
@@ -733,7 +733,7 @@ Proof.
       destruct k. contradiction. simpl in n0. apply n0.
       right. exact abs. apply n. apply applyUnionIterate.
       exists k. split. unfold lt in l. apply (Nat.le_trans _ (S k)).
-      apply le_S, le_refl. exact l. exact abs.
+      apply le_S, Nat.le_refl. exact l. exact abs.
     + intros. apply applyPointwiseLimit. simpl.
       destruct xD as [xn xcv]. destruct xG.
       simpl in xn.
@@ -791,13 +791,13 @@ Proof.
       simpl in pcv.
       destruct (xn p). left. intros.
       destruct (le_lt_dec p n). specialize (pcv n l).
-      destruct (xn n). rewrite applyIntersectIterate in i0. apply i0, le_refl.
+      destruct (xn n). rewrite applyIntersectIterate in i0. apply i0, Nat.le_refl.
       exfalso. symmetry in pcv. pose proof CRzero_lt_one.
       specialize (X (RealT (ElemFunc IS))) as H0.
       rewrite pcv in H0. exact (CRlt_asym _ _ H0 H0).
       rewrite applyIntersectIterate in i. apply i.
       apply (Nat.le_trans _ (S n)).
-      apply le_S, le_refl. exact l.
+      apply le_S, Nat.le_refl. exact l.
       right. intro abs. apply n. rewrite applyIntersectIterate. intros.
       apply abs.
     + intros. apply applyPointwiseLimit. simpl.
@@ -813,12 +813,12 @@ Proof.
       exfalso. (* if in all An above p and intersect p, means all n *)
       apply n. intros n1.
       destruct (le_lt_dec p n1). specialize (pcv n1 l).
-      destruct (xn n1). rewrite applyIntersectIterate in i1. apply i1, le_refl.
+      destruct (xn n1). rewrite applyIntersectIterate in i1. apply i1, Nat.le_refl.
       exfalso. symmetry in pcv. pose proof CRzero_lt_one.
       specialize (X (RealT (ElemFunc IS))).
       rewrite pcv in X. exact (CRlt_asym _ _ X X).
       rewrite applyIntersectIterate in i0. apply i0.
-      apply (Nat.le_trans _ (S n1)). apply le_S, le_refl. exact l.
+      apply (Nat.le_trans _ (S n1)). apply le_S, Nat.le_refl. exact l.
       (* So it is not in the intersection at p *)
       specialize (pcv i H0). destruct (xn i).
       exfalso. pose proof CRzero_lt_one.
@@ -896,7 +896,7 @@ Proof.
       unfold INR. rewrite <- CR_of_Q_plus. apply CR_of_Q_morph.
       rewrite Qinv_plus_distr. rewrite <- Nat2Z.inj_add.
       rewrite Nat.sub_add. reflexivity. specialize (H (S k)).
-      apply (Nat.le_trans _ (S (nk (S k)))). apply le_S, le_refl.
+      apply (Nat.le_trans _ (S (nk (S k)))). apply le_S, Nat.le_refl.
       apply H. rewrite CRplus_comm. unfold CRminus.
       rewrite CRplus_assoc, CRplus_opp_l, CRplus_0_r.
       reflexivity. }
@@ -908,7 +908,7 @@ Proof.
   apply CR_of_Q_le. unfold Qle; simpl.
   do 2 rewrite Z.mul_1_r. apply Nat2Z.inj_le.
   apply (Nat.le_trans _ _ _ H3). apply (Nat.le_trans _ (S i)).
-  apply le_S, le_refl. apply growing_infinite. exact H.
+  apply le_S, Nat.le_refl. apply growing_infinite. exact H.
 Qed.
 
 Lemma SliceNonNegFunc

@@ -94,7 +94,7 @@ Lemma Partition_in_compact : forall a b Hab lng (P : Partition a b Hab lng) i Hi
 Proof.
  intros.
  split.
-  apply leEq_wdl with (P _ (le_O_n _)).
+  apply leEq_wdl with (P _ (Nat.le_0_l _)).
    apply Partition_mon; auto with arith.
   apply start.
  apply leEq_wdr with (P _ (le_n _)).
@@ -112,7 +112,7 @@ define it.
 Lemma part_pred_lemma : forall a b Hab lng (P : Partition a b Hab lng) i Hi, a [<=] P i Hi.
 Proof.
  intros.
- apply leEq_wdl with (P 0 (le_O_n _)).
+ apply leEq_wdl with (P 0 (Nat.le_0_l _)).
   apply Partition_mon; auto with arith.
  apply start.
 Qed.
@@ -246,7 +246,7 @@ Proof.
    apply (le_not_lt (f j) (f n)); auto with arith.
    apply Hfmon.
    elim (le_lt_eq_dec _ _ H1); intro; auto.
-   rewrite b0 in H0; elim (lt_irrefl (f j)); auto.
+   rewrite b0 in H0; elim (Nat.lt_irrefl (f j)); auto.
   rewrite <- Hfn in Hi'; auto.
  apply mon_fun_covers; auto.
  exists n; clear Hf Hfmon.
@@ -263,7 +263,7 @@ some condition.  We define the condition and the sum for a fixed [P]:
 *)
 
 Definition Points_in_Partition (g : forall i, i < n -> IR) : CProp :=
-  forall i Hi, Compact (prf2 _ _ _ _ P i (lt_le_weak _ _ Hi) Hi) (g i Hi).
+  forall i Hi, Compact (prf2 _ _ _ _ P i (Nat.lt_le_incl _ _ Hi) Hi) (g i Hi).
 
 Lemma Pts_part_lemma : forall g, Points_in_Partition g -> forall i Hi, compact a b Hab (g i Hi).
 Proof.
@@ -272,7 +272,7 @@ Proof.
  split.
   eapply leEq_transitive.
    2: apply a0.
-  apply leEq_wdl with (P 0 (le_O_n _)).
+  apply leEq_wdl with (P 0 (Nat.le_0_l _)).
    apply Partition_mon; auto with arith.
   apply start.
  eapply leEq_transitive.
@@ -284,7 +284,7 @@ Qed.
 
 Definition Partition_Sum g F (H : Points_in_Partition g) (incF : included (Compact Hab) (Dom F)) :=
  Sumx (fun i Hi => F (g i Hi) (incF _ (Pts_part_lemma _ H i Hi)) [*]
-     (P (S i) Hi[-]P i (lt_le_weak _ _ Hi))).
+     (P (S i) Hi[-]P i (Nat.lt_le_incl _ _ Hi))).
 
 End Refinements.
 
@@ -323,7 +323,7 @@ Variable Q : Partition a b Hab m.
 Definition Partition_imp_points : forall i : nat, i < m -> IR.
 Proof.
  intros.
- apply (Q i (lt_le_weak _ _ H)).
+ apply (Q i (Nat.lt_le_incl _ _ H)).
 Defined.
 
 Lemma Partition_imp_points_1 : Points_in_Partition Q Partition_imp_points.
@@ -824,7 +824,7 @@ Lemma pos_AntiMesh : forall n (P : Partition Hab n),
  0 < n -> _Separated P -> [0] [<] AntiMesh P.
 Proof.
  intro; case n; clear n.
-  intros P H H0; exfalso; apply (lt_irrefl _ H).
+  intros P H H0; exfalso; apply (Nat.lt_irrefl _ H).
  intros n P H H0.
  unfold AntiMesh in |- *.
  apply less_minlist.
@@ -848,7 +848,7 @@ endpoints of the interval are the same then it must have one point.
 Lemma partition_length_zero : Partition Hab 0 -> a [=] b.
 Proof.
  intro H.
- Step_final (H 0 (le_O_n 0)).
+ Step_final (H 0 (Nat.le_0_l 0)).
 Qed.
 
 Lemma _Separated_imp_length_zero : forall n (P : Partition Hab n),
@@ -859,7 +859,7 @@ Proof.
  cut (0 < n); [ intro | apply neq_O_lt; auto ].
  cut (a [#] b).
   exact (eq_imp_not_ap _ _ _ H0).
- astepl (P _ (le_O_n _)).
+ astepl (P _ (Nat.le_0_l _)).
  astepr (P _ (le_n _)).
  apply less_imp_ap.
  apply local_mon_imp_mon_le with (f := fun (i : nat) (H : i <= n) => P i H).

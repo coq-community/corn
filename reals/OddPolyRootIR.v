@@ -100,7 +100,7 @@ Proof.
    apply leEq_transitive with X; auto.
   apply monic_cpoly_linear with c; auto.
  rewrite <- y in H0.
- elim (lt_irrefl _ H0).
+ elim (Nat.lt_irrefl _ H0).
 Qed.
 
 Lemma cpoly_pos : forall (p : RX) n, 0 < n -> monic n p -> {x : R | [0] [<=] p ! x}.

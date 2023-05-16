@@ -227,7 +227,7 @@ Lemma FreeSubsetsFull : forall l : list bool,
               /\ nth k (FreeSubsets (length l)) nil = l }.
 Proof.
   induction l as [|a l].
-  - exists O. split. apply le_refl. reflexivity.
+  - exists O. split. apply Nat.le_refl. reflexivity.
   - simpl. destruct IHl as [k [H H0]]. destruct a.
     + exists k. split. rewrite app_length, map_length, map_length.
       apply (Nat.lt_le_trans _ (0+length (FreeSubsets (length l)))).
@@ -244,7 +244,7 @@ Proof.
       reflexivity. rewrite map_length. exact H.
       rewrite map_length.
       apply (Nat.le_trans _ (0+length (FreeSubsets (length l)))).
-      apply le_refl. rewrite <- Nat.add_le_mono_r. apply le_0_n.
+      apply Nat.le_refl. rewrite <- Nat.add_le_mono_r. apply le_0_n.
 Qed.
 
 Lemma FreeSubsetsDifferent : forall (n p q : nat),
@@ -2175,7 +2175,7 @@ Proof.
     apply CR_of_Q_le. unfold Qle, Qnum, Qden.
     do 2 rewrite Z.mul_1_l. apply Pos2Z.pos_le_pos, Pos2Nat.inj_le.
     rewrite Nat2Pos.id. 2: discriminate. apply (Nat.le_trans _ _ _ H1).
-    apply le_S, le_refl. apply CR_of_Q_le. discriminate.
+    apply le_S, Nat.le_refl. apply CR_of_Q_le. discriminate.
 Qed.
 
 Lemma ProductMinLimits

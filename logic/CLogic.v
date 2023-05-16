@@ -404,7 +404,7 @@ Proof.
   intros n0 H H0.
   apply Cle_S.
   apply H.
-  apply le_O_n.
+  apply Nat.le_0_l.
  simple induction n.
   intro.
   exfalso.
@@ -744,7 +744,7 @@ definitions keeping conciseness.
 Lemma Clt_le_weak : forall i j : nat, Clt i j -> Cle i j.
 Proof.
  intros.
- apply toCle; apply lt_le_weak; apply Clt_to; assumption.
+ apply toCle; apply Nat.lt_le_incl; apply Clt_to; assumption.
 Qed.
 
 Lemma lt_5 : forall i n : nat, i < n -> pred i < n.
@@ -871,8 +871,8 @@ Proof.
  cut (~ i <> j); [ lia | intro H1 ].
  cut (i < j \/ j < i); [ intro H2 | lia ].
  inversion_clear H2.
-  cut (h i < h j); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
- cut (h j < h i); [ rewrite H0; apply lt_irrefl | apply H; assumption ].
+  cut (h i < h j); [ rewrite H0; apply Nat.lt_irrefl | apply H; assumption ].
+ cut (h j < h i); [ rewrite H0; apply Nat.lt_irrefl | apply H; assumption ].
 Qed.
 
 (** And (not completely trivial) a function that preserves [lt] also preserves [le]. *)
@@ -882,7 +882,7 @@ Lemma nat_mon_imp_mon' : (forall i j : nat, i < j -> h i < h j) ->
 Proof.
  intros H i j H0.
  elim (le_lt_eq_dec _ _ H0); intro H1.
-  apply lt_le_weak; apply H; assumption.
+  apply Nat.lt_le_incl; apply H; assumption.
  rewrite H1; apply le_n.
 Qed.
 
@@ -901,8 +901,8 @@ Proof.
  induction  k as [| k Hreck].
   exists 0.
    rewrite H0; auto with arith.
-  cut (h 0 < h 1); [ intro; apply Nat.le_trans with (h 0); auto with arith | apply H; apply lt_n_Sn ].
- cut (h k < h (S k)); [ intro H2 | apply H; apply lt_n_Sn ].
+  cut (h 0 < h 1); [ intro; apply Nat.le_trans with (h 0); auto with arith | apply H; apply Nat.lt_succ_diag_r ].
+ cut (h k < h (S k)); [ intro H2 | apply H; apply Nat.lt_succ_diag_r ].
  elim (le_lt_dec (S n) (h k)); intro H3.
   elim (Hreck H3); intros i Hi.
   exists i; assumption.
@@ -927,13 +927,13 @@ Proof.
   apply Nat.le_lt_trans with (f m).
    rewrite b; auto with arith.
   apply H.
-  rewrite b; apply lt_n_Sn.
+  rewrite b; apply Nat.lt_succ_diag_r.
  intros.
  elim (le_lt_eq_dec _ _ H0); intro.
   auto with arith.
  cut (i = m); [ intro | auto ].
  rewrite b; rewrite <- H1.
- apply lt_n_Sn.
+ apply Nat.lt_succ_diag_r.
 Qed.
 
 End Natural_Numbers.
@@ -1491,13 +1491,13 @@ Proof.
   apply Zle_lt_succ.
   change (Z_of_nat 0 <= Z_of_nat n)%Z in |- *.
   apply Znat.inj_le.
-  apply le_O_n.
+  apply Nat.le_0_l.
  apply Z.lt_gt.
  change (0 < Z.succ (Z_of_nat m))%Z in |- *.
  apply Zle_lt_succ.
  change (Z_of_nat 0 <= Z_of_nat m)%Z in |- *.
  apply Znat.inj_le.
- apply le_O_n.
+ apply Nat.le_0_l.
 Qed.
 
 Theorem S_predn : forall m : nat, m <> 0 -> S (pred m) = m.

@@ -271,10 +271,10 @@ Proof.
   change (L[<=]R).
   rstepr (R[*][1]).
   rewrite <- (@one_MVP_apply Q_as_CRing _ (Vector.cons _ a _ v0)).
-  stepr (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (Nat.lt_le_trans _ _ _ H (le_refl _))))) (Vector.cons _ a _ v0))).
+  stepr (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (Nat.lt_le_trans _ _ _ H (Nat.le_refl _))))) (Vector.cons _ a _ v0))).
    fold (MultivariatePolynomial Q_as_CRing n).
    unfold L, R; clear L R.
-   generalize (le_refl (S m)).
+   generalize (Nat.le_refl (S m)).
    revert b.
    generalize (S m) at 1 2 5 6 7 8 9.
    induction b as [| a0]; intros l.
@@ -294,18 +294,18 @@ Proof.
    do 2 rewrite -> MVP_plus_apply.
    rewrite ->  (Qplus_comm (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
      Bernstein (MultivariatePolynomial Q_as_CRing n)
-       (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (lt_S i n1 l0) l)))) (Vector.cons Q a n v0))).
+       (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 l0) l)))) (Vector.cons Q a n v0))).
    rewrite -> Qmult_comm.
    rewrite -> Qmult_plus_distr_l.
    apply Qplus_le_compat; rewrite -> Qmult_comm; rewrite -> Qmax_mult_pos_distr_l.
       replace LHS with (MVP_apply Q_as_CRing a0 v0 * @MVP_apply Q_as_CRing (S n)
         (Bernstein (MultivariatePolynomial Q_as_CRing n)
-          (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))) (Vector.cons _ a _ v0)).
+          (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))) (Vector.cons _ a _ v0)).
        apply Qmax_ub_l.
       simpl.
       rewrite <- (MVP_mult_apply Q_as_CRing).
       apply: MVP_apply_wd; try reflexivity.
-      replace (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
+      replace (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))
         with (Le.le_S_n n1 m l) by apply le_irrelevent.
       apply c_mult_apply.
      apply MVP_BernsteinNonNeg; auto.
@@ -323,7 +323,7 @@ Proof.
     apply MVP_apply_wd; try reflexivity.
     apply Sumx_wd.
     intros i H.
-    replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (lt_S i n1 H) l))
+    replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) l))
       with (lt_n_Sm_le i m (Nat.lt_le_trans i n1 (S m) H (le_Sn_le n1 (S m) l))) by apply le_irrelevent.
     reflexivity.
    clear - Ha0 Ha1.
@@ -331,18 +331,18 @@ Proof.
     rewrite -> zero_MVP_apply.
     auto with *.
    simpl (Sumx (fun (i : nat) (l0 : (i < S n1)%nat) => Bernstein (MultivariatePolynomial Q_as_CRing n)
-     (lt_n_Sm_le i m (Nat.lt_le_trans i (S (S n1)) (S m) (lt_S i (S n1) l0) l)))).
+     (lt_n_Sm_le i m (Nat.lt_le_trans i (S (S n1)) (S m) (Nat.lt_lt_succ_r i (S n1) l0) l)))).
    rewrite -> MVP_plus_apply.
    apply: plus_resp_nonneg.
     stepr (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
       Bernstein (MultivariatePolynomial Q_as_CRing n)
-        (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (lt_S i n1 l0) (le_Sn_le _ _ l))))) (Vector.cons _ a _ v0)).
+        (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 l0) (le_Sn_le _ _ l))))) (Vector.cons _ a _ v0)).
      apply IHn1.
     apply MVP_apply_wd; try reflexivity.
     apply Sumx_wd.
     intros i H.
-    replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (lt_S i n1 H) (le_Sn_le (S n1) (S m) l)))
-      with (lt_n_Sm_le i m (Nat.lt_le_trans i (S (S n1)) (S m) (lt_S i (S n1) (lt_S i n1 H)) l))
+    replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) (le_Sn_le (S n1) (S m) l)))
+      with (lt_n_Sm_le i m (Nat.lt_le_trans i (S (S n1)) (S m) (Nat.lt_lt_succ_r i (S n1) (Nat.lt_lt_succ_r i n1 H)) l))
         by apply le_irrelevent.
     reflexivity.
    apply MVP_BernsteinNonNeg; auto with *.
@@ -352,7 +352,7 @@ Proof.
   rewrite <- (fun X => partitionOfUnity X m).
   apply Sumx_wd.
   intros i H.
-  replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S m) (S m) H (le_refl (S m))))
+  replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S m) (S m) H (Nat.le_refl (S m))))
     with (lt_n_Sm_le i m H) by apply le_irrelevent.
   reflexivity.
  clear - IHn Hv.
@@ -399,10 +399,10 @@ Proof.
  change (R[<=]L).
  rstepl (R[*][1]).
  rewrite <- (@one_MVP_apply Q_as_CRing _ (Vector.cons _ a _ v0)).
- stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (Nat.lt_le_trans _ _ _ H (le_refl _))))) (Vector.cons _ a _ v0))).
+ stepl (R[*](@MVP_apply Q_as_CRing (S n) (@Sumx (cpoly_cring _) _ (fun i H => Bernstein _ (lt_n_Sm_le i m (Nat.lt_le_trans _ _ _ H (Nat.le_refl _))))) (Vector.cons _ a _ v0))).
   fold (MultivariatePolynomial Q_as_CRing n).
   unfold L, R; clear L R.
-  generalize (le_refl (S m)).
+  generalize (Nat.le_refl (S m)).
   revert b.
   generalize (S m) at 1 2 4 5 6 7 10.
   induction b as [| a0]; intros l.
@@ -422,18 +422,18 @@ Proof.
   do 2 rewrite -> MVP_plus_apply.
   rewrite ->  (Qplus_comm (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
     Bernstein (MultivariatePolynomial Q_as_CRing n)
-      (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (lt_S i n1 l0) l)))) (Vector.cons _ a _ v0))).
+      (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 l0) l)))) (Vector.cons _ a _ v0))).
   rewrite ->  Qmult_comm.
   rewrite -> Qmult_plus_distr_l.
   apply Qplus_le_compat; rewrite -> Qmult_comm; rewrite -> Qmin_mult_pos_distr_l.
      replace RHS with (MVP_apply Q_as_CRing a0 v0 * @MVP_apply Q_as_CRing (S n)
        (Bernstein (MultivariatePolynomial Q_as_CRing n)
-         (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))) (Vector.cons _ a _ v0)).
+         (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))) (Vector.cons _ a _ v0)).
       apply Qmin_lb_l.
      simpl.
      rewrite <- (MVP_mult_apply Q_as_CRing).
      apply: MVP_apply_wd; try reflexivity.
-     replace (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (lt_n_Sn n1) l))
+     replace (lt_n_Sm_le n1 m (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))
        with (Le.le_S_n n1 m l) by apply le_irrelevent.
      apply c_mult_apply.
     apply MVP_BernsteinNonNeg; auto.
@@ -451,7 +451,7 @@ Proof.
    apply MVP_apply_wd; try reflexivity.
    apply Sumx_wd.
    intros i H.
-   replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (lt_S i n1 H) l))
+   replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) l))
      with (lt_n_Sm_le i m (Nat.lt_le_trans i n1 (S m) H (le_Sn_le n1 (S m) l))) by apply le_irrelevent.
    reflexivity.
   clear - Ha0 Ha1.
@@ -459,18 +459,18 @@ Proof.
    rewrite -> zero_MVP_apply.
    auto with *.
   simpl (Sumx (fun (i : nat) (l0 : (i < S n1)%nat) => Bernstein (MultivariatePolynomial Q_as_CRing n)
-    (lt_n_Sm_le i m (Nat.lt_le_trans i (S (S n1)) (S m) (lt_S i (S n1) l0) l)))).
+    (lt_n_Sm_le i m (Nat.lt_le_trans i (S (S n1)) (S m) (Nat.lt_lt_succ_r i (S n1) l0) l)))).
   rewrite -> MVP_plus_apply.
   apply: plus_resp_nonneg.
    stepr (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
      Bernstein (MultivariatePolynomial Q_as_CRing n)
-       (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (lt_S i n1 l0) (le_Sn_le _ _ l))))) (Vector.cons _ a _ v0)).
+       (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 l0) (le_Sn_le _ _ l))))) (Vector.cons _ a _ v0)).
     apply IHn1.
    apply MVP_apply_wd; try reflexivity.
    apply Sumx_wd.
    intros i H.
-   replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (lt_S i n1 H) (le_Sn_le (S n1) (S m) l)))
-     with (lt_n_Sm_le i m (Nat.lt_le_trans i (S (S n1)) (S m) (lt_S i (S n1) (lt_S i n1 H)) l))
+   replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) (le_Sn_le (S n1) (S m) l)))
+     with (lt_n_Sm_le i m (Nat.lt_le_trans i (S (S n1)) (S m) (Nat.lt_lt_succ_r i (S n1) (Nat.lt_lt_succ_r i n1 H)) l))
        by apply le_irrelevent.
    reflexivity.
   apply MVP_BernsteinNonNeg; auto with *.
@@ -480,7 +480,7 @@ Proof.
  rewrite <- (fun X => partitionOfUnity X m).
  apply Sumx_wd.
  intros i H.
- replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S m) (S m) H (le_refl (S m))))
+ replace (lt_n_Sm_le i m (Nat.lt_le_trans i (S m) (S m) H (Nat.le_refl (S m))))
    with (lt_n_Sm_le i m H) by apply le_irrelevent.
  reflexivity.
 Qed.

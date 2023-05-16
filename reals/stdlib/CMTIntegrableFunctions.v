@@ -410,7 +410,7 @@ Proof.
       apply cv. apply (Nat.le_trans N n). assumption.
       apply (Nat.le_trans n (n*2)). rewrite <- (mult_1_r n).
       rewrite <- mult_assoc. apply Nat.mul_le_mono_nonneg_l.
-      apply le_0_n. apply le_S. apply le_refl.
+      apply le_0_n. apply le_S. apply Nat.le_refl.
       rewrite <- (plus_0_l (n*2)). rewrite plus_assoc.
       apply Nat.add_le_mono_r. auto.
     + auto.
@@ -437,13 +437,13 @@ Proof.
     apply H. rewrite <- (Nat.div_mul N 2). apply Nat.div_le_mono.
     auto. apply (Nat.le_trans (N*2) (N*2 + (S N0)*2)). apply Nat.le_add_r.
     apply (Nat.le_trans _ i). assumption.
-    apply le_S. apply le_refl. auto.
+    apply le_S. apply Nat.le_refl. auto.
     apply H0. assert (N0 = pred (S N0)). reflexivity.
     rewrite H2. apply le_pred. rewrite <- (Nat.div_mul (S N0) 2).
     apply Nat.div_le_mono. auto.
     apply (Nat.le_trans _ (N*2 + (S N0)*2)).
     rewrite plus_comm. apply Nat.le_add_r.
-    apply (Nat.le_trans (N*2 + (S N0)*2) i). assumption. apply le_S. apply le_refl. auto.
+    apply (Nat.le_trans (N*2 + (S N0)*2) i). assumption. apply le_S. apply Nat.le_refl. auto.
     rewrite Qinv_plus_distr. reflexivity.
     unfold CRminus. do 2 rewrite CRplus_assoc.
     apply CRplus_morph. reflexivity. rewrite CRopp_plus_distr, CRplus_comm.
@@ -455,14 +455,14 @@ Proof.
     apply le_S_n in H1. rewrite CR_of_Q_plus. apply CRplus_le_compat.
     apply H. rewrite <- (Nat.div_mul N 2). apply Nat.div_le_mono.
     auto. apply (Nat.le_trans (N*2) (N*2 + (S N0)*2)). apply Nat.le_add_r.
-    apply (Nat.le_trans _ i). assumption. apply le_S. apply le_refl. auto.
+    apply (Nat.le_trans _ i). assumption. apply le_S. apply Nat.le_refl. auto.
     apply H0. rewrite <- (Nat.div_mul N0 2).
     apply Nat.div_le_mono. auto.
     apply (Nat.le_trans (N0*2) (N*2 + (S N0)*2)). rewrite plus_comm.
     apply (Nat.le_trans (N0 * 2) (S N0 * 2)).
-    apply mult_le_compat_r. apply le_S. apply le_refl.
+    apply mult_le_compat_r. apply le_S. apply Nat.le_refl.
     apply Nat.le_add_r.
-    apply (Nat.le_trans _ i). assumption. apply le_S. apply le_refl. auto.
+    apply (Nat.le_trans _ i). assumption. apply le_S. apply Nat.le_refl. auto.
     rewrite Qinv_plus_distr. reflexivity.
     unfold CRminus. do 2 rewrite CRplus_assoc.
     apply CRplus_morph. reflexivity. rewrite CRopp_plus_distr, CRplus_comm.
@@ -1002,7 +1002,7 @@ Proof.
   + apply CRmult_lt_0_compat. rewrite <- (CRplus_opp_r a).
     apply CRplus_lt_compat_r. exact H0.
     apply CR_of_Q_lt. reflexivity.
-  + exists N. specialize (H1 N (le_refl N)).
+  + exists N. specialize (H1 N (Nat.le_refl N)).
     rewrite CRabs_minus_sym in H1.
     apply (CRle_lt_trans (s - CRsum u N)) in H1.
     apply (CRmult_lt_compat_r (CR_of_Q R 2)) in H1.

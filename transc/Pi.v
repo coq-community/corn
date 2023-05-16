@@ -496,7 +496,7 @@ Proof.
  astepr (Lim (Build_CauchySeq _ _ pi_seq_Cauchy) [-] Lim (Build_CauchySeq _ _ pi_seq_Cauchy)).
  assert (H : Cauchy_prop (fun n : nat => pi_seq (S n))).
   apply conv_seq_imp_conv_subseq with pi_seq S; auto with arith.
-    intro; exists (S n); split; apply lt_n_Sn.
+    intro; exists (S n); split; apply Nat.lt_succ_diag_r.
    simpl in |- *; auto.
    algebra.
   apply pi_seq_Cauchy.
@@ -504,7 +504,7 @@ Proof.
    (Lim (Build_CauchySeq _ _ H) [-]Lim (Build_CauchySeq _ _ pi_seq_Cauchy)).
   2: apply cg_minus_wd; algebra.
   2: apply Lim_subseq_eq_Lim_seq with S; auto with arith.
-    2: intro; exists (S n); split; apply lt_n_Sn.
+    2: intro; exists (S n); split; apply Nat.lt_succ_diag_r.
    2: simpl in |- *; auto.
    2: algebra.
   2: left; intros; simpl in |- *.

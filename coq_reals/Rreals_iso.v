@@ -410,7 +410,7 @@ Proof.
  exists (S N).
  intros m Hm.
  assert (N <= pred m)%nat by  auto with *.
- assert (HH := HN (pred m) N H (le_refl N)).
+ assert (HH := HN (pred m) N H (Nat.le_refl N)).
  clear - HH Hm.
  destruct m.
   exfalso.

@@ -153,7 +153,7 @@ Proof. intro. reflexivity. Qed.
 Lemma degree_le_c_ : forall c : R, degree_le 0 (_C_ c).
 Proof.
  unfold degree_le in |- *. intros c m. elim m; intros.
- elim (lt_irrefl _ H).
+ elim (Nat.lt_irrefl _ H).
  simpl in |- *. algebra.
 Qed.
 
@@ -171,7 +171,7 @@ Lemma degree_le_x_ : degree_le 1 (_X_:RX).
 Proof.
  unfold degree_le in |- *.
  intro. elim m. intros. elim (lt_n_O _ H).
- intro. elim n. intros. elim (lt_irrefl _ H0).
+ intro. elim n. intros. elim (Nat.lt_irrefl _ H0).
  intros. simpl in |- *. algebra.
 Qed.
 
@@ -463,7 +463,7 @@ Qed.
 Lemma poly_degree_lth : forall p : RX, degree_le (lth_of_poly p) p.
 Proof.
  unfold degree_le in |- *. intros. apply not_ap_imp_eq. intro.
- elim (lt_not_le _ _ H). apply lt_le_weak.
+ elim (lt_not_le _ _ H). apply Nat.lt_le_incl.
  apply lt_i_lth_of_poly. auto.
 Qed.
 

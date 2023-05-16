@@ -210,7 +210,7 @@ Proof.
  eapply eq_transitive_unfolded.
   2: apply eq_symmetric_unfolded; apply ring_dist_unfolded.
  apply bin_op_wd_unfolded.
-  apply H with (f := fun i l => f i (lt_S _ _ l)).
+  apply H with (f := fun i l => f i (Nat.lt_lt_succ_r _ _ l)).
  algebra.
 Qed.
 

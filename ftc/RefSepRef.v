@@ -226,10 +226,10 @@ Proof.
  elim (le_lt_eq_dec _ _ Hi); elim (le_lt_eq_dec _ _ Hj); elim (le_lt_dec i 0); intros; simpl in |- *.
         algebra.
        apply RSR_h_nlnf; reflexivity.
-      exfalso; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
-     exfalso; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
-    exfalso; rewrite <- b0 in a1; apply (lt_irrefl _ a1).
-   exfalso; rewrite <- b1 in a0; apply (lt_irrefl _ a0).
+      exfalso; rewrite <- b0 in a1; apply (Nat.lt_irrefl _ a1).
+     exfalso; rewrite <- b1 in a0; apply (Nat.lt_irrefl _ a0).
+    exfalso; rewrite <- b0 in a1; apply (Nat.lt_irrefl _ a1).
+   exfalso; rewrite <- b1 in a0; apply (Nat.lt_irrefl _ a0).
   algebra.
  algebra.
 Qed.
@@ -256,8 +256,8 @@ Proof.
  intros; unfold Separated_Refinement_fun in |- *; simpl in |- *.
  elim (le_lt_eq_dec _ _ H); elim (le_lt_dec 0 0); intros; simpl in |- *.
     algebra.
-    exfalso; apply (lt_irrefl _ a1).
-   exfalso; apply (lt_irrefl _ a0).
+    exfalso; apply (Nat.lt_irrefl _ a1).
+   exfalso; apply (Nat.lt_irrefl _ a0).
   algebra.
  algebra.
 Qed.
@@ -274,11 +274,11 @@ Proof.
         red in |- *; intros.
         apply leEq_wdr with x; assumption.
        intros; unfold f' in |- *.
-       astepl (P 0 (le_O_n _)).
-       apply Partition_mon; apply le_O_n.
+       astepl (P 0 (Nat.le_0_l _)).
+       apply Partition_mon; apply Nat.le_0_l.
       intros; unfold g' in |- *.
-      astepl (R 0 (le_O_n _)).
-      apply Partition_mon; apply le_O_n.
+      astepl (R 0 (Nat.le_0_l _)).
+      apply Partition_mon; apply Nat.le_0_l.
      exfalso; inversion a2.
     apply less_leEq; apply RSR_h_mon; auto with arith.
    elim (le_lt_dec i 0); elim (le_lt_dec (S i) 0); intros; simpl in |- *.
@@ -354,7 +354,7 @@ Proof.
  elim (le_lt_dec n i); intro; simpl in |- *.
   exfalso; apply le_not_lt with n i; auto.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  exfalso; apply lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
+  exfalso; apply Nat.lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
  set (x := ProjT1 (RSR_h_f' _ (lt_pred' _ _ b1 b0))) in *.
  set (y := ProjT1 (RSR_h_f' _ (lt_pred' _ _ Hi Hi'))) in *.
  cut (x = y).
@@ -382,7 +382,7 @@ Proof.
   apply partition_length_zero with Hab; rewrite <- H; apply P.
  elim (le_lt_dec n n); intro; simpl in |- *.
   rewrite <- minus_n_n; auto.
- exfalso; apply lt_irrefl with n; auto.
+ exfalso; apply Nat.lt_irrefl with n; auto.
 Qed.
 
 Lemma RSR_auxP_lemma1 : forall i j : nat, i < j -> RSR_auxP i < RSR_auxP j.
@@ -397,13 +397,13 @@ Proof.
    lia.
   apply lt_O_Sn.
  elim (le_lt_dec n i); elim (le_lt_dec j 0); intros; simpl in |- *.
-    elim (lt_irrefl 0); apply Nat.lt_le_trans with j; try apply Nat.le_lt_trans with i; auto with arith.
+    elim (Nat.lt_irrefl 0); apply Nat.lt_le_trans with j; try apply Nat.le_lt_trans with i; auto with arith.
    elim (le_lt_dec n j); intro; simpl in |- *.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with n.
     repeat rewrite <- le_plus_minus; auto.
    elim (le_not_lt n i); auto; apply Nat.lt_trans with j; auto.
-  elim (lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
+  elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec n j); intro; simpl in |- *.
   apply Nat.lt_le_trans with (S (pred m + pred n)).
    apply lt_n_S.
@@ -418,7 +418,7 @@ Proof.
   rewrite (S_pred m 0); auto with arith.
   apply neq_O_lt.
   intro.
-  apply lt_irrefl with 0.
+  apply Nat.lt_irrefl with 0.
   apply Nat.lt_trans with i; auto.
   rewrite RSR_mn0; auto.
  apply lt_n_S.
@@ -460,7 +460,7 @@ Proof.
   generalize H; clear a0 H; rewrite H0.
   rewrite RSR_auxP_lemma0.
   clear H0; intros.
-  exists (le_O_n (pred (m + n))).
+  exists (Nat.le_0_l (pred (m + n))).
   elim le_lt_eq_dec; intro; simpl in |- *.
    elim (le_lt_dec 0 0); intro; simpl in |- *.
     apply start.
@@ -487,7 +487,7 @@ Proof.
      cut (RSR_auxP i = 0); [ intro | auto with arith ].
      rewrite <- RSR_auxP_lemma0 in H2.
      cut (RSR_auxP 0 < RSR_auxP i); [ intro | apply RSR_auxP_lemma1; assumption ].
-     exfalso; rewrite H2 in H3; apply (lt_irrefl _ H3).
+     exfalso; rewrite H2 in H3; apply (Nat.lt_irrefl _ H3).
     generalize b1 a1; clear b1 a1.
     rewrite (RSR_auxP_lemmai i b0 a0); intros.
     simpl in |- *.
@@ -500,15 +500,15 @@ Proof.
     apply RSR_h_nlnf; reflexivity.
    rewrite <- RSR_auxP_lemman in b1.
    cut (i = n).
-    intro; exfalso; rewrite H2 in a0; apply (lt_irrefl _ a0).
+    intro; exfalso; rewrite H2 in a0; apply (Nat.lt_irrefl _ a0).
    apply nat_mon_imp_inj with (h := RSR_auxP).
     apply RSR_auxP_lemma1.
    assumption.
   unfold RSR_auxP in |- *.
   elim (le_lt_dec i 0); intro; simpl in |- *.
-   apply le_O_n.
+   apply Nat.le_0_l.
   elim (le_lt_dec n i); intro; simpl in |- *.
-   elim (lt_irrefl n); apply Nat.le_lt_trans with i; auto.
+   elim (Nat.lt_irrefl n); apply Nat.le_lt_trans with i; auto.
   apply plus_pred_pred_plus.
   elim (ProjT2 (RSR_h_f' _ (lt_pred' i n b1 b2))); intros.
   assumption.
@@ -516,7 +516,7 @@ Proof.
  rewrite RSR_auxP_lemman.
  exists (le_n (pred (m + n))).
  elim le_lt_eq_dec; intro; simpl in |- *.
-  exfalso; apply (lt_irrefl _ a0).
+  exfalso; apply (Nat.lt_irrefl _ a0).
  apply finish.
 Qed.
 
@@ -545,7 +545,7 @@ Proof.
  elim (le_lt_dec m i); intro; simpl in |- *.
   exfalso; apply le_not_lt with m i; auto.
  elim (le_lt_dec i 0); intro; simpl in |- *.
-  exfalso; apply lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
+  exfalso; apply Nat.lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
  set (x := ProjT1 (RSR_h_g' _ (lt_pred' _ _ b1 b0))) in *.
  set (y := ProjT1 (RSR_h_g' _ (lt_pred' _ _ Hi Hi'))) in *.
  cut (x = y).
@@ -573,7 +573,7 @@ Proof.
   apply partition_length_zero with Hab; rewrite <- H; apply R.
  elim (le_lt_dec m m); intro; simpl in |- *.
   rewrite <- minus_n_n; auto.
- elim (lt_irrefl _ b1).
+ elim (Nat.lt_irrefl _ b1).
 Qed.
 
 Lemma RSR_auxR_lemma1 : forall i j : nat, i < j -> RSR_auxR i < RSR_auxR j.
@@ -588,13 +588,13 @@ Proof.
    lia.
   apply lt_O_Sn.
  elim (le_lt_dec m i); elim (le_lt_dec j 0); intros; simpl in |- *.
-    elim (lt_irrefl 0); apply Nat.le_lt_trans with i; try apply Nat.lt_le_trans with j; auto with arith.
+    elim (Nat.lt_irrefl 0); apply Nat.le_lt_trans with i; try apply Nat.lt_le_trans with j; auto with arith.
    elim (le_lt_dec m j); intro; simpl in |- *.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with m.
     repeat rewrite <- le_plus_minus; auto.
    elim (le_not_lt m i); auto; apply Nat.lt_trans with j; auto.
-  elim (lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
+  elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec m j); intro; simpl in |- *.
   set (H0 := RSR_nm0) in *; set (H1 := RSR_mn0) in *; apply Nat.lt_le_trans with (S (pred m + pred n)).
    apply lt_n_S.
@@ -612,7 +612,7 @@ Proof.
    apply Nat.lt_trans with i; auto.
   apply neq_O_lt.
   intro.
-  apply lt_irrefl with 0.
+  apply Nat.lt_irrefl with 0.
   apply Nat.lt_trans with i; auto.
   rewrite RSR_nm0; auto.
  apply lt_n_S.
@@ -654,7 +654,7 @@ Proof.
   generalize H; clear a0 H; rewrite H0.
   rewrite RSR_auxR_lemma0.
   clear H0; intros.
-  exists (le_O_n (pred (m + n))).
+  exists (Nat.le_0_l (pred (m + n))).
   elim le_lt_eq_dec; intro; simpl in |- *.
    elim (le_lt_dec 0 0); intro; simpl in |- *.
     apply start.
@@ -681,7 +681,7 @@ Proof.
      cut (RSR_auxR j = 0); [ intro | auto with arith ].
      rewrite <- RSR_auxR_lemma0 in H2.
      cut (RSR_auxR 0 < RSR_auxR j); [ intro | apply RSR_auxR_lemma1; assumption ].
-     exfalso; rewrite H2 in H3; apply (lt_irrefl _ H3).
+     exfalso; rewrite H2 in H3; apply (Nat.lt_irrefl _ H3).
     generalize b1 a1; clear b1 a1.
     rewrite (RSR_auxR_lemmai j b0 a0); intros.
     simpl in |- *.
@@ -694,13 +694,13 @@ Proof.
     apply RSR_h_nlnf; reflexivity.
    rewrite <- RSR_auxR_lemmam in b1.
    cut (j = m).
-    intro; exfalso; rewrite H2 in a0; apply (lt_irrefl _ a0).
+    intro; exfalso; rewrite H2 in a0; apply (Nat.lt_irrefl _ a0).
    apply nat_mon_imp_inj with (h := RSR_auxR).
     apply RSR_auxR_lemma1.
    assumption.
   unfold RSR_auxR in |- *.
   elim (le_lt_dec j 0); intro; simpl in |- *.
-   apply le_O_n.
+   apply Nat.le_0_l.
   elim (le_lt_dec m j); intro; simpl in |- *.
    rewrite not_le_minus_0.
     rewrite <- plus_n_O; auto with arith.
@@ -712,7 +712,7 @@ Proof.
  rewrite RSR_auxR_lemmam.
  exists (le_n (pred (m + n))).
  elim le_lt_eq_dec; intro; simpl in |- *.
-  exfalso; apply (lt_irrefl _ a0).
+  exfalso; apply (Nat.lt_irrefl _ a0).
  apply finish.
 Qed.
 

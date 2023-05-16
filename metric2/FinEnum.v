@@ -297,7 +297,7 @@ Proof.
  simpl. apply Pos2Nat.inj_le.
  apply (Nat.le_trans _ _ _ Hmd).
  rewrite nat_of_P_o_P_of_succ_nat_eq_succ.
- apply le_S, le_refl.
+ apply le_S, Nat.le_refl.
  discriminate. discriminate.
 Qed.
 

@@ -35,7 +35,6 @@
  *)
 
 Require Export CoRN.metrics.Prod_Sub.
-Set Automatic Introduction.
 
 Section lists.
 (**

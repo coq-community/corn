@@ -773,7 +773,7 @@ Proof.
  change (x[^]0[<=]x[^]n) in |- *.
  apply great_nexp_resp_le.
   apply less_leEq; assumption.
- apply le_O_n.
+ apply Nat.le_0_l.
 Qed.
 
 
@@ -864,7 +864,7 @@ Proof.
     rational.
    apply nexp_resp_less.
      apply le_n_S.
-     apply le_O_n.
+     apply Nat.le_0_l.
     apply less_leEq.
     apply less_transitive_unfolded with (y := [1]:R1).
      apply pos_one.
@@ -924,7 +924,7 @@ Proof.
     apply leEq_less_trans with (y := nring (R:=R1) n).
      change (nring (R:=R1) 0[<=]nring n) in |- *.
      apply nring_leEq.
-     apply le_O_n.
+     apply Nat.le_0_l.
     assumption.
    rational.
   rational.
@@ -996,7 +996,7 @@ Proof.
      rstepl (Two:R1).
      rstepr (Three:R1).
      apply two_less_three.
-    apply le_O_n.
+    apply Nat.le_0_l.
    apply less_wdl with (x := (Two[^]m[/] Three[^]m[//]nexp_resp_ap_zero m (three_ap_zero R1))[*]
      (dstart_r[-]dstart_l)[*] (Three[^]m[/] Two[^]m[//]nexp_resp_ap_zero m (two_ap_zero R1))).
     rstepl (dstart_r[-]dstart_l).
@@ -1097,7 +1097,7 @@ Proof.
      rstepl (Two:R1).
      rstepr (Three:R1).
      apply two_less_three.
-    apply le_O_n.
+    apply Nat.le_0_l.
    apply less_wdl with (x := (Two[^]m[/] Three[^]m[//]nexp_resp_ap_zero m (three_ap_zero R1))[*]
      (dstart_r[-]dstart_l)[*] (Three[^]m[/] Two[^]m[//]nexp_resp_ap_zero m (two_ap_zero R1))).
     rstepl (dstart_r[-]dstart_l).

@@ -216,7 +216,7 @@ Proof.
     rewrite map_length, iterateN_succ_length.
     rewrite Forall_forall in H1.
     rewrite (H1 (nth i bitmap nil)).
-    apply le_refl.
+    apply Nat.le_refl.
     apply nth_In. rewrite H. exact iin.
     rewrite map_nth. apply f_equal.
     apply iterateN_succ_nth, jin.

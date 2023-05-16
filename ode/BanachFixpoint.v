@@ -163,7 +163,7 @@ intros A1 A2.
 assert (A3 : 0 < n).
 + let T := type of A2 in match T with (?lhs ≤ _) => apply lt_le_trans with (y := lhs) end; [| trivial].
   apply Q.Qlt_lt_of_nat_inject_Z; change (0 < / (e * (1 - q))); solve_propholds.
-+ destruct n as [| n]; [elim (lt_irrefl _ A3) |].
++ destruct n as [| n]; [elim (Nat.lt_irrefl _ A3) |].
   rewrite <- Qpower_mc_power.
   apply GeometricCovergenceLemma with (e := e ↾ A1); [solve_propholds .. |].
   apply (Q.le_Qle_Qceiling_to_nat _ (S n)), A2.
