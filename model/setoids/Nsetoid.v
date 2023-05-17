@@ -106,7 +106,7 @@ Proof.
  red in |- *.
  intros x y z.
  simpl in |- *.
- apply plus_assoc.
+ apply Nat.add_assoc.
 Qed.
 
 Lemma plus_is_commut : commutes plus_is_bin_fun.
