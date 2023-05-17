@@ -88,7 +88,7 @@ Qed.
 
 Lemma le_Zle_to_nat (n : nat) (z : Z) : (Z.to_nat z <= n)%nat <-> z <= Z.of_nat n.
 Proof.
-pose proof (le_0_n n). pose proof (Zle_0_nat n).
+pose proof (Nat.le_0_l n). pose proof (Zle_0_nat n).
 destruct (Z.neg_nonneg_cases z).
 + rewrite Zto_nat_nonpos by now apply Z.lt_le_incl. split; auto with zarith.
 + split; intro A.

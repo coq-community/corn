@@ -126,7 +126,7 @@ Proof.
   induction hn.
   - intros. simpl. trivial.
   - intros x y H. split.
-    + apply (H O). apply le_n_S, le_0_n.
+    + apply (H O). apply le_n_S, Nat.le_0_l.
     + apply IHhn. intros. apply le_n_S in H0.
       exact (H (S n) H0).
 Qed.
@@ -231,7 +231,7 @@ Proof.
   - simpl. destruct IHl as [k [H H0]]. destruct a.
     + exists k. split. rewrite app_length, map_length, map_length.
       apply (Nat.lt_le_trans _ (0+length (FreeSubsets (length l)))).
-      exact H. rewrite <- Nat.add_le_mono_r. apply le_0_n.
+      exact H. rewrite <- Nat.add_le_mono_r. apply Nat.le_0_l.
       rewrite app_nth1.
       rewrite (nth_indep _ nil (true::nil)), map_nth, H0.
       reflexivity. rewrite map_length. exact H.
@@ -244,7 +244,7 @@ Proof.
       reflexivity. rewrite map_length. exact H.
       rewrite map_length.
       apply (Nat.le_trans _ (0+length (FreeSubsets (length l)))).
-      apply Nat.le_refl. rewrite <- Nat.add_le_mono_r. apply le_0_n.
+      apply Nat.le_refl. rewrite <- Nat.add_le_mono_r. apply Nat.le_0_l.
 Qed.
 
 Lemma FreeSubsetsDifferent : forall (n p q : nat),
@@ -351,7 +351,7 @@ Proof.
       apply (In_nth _ _ a) in H0. destruct H0 as [n [H0 H1]].
       subst x0. specialize (H O (S n)). simpl in H.
       rewrite (nth_indep _ a x). apply H.
-      apply le_n_S, le_0_n. apply le_n_S, H0. exact H0.
+      apply le_n_S, Nat.le_0_l. apply le_n_S, H0. exact H0.
 Qed.
 
 Definition ProdIntegrableSimple
@@ -637,8 +637,8 @@ Proof.
     + destruct (IHh k H2) as [n [nlen ndiff]].
       intro abs. subst k. exact (H0 eq_refl).
       exists (S n). split. apply le_n_S, nlen. exact ndiff.
-    + exists O. split. apply le_n_S, le_0_n. simpl. discriminate.
-    + exists O. split. apply le_n_S, le_0_n. simpl. discriminate.
+    + exists O. split. apply le_n_S, Nat.le_0_l. simpl. discriminate.
+    + exists O. split. apply le_n_S, Nat.le_0_l. simpl. discriminate.
     + destruct (IHh k H2) as [n [nlen ndiff]].
       intro abs. subst k. exact (H0 eq_refl).
       exists (S n). split. apply le_n_S, nlen. exact ndiff.
@@ -705,7 +705,7 @@ Proof.
   unfold ProdIntegrableSimplify in H0. rewrite map_length, prod_length in H0.
   assert (0 < length (FreeSubsets (length hn)))%nat as lenPos.
   { destruct (length (FreeSubsets (length hn))).
-    exfalso; inversion H0. apply le_n_S, le_0_n. }
+    exfalso; inversion H0. apply le_n_S, Nat.le_0_l. }
   unfold ProdIntegrableSimplify.
   do 2 rewrite (map_nth (fun xy => ProdSubsetIntersect hn (fst xy) (snd xy))
                    _ (@nil bool, @nil bool)).
@@ -840,7 +840,7 @@ Proof.
     transitivity (partialApply _ _ d + partialApply _ _ d0).
     reflexivity. rewrite IHhn, CRplus_0_r. clear IHhn.
     assert (O < length (a :: hn))%nat.
-    { apply le_n_S, le_0_n. }
+    { apply le_n_S, Nat.le_0_l. }
     rewrite <- (H O H0). apply DomainProp.
     clear IHhn. intros.
     assert (S n < length (a :: hn))%nat.
@@ -878,7 +878,7 @@ Proof.
       rewrite <- (CRplus_0_l (partialApply (ProdIntegrableFunc (nth (S n) (a :: hn) (ProdIntegrableZero I J)))
     (x, y) (DomainProdLFuncInc (a :: hn) x y (d, d0) (S n) ltnh))).
       apply CRplus_morph. 2: apply DomainProp.
-      assert (0 < S (length hn))%nat. apply le_n_S, le_0_n.
+      assert (0 < S (length hn))%nat. apply le_n_S, Nat.le_0_l.
       specialize (H O H1). unfold nth in H. rewrite <- H.
       apply DomainProp. discriminate. clear IHhn. intros.
       assert (S k < length (a :: hn))%nat.
@@ -977,7 +977,7 @@ Proof.
   induction hn.
   - intros x y H. right. intros. exfalso. inversion H0.
   - intros x y H. destruct H, d. unfold fst in d. destruct d.
-    + left. exists O. split. apply le_n_S, le_0_n. exact p.
+    + left. exists O. split. apply le_n_S, Nat.le_0_l. exact p.
     + specialize (IHhn x y d0) as [[k isin] | isout].
       left. exists (S k). destruct isin. split. apply le_n_S, H. exact H0.
       right. intros. destruct n0. exact n.
@@ -995,7 +995,7 @@ Proof.
   induction hn.
   - intros x y H. right. intros. exfalso. inversion H0.
   - intros x y H. destruct H, d. unfold snd in d1. destruct d1.
-    + left. exists O. split. apply le_n_S, le_0_n. exact p.
+    + left. exists O. split. apply le_n_S, Nat.le_0_l. exact p.
     + specialize (IHhn x y d0) as [[k isin] | isout].
       left. exists (S k). destruct isin. split. apply le_n_S, H. exact H0.
       right. intros. destruct n0. exact n.
@@ -1076,8 +1076,8 @@ Proof.
   induction hn.
   - intros. simpl. trivial.
   - intros. split.
-    + split. apply (H O). apply le_n_S, le_0_n.
-      apply (H0 O). apply le_n_S, le_0_n.
+    + split. apply (H O). apply le_n_S, Nat.le_0_l.
+      apply (H0 O). apply le_n_S, Nat.le_0_l.
     + apply IHhn.
       intros. apply le_n_S in H1. exact (H (S n) H1).
       intros. apply le_n_S in H1. exact (H0 (S n) H1).
@@ -1093,7 +1093,7 @@ Proof.
   intros I J hn x y H.
   assert (lt O (length (FreeSubsets (length hn)))) as flen.
   { destruct (FreeSubsets (length hn)) eqn:des. exfalso.
-    exact (FreeSubsetsNotNil _ des). apply le_n_S, le_0_n. }
+    exact (FreeSubsetsNotNil _ des). apply le_n_S, Nat.le_0_l. }
   apply DomainProdLFuncSplitCoord.
   - destruct (ProdLFuncDomainLeft _ x y H) as [[nl isinl] | H0].
     + intros. destruct isinl.
@@ -1181,7 +1181,7 @@ Proof.
       rewrite (FreeSubsetsLength
                  (length hn) (nth (nl mod length (FreeSubsets (length hn))) (FreeSubsets (length hn)) nil)) in des2.
       exact (lt_not_le _ _ H0 des2).
-      apply nth_In. apply Nat.mod_bound_pos. apply le_0_n.
+      apply nth_In. apply Nat.mod_bound_pos. apply Nat.le_0_l.
       exact flen. exact H1.
       exfalso. apply nth_error_None in des. rewrite map_length in des.
       exact (lt_not_le _ _ H0 des).
@@ -1193,7 +1193,7 @@ Proof.
         unfold ProdIntegrableSimplify. rewrite map_length, prod_length.
         apply (Nat.lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
         rewrite Nat.mul_1_l. rewrite <- H1. exact H2.
-        apply Nat.mul_le_mono_nonneg_r. apply le_0_n. exact flen.
+        apply Nat.mul_le_mono_nonneg_r. apply Nat.le_0_l. exact flen.
         clear H0.
         unfold ProdIntegrableSimplify.
         rewrite (nth_indep _ (ProdIntegrableZero I J)
@@ -1208,11 +1208,11 @@ Proof.
         rewrite <- H1. exact H2.
         apply (Nat.lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
         rewrite Nat.mul_1_l. rewrite <- H1. exact H2.
-        apply Nat.mul_le_mono_nonneg_r. apply le_0_n. exact flen.
+        apply Nat.mul_le_mono_nonneg_r. apply Nat.le_0_l. exact flen.
         rewrite map_length, prod_length.
         apply (Nat.lt_le_trans _ (1 * length (FreeSubsets (length hn)))).
         rewrite Nat.mul_1_l. rewrite <- H1. exact H2.
-        apply Nat.mul_le_mono_nonneg_r. apply le_0_n. exact flen. }
+        apply Nat.mul_le_mono_nonneg_r. apply Nat.le_0_l. exact flen. }
       intros. right. rewrite Forall_forall in H1.
       apply (H1 (prodint_g (nth n hn (ProdIntegrableZero I J)))).
       apply in_map, nth_In, H2.
@@ -1243,7 +1243,7 @@ Proof.
                           + kf * length (FreeSubsets (length hn)))).
     rewrite <- Nat.add_lt_mono_r. apply H0.
     apply (Nat.mul_le_mono_nonneg_r (S kf) _ (length (FreeSubsets (length hn)))).
-    apply le_0_n. exact H. }
+    apply Nat.le_0_l. exact H. }
   rewrite (ProdLFuncApplyUnique
              (ProdIntegrableSimplify hn) x y xyS
              (kg + kf * (length (FreeSubsets (length hn)))) H1).
@@ -1320,7 +1320,7 @@ Proof.
     2: rewrite map_length, prod_length; exact H3.
     clear H4.
     assert (0 < length (FreeSubsets (length hn)))%nat as lenPos.
-    { apply (Nat.le_lt_trans _ kg _ (le_0_n _)). apply H0. }
+    { apply (Nat.le_lt_trans _ kg _ (Nat.le_0_l _)). apply H0. }
     destruct (Nat.eq_dec (k / length (FreeSubsets (length hn))) kf).
     + rewrite e in p0. clear p. simpl in p0.
       apply (ProdIntegrableSubsetsDisjoint
@@ -1329,15 +1329,15 @@ Proof.
                (ProdIntegrableSubsetRight hn x y xyH) y).
       rewrite ProdIntegrableSubsetRight_length.
       apply FreeSubsetsLength. apply nth_In.
-      apply Nat.mod_bound_pos. apply le_0_n. exact lenPos.
+      apply Nat.mod_bound_pos. apply Nat.le_0_l. exact lenPos.
       apply FreeSubsetsLength. rewrite map_length. apply nth_In.
-      apply Nat.mod_bound_pos. apply le_0_n. exact lenPos.
+      apply Nat.mod_bound_pos. apply Nat.le_0_l. exact lenPos.
       destruct H0. rewrite <- H4.
       apply FreeSubsetsDifferent. intro abs. subst kg. subst kf.
       pose proof (Nat.div_mod k (length (FreeSubsets (length hn)))).
       rewrite Nat.add_comm, Nat.mul_comm in H5. apply H2, H5.
       intro abs. rewrite abs in lenPos. inversion lenPos.
-      apply Nat.mod_bound_pos. apply le_0_n. exact lenPos.
+      apply Nat.mod_bound_pos. apply Nat.le_0_l. exact lenPos.
       exact H0. split. exact p0.
       apply ProdIntegrableSubsetRight_match. apply inuniong.
     + clear p0. simpl in p.

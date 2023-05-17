@@ -419,7 +419,7 @@ Proof.
     exfalso. apply Nat.sub_0_le in des.
     apply (le_not_lt _ _ des). apply H, Nat.le_refl. simpl.
     pose proof (H n). destruct (Pn (S n)).
-    exfalso. apply (le_not_lt 0 (Pn n) (le_0_n _)). apply H1, le_S, Nat.le_refl.
+    exfalso. apply (le_not_lt 0 (Pn n) (Nat.le_0_l _)). apply H1, le_S, Nat.le_refl.
     clear H1. simpl.
     rewrite (CRsum_eq (fun k : nat => xn (k + S n1)%nat)
                       (fun k : nat => xn (S n1 + k)%nat)).
@@ -444,7 +444,7 @@ Lemma ShouldReplaceSubSeq : forall (sub : SubSeq) (n : nat),
     le n (proj1_sig sub n).
 Proof.
   induction n.
-  - apply le_0_n.
+  - apply Nat.le_0_l.
   - destruct sub; simpl. simpl in IHn. specialize (l n (S n) (Nat.le_refl _)).
     apply (Nat.le_trans _ (S (x n))). apply le_n_S, IHn. exact l.
 Qed.
@@ -1152,7 +1152,7 @@ Proof.
     rewrite (UniformContProper
                f fMod fUC _ (a + INR 0 * fMod 1 (CRzero_lt_one R) * CR_of_Q R (1#2))).
     apply CRplus_le_compat. 2: apply CRle_refl.
-    apply maxouSpec, le_0_n. unfold INR, Z.of_nat.
+    apply maxouSpec, Nat.le_0_l. unfold INR, Z.of_nat.
     rewrite CRmult_0_l, CRmult_0_l, CRplus_0_r. reflexivity.
   - (* 0 < i *)
     apply CRltForget.

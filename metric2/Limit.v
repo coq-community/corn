@@ -297,9 +297,9 @@ Proof with auto using Is_true_eq_left, Is_true_neq_left.
   assert (ex1':=ex1).
   unfold takeUntil_length.
   induction ex1' as [s1|s1 ? IH]; intros.
-   rewrite takeUntil_end... apply le_0_n.
+   rewrite takeUntil_end... apply Nat.le_0_l.
   case_eq (P1 s1); intros EP1.
-   rewrite takeUntil_end... apply le_0_n.
+   rewrite takeUntil_end... apply Nat.le_0_l.
   destruct (takeUntil_step _ ex1 (λ _, S) O) as [ex1' E1']...
   rewrite E1'. 
   assert (ex2':=ex2).

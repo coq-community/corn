@@ -849,7 +849,7 @@ Lemma growing_infinite : forall un : nat -> nat,
     -> forall n : nat, le n (un n).
 Proof.
   induction n.
-  - apply le_0_n.
+  - apply Nat.le_0_l.
   - specialize (H n). unfold lt in H.
     apply (Nat.le_trans _ (S (un n))). apply le_n_S, IHn. exact H.
 Qed.
@@ -991,8 +991,8 @@ Lemma StartZeroInc : forall (un : nat -> nat),
 Proof.
   intros. destruct n.
   - simpl. destruct (un O) eqn:des.
-    apply (Nat.le_lt_trans _ (un O)). apply le_0_n. apply H.
-    apply le_n_S, le_0_n.
+    apply (Nat.le_lt_trans _ (un O)). apply Nat.le_0_l. apply H.
+    apply le_n_S, Nat.le_0_l.
   - simpl. destruct (un O); apply H.
 Qed.
 

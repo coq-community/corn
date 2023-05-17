@@ -332,14 +332,14 @@ Proof.
     rewrite rings.preserves_3.
     rewrite <-(int_pow_nat_pow (f:=cast nat Z)).
     rewrite <- (Zpower_Qpower 3).
-    apply H5. apply (Nat2Z.inj_le 0), le_0_n.
+    apply H5. apply (Nat2Z.inj_le 0), Nat.le_0_l.
   - destruct H4, aq_ring, ring_monoid.
     destruct commonoid_mon. rewrite monoid_left_id.
     rewrite preserves_nat_pow.
     rewrite rings.preserves_3.
     rewrite <-(int_pow_nat_pow (f:=cast nat Z)).
     rewrite <- (Zpower_Qpower 3).
-    apply H5. apply (Nat2Z.inj_le 0), le_0_n.
+    apply H5. apply (Nat2Z.inj_le 0), Nat.le_0_l.
 Qed.
 
 Lemma AQsin_bound_pos : forall a, 0 < 1 * 3 ^ AQsin_bound a.

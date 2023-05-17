@@ -475,7 +475,7 @@ Proof.
     rewrite <- (CRplus_comm a). unfold CRminus.
     rewrite CRopp_plus_distr. rewrite <- CRplus_assoc. rewrite CRplus_opp_r.
     rewrite CRplus_0_l. rewrite CRabs_opp.
-    specialize (maj N (le_0_n N)).
+    specialize (maj N (Nat.le_0_l N)).
     rewrite CRabs_minus_sym in maj. exact maj.
   - rewrite decomp_sum. simpl. unfold CRminus.
     rewrite CRplus_comm. rewrite CRopp_plus_distr.
@@ -488,9 +488,9 @@ Proof.
     rewrite <- sum_assoc. rewrite CRplus_comm. simpl in maj. apply maj.
     apply (Nat.le_trans k (S i)). assumption. simpl.
     apply le_n_S. rewrite plus_comm. rewrite <- (plus_0_r i). rewrite <- plus_assoc.
-    apply Nat.add_le_mono_l. apply le_0_n.
+    apply Nat.add_le_mono_l. apply Nat.le_0_l.
     intros. rewrite Nat.add_succ_r. reflexivity. apply le_n_S.
-    apply le_0_n.
+    apply Nat.le_0_l.
 Qed.
 
 Lemma PackSeriesCVReverse
@@ -507,7 +507,7 @@ Proof.
   intros n kLen.
   destruct (Nat.le_exists_sub (S N) n) as [m [inf _]].
   apply (Nat.le_trans _ (S N + k)). rewrite <- (plus_0_r (S N)).
-  rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply le_0_n.
+  rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply Nat.le_0_l.
   assumption.
   subst n. replace (m + S N)%nat with (S N + m)%nat. rewrite sum_assoc.
   specialize (maj (S m)). rewrite decomp_sum in maj.
@@ -523,7 +523,7 @@ Proof.
   rewrite plus_comm in kLen. apply Nat.add_le_mono_r in kLen.
   apply (Nat.le_trans k m). assumption. apply le_S. apply Nat.le_refl.
   intros. rewrite Nat.add_succ_r. reflexivity. apply le_n_S.
-  apply le_0_n. rewrite plus_comm. reflexivity.
+  apply Nat.le_0_l. rewrite plus_comm. reflexivity.
 Qed.
 
 Definition domainSumPackIncReverse
@@ -588,7 +588,7 @@ Proof.
     apply (Nat.le_trans _ (S N + k)).
     simpl. apply le_S. rewrite <- (plus_0_r N).
     rewrite <- plus_assoc. apply Nat.add_le_mono_l.
-    apply le_0_n. assumption. subst n.
+    apply Nat.le_0_l. assumption. subst n.
     rewrite <- (applyPackFirstSum X fn m N x x1 x0).
     apply maj. apply (Nat.add_le_mono_l k m (S N)).
     apply (Nat.le_trans _ (m + N)). assumption. rewrite plus_comm.
@@ -1239,7 +1239,7 @@ Proof.
                           CMTIntegrableFunctions.IntFnL.
   specialize (IntAbsSumCv p) as [j jmaj].
   exists j. intros. apply jmaj.
-  apply (Nat.le_trans _ (0+i) _ H). apply Nat.add_le_mono_r, le_0_n.
+  apply (Nat.le_trans _ (0+i) _ H). apply Nat.add_le_mono_r, Nat.le_0_l.
 Defined.
 
 Lemma IntegralRepresentationShiftVal
@@ -1264,7 +1264,7 @@ Proof.
   intro p.
   pose proof (IntegralCv fInt p) as [k kmaj]. exists k.
   intros. apply kmaj. apply (Nat.le_trans _ (0+i) _ H).
-  apply Nat.add_le_mono_r, le_0_n.
+  apply Nat.add_le_mono_r, Nat.le_0_l.
 Qed.
 
 

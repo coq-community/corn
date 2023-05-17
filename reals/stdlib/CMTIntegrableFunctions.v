@@ -378,7 +378,7 @@ Proof.
            end) with (CR_of_Q R 0) in cv.
     rewrite CRplus_0_r in cv. apply cv. apply (Nat.le_trans _ i).
     assumption. rewrite mult_comm. simpl. rewrite <- (plus_0_r i).
-    rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply le_0_n.
+    rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply Nat.le_0_l.
     destruct (i*2)%nat eqn:des. reflexivity.
     rewrite sum_const. rewrite CRmult_0_l. reflexivity. auto.
 Qed.
@@ -410,7 +410,7 @@ Proof.
       apply cv. apply (Nat.le_trans N n). assumption.
       apply (Nat.le_trans n (n*2)). rewrite <- (mult_1_r n).
       rewrite <- mult_assoc. apply Nat.mul_le_mono_nonneg_l.
-      apply le_0_n. apply le_S. apply Nat.le_refl.
+      apply Nat.le_0_l. apply le_S. apply Nat.le_refl.
       rewrite <- (plus_0_l (n*2)). rewrite plus_assoc.
       apply Nat.add_le_mono_r. auto.
     + auto.
@@ -2284,7 +2284,7 @@ Proof.
   rewrite (IExtensional _ (Izero IS) _ (Izero_is_L IS)).
   apply Izero_is_zero. intros.
   rewrite applyXabs, applyIzero, applyIzero, CRabs_right.
-  reflexivity. apply CRle_refl. apply le_n_S, le_0_n.
+  reflexivity. apply CRle_refl. apply le_n_S, Nat.le_0_l.
 Defined.
 
 Definition IntegrableL {IS : IntegrationSpace}
@@ -2302,7 +2302,7 @@ Proof.
     apply DomainProp. rewrite (CRsum_eq _ (fun _ => 0)).
     rewrite sum_eq_R0. reflexivity. intros _. reflexivity.
     intros. unfold IntegralRepresentationL, IntFn.
-    apply applyIzero. apply le_n_S, le_0_n.
+    apply applyIzero. apply le_n_S, Nat.le_0_l.
 Defined.
 
 Lemma IntegralLstable : forall {IS : IntegrationSpace}
@@ -2323,7 +2323,7 @@ Proof.
   rewrite (CRsum_eq _ (fun _ => 0)).
   rewrite sum_eq_R0. reflexivity. intros _. reflexivity.
   intros. simpl. apply Izero_is_zero.
-  apply le_n_S, le_0_n.
+  apply le_n_S, Nat.le_0_l.
 Qed.
 
 Fixpoint IntegrableSum {IS : IntegrationSpace}
