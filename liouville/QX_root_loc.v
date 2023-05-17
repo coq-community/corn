@@ -166,7 +166,7 @@ Proof.
   rewrite Zmult_1_r; intro H; rewrite H.
   apply Zdivides_zero_rht.
  rewrite -> Sum_last.
- rewrite minus_diag.
+ rewrite Nat.sub_diag.
  simpl (q[^]0).
  rewrite -> mult_one.
  generalize (nth_coeff (S n) P[*]p[^]S n); intro r.
