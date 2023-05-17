@@ -954,7 +954,7 @@ Lemma seq_lim_S' (x : seq X) (a : X) N : seq_lim (x ∘ S) a N -> seq_lim x a (S
 Proof.
 intros A e A1 n A2.
 destruct n as [| n].
-+ contradict A2; apply le_Sn_0.
++ contradict A2; apply Nat.nle_succ_0.
 + apply A; trivial. apply le_S_n, A2.
 Qed.
 
