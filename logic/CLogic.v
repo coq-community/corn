@@ -1080,7 +1080,7 @@ Proof.
      rewrite <- (even_double n0). assumption.
       assumption.
     apply H2.
-     apply lt_div2. assumption.
+     apply Nat.lt_div2. assumption.
      rewrite (even_double n0) in H3.
      apply H. assumption.
      assumption.
