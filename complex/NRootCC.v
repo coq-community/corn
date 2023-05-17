@@ -134,7 +134,7 @@ Proof.
  intros n' H.
  rewrite H.
  exists (n' * n' + n').
- unfold double in |- *.
+ unfold Nat.double in |- *.
  ring.
 Qed.
 
@@ -1318,15 +1318,15 @@ End NRootCC_4.
 
 Section NRootCC_5.
 
-Lemma nrCC_5a2 : forall n : nat, double n = 2 * n.
+Lemma nrCC_5a2 : forall n : nat, Nat.double n = 2 * n.
 Proof.
  intros.
- unfold double in |- *.
+ unfold Nat.double in |- *.
  unfold mult in |- *.
  auto with arith.
 Qed.
 
-Lemma nrCC_5a3 : forall (n : nat) (z : CC), (z[^]2) [^]n [=] z[^]double n.
+Lemma nrCC_5a3 : forall (n : nat) (z : CC), (z[^]2) [^]n [=] z[^]Nat.double n.
 Proof.
  intros.
  (* astepl z[^] (mult (2) n). *)
@@ -1345,7 +1345,7 @@ Hint Resolve nrCC_5a3: algebra.
 Variable c : CC.
 Hypothesis c_ : c [#] [0].
 
-Lemma nrCC_5a4 : forall n, 0 < n -> {z : CC | z[^]n [=] c} -> {z : CC | z[^]double n [=] c}.
+Lemma nrCC_5a4 : forall n, 0 < n -> {z : CC | z[^]n [=] c} -> {z : CC | z[^]Nat.double n [=] c}.
 Proof.
  intros n H H0.
  elim H0. intros x H1.

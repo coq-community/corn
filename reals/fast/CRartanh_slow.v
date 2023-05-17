@@ -347,11 +347,11 @@ apply IRasCR_wd.
  [|apply (ArTanH_series (inj_Q IR a) (ArTanH_series_convergent_IR) (artanh_DomArTanH Ha) Ha0)].
 simpl.
 unfold series_sum.
-apply Lim_seq_eq_Lim_subseq with double.
-  unfold double; auto with *.
+apply Lim_seq_eq_Lim_subseq with Nat.double.
+  unfold Nat.double; auto with *.
  intros n.
  exists (S n).
- unfold double; auto with *.
+ unfold Nat.double; auto with *.
 intros n.
 simpl.
 clear - n.
@@ -361,7 +361,7 @@ simpl.
 set (A:=nexp IR (Nat.add n (S n)) (inj_Q IR a[-][0])).
 rewrite Nat.add_comm.
 simpl.
-fold (double n).
+fold (Nat.double n).
 csetoid_rewrite_rev IHn.
 clear IHn.
 csetoid_replace (ArTanH_series_coef (Nat.double n)[*]nexp IR (Nat.double n) (inj_Q IR a[-][0])) ([0]:IR).
@@ -369,7 +369,7 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
                 (inj_Q IR (Str_nth n (artanhSequence a))).
   rational.
  unfold ArTanH_series_coef.
- case_eq (even_odd_dec (S (double n))); intros H.
+ case_eq (even_odd_dec (S (Nat.double n))); intros H.
   elim (not_even_and_odd _ H).
   constructor.
   apply even_plus_n_n.
@@ -379,7 +379,7 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
  eapply eq_transitive;
   [|apply eq_symmetric; apply inj_Q_mult].
  apply mult_wd.
-  assert (X:(inj_Q IR (nring (S (double n))))[#][0]).
+  assert (X:(inj_Q IR (nring (S (Nat.double n))))[#][0]).
    stepr (inj_Q IR [0]).
     apply inj_Q_ap.
     apply nringS_ap_zero.
@@ -405,7 +405,7 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
   apply inj_Q_wd.
   rewrite <- POS_anti_convert.
   eapply eq_transitive;[apply nring_Q|].
-  unfold double.
+  unfold Nat.double.
   simpl.
   replace (n+0)%nat with n by ring.
   reflexivity.
@@ -416,7 +416,7 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
   apply nexp_wd.
  rational.
 unfold ArTanH_series_coef.
-case_eq (even_odd_dec (double n)).
+case_eq (even_odd_dec (Nat.double n)).
  intros _ _.
  rational.
 intros o.

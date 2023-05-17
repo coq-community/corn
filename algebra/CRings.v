@@ -1104,7 +1104,7 @@ Proof.
  intros x n H.
  elim (even_2n n); try assumption.
  intros m H0.
- rewrite H0. unfold double in |- *.
+ rewrite H0. unfold Nat.double in |- *.
  astepl ( [--]x[^]m[*] [--]x[^]m).
  astepl (( [--]x[*] [--]x) [^]m).
  astepl ((x[*]x) [^]m).

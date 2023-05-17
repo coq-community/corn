@@ -1066,9 +1066,9 @@ Proof.
 Qed.
 
 Lemma odd_double_ind : forall P : nat -> CProp, (forall n, odd n -> P n) ->
- (forall n, 0 < n -> P n -> P (double n)) -> forall n, 0 < n -> P n.
+ (forall n, 0 < n -> P n -> P (Nat.double n)) -> forall n, 0 < n -> P n.
 Proof.
- cut (forall n : nat, 0 < double n -> 0 < n). intro.
+ cut (forall n : nat, 0 < Nat.double n -> 0 < n). intro.
   intro. intro H0. intro H1. intro n.
   pattern n in |- *.
   apply lt_wf_rect. intros n0 H2 H3.
@@ -1086,7 +1086,7 @@ Proof.
      assumption.
    assumption.
   exact (H0 n0).
- unfold double in |- *. intros.
+ unfold Nat.double in |- *. intros.
  case (zerop n). intro.
   absurd (0 < n + n).
    rewrite e. auto with arith.
