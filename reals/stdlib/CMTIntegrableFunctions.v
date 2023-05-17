@@ -249,7 +249,7 @@ Proof.
     + destruct n. exfalso. inversion nEven. destruct (Nat.even n) eqn:snEven.
       rewrite divModSucc. rewrite H. rewrite H0.
       pose proof (Nat.odd_spec (S n)) as [H1 _]. destruct H1. unfold Nat.odd.
-      rewrite nEven. trivial. rewrite mult_comm in H1. rewrite plus_comm in H1.
+      rewrite nEven. trivial. rewrite mult_comm in H1. rewrite Nat.add_comm in H1.
       rewrite H1. rewrite Nat.div_add.
       assert ((1 + (1 + x * 2)) / 2 = (2 + x * 2) / 2)%nat. reflexivity.
       rewrite H2. rewrite Nat.div_add. simpl.
@@ -324,7 +324,7 @@ Proof.
   destruct (Nat.even (1+n*2)) eqn:des.
   - exfalso. assert (Nat.odd (1+ n * 2) = true).
     apply Nat.odd_spec. exists n. rewrite mult_comm.
-    rewrite plus_comm. reflexivity.
+    rewrite Nat.add_comm. reflexivity.
     unfold Nat.odd in H. rewrite des in H. discriminate.
   - remember ((1+n*2)/2)%nat. rewrite Nat.div_add in Heqn0. subst n0.
     exact xD. auto.
@@ -404,7 +404,7 @@ Proof.
     destruct (1 + n*2)%nat eqn:des.
     + exfalso. inversion des.
     + rewrite <- des in cv. clear des. destruct (Nat.even (1+n*2)) eqn:des.
-      exfalso. assert (Nat.Odd (1+n*2)). exists n. rewrite plus_comm.
+      exfalso. assert (Nat.Odd (1+n*2)). exists n. rewrite Nat.add_comm.
       rewrite mult_comm. reflexivity. apply Nat.odd_spec in H3.
       unfold Nat.odd in H3. rewrite des in H3. inversion H3.
       apply cv. apply (Nat.le_trans N n). assumption.
@@ -442,7 +442,7 @@ Proof.
     rewrite H2. apply le_pred. rewrite <- (Nat.div_mul (S N0) 2).
     apply Nat.div_le_mono. auto.
     apply (Nat.le_trans _ (N*2 + (S N0)*2)).
-    rewrite plus_comm. apply Nat.le_add_r.
+    rewrite Nat.add_comm. apply Nat.le_add_r.
     apply (Nat.le_trans (N*2 + (S N0)*2) i). assumption. apply le_S. apply Nat.le_refl. auto.
     rewrite Qinv_plus_distr. reflexivity.
     unfold CRminus. do 2 rewrite CRplus_assoc.
@@ -458,7 +458,7 @@ Proof.
     apply (Nat.le_trans _ i). assumption. apply le_S. apply Nat.le_refl. auto.
     apply H0. rewrite <- (Nat.div_mul N0 2).
     apply Nat.div_le_mono. auto.
-    apply (Nat.le_trans (N0*2) (N*2 + (S N0)*2)). rewrite plus_comm.
+    apply (Nat.le_trans (N0*2) (N*2 + (S N0)*2)). rewrite Nat.add_comm.
     apply (Nat.le_trans (N0 * 2) (S N0 * 2)).
     apply mult_le_compat_r. apply le_S. apply Nat.le_refl.
     apply Nat.le_add_r.
@@ -480,7 +480,7 @@ Proof.
     destruct (Nat.le_exists_sub (S N) n) as [p [H0 _]].
     + pose proof (Nat.lt_ge_cases N n) as [H0|H1]. apply H0. exfalso.
       exact (n0 (le_antisym N n H H1)).
-    + subst n. rewrite plus_comm. rewrite sum_assoc.
+    + subst n. rewrite Nat.add_comm. rewrite sum_assoc.
       assert (CRsum (fun k : nat => if le_dec (S N + k) N then u (S N + k)%nat else 0) p == 0).
       { rewrite <- (CRsum_eq (fun k => 0)). rewrite sum_const.
         apply CRmult_0_l. intros.
@@ -544,7 +544,7 @@ Proof.
                  X fn gn m x (domainInfiniteSumAbsIncReverse _ x xD m)).
     + rewrite weaveSequencesEven. reflexivity.
   - pose proof (Nat.odd_spec n) as [H2 _]. destruct H2 as [m H3]. unfold Nat.odd.
-    rewrite nEven. trivial. subst n. rewrite plus_comm. rewrite mult_comm.
+    rewrite nEven. trivial. subst n. rewrite Nat.add_comm. rewrite mult_comm.
     rewrite <- (partialApplyWeaveOdd
                  X fn gn m x (domainInfiniteSumAbsIncReverse _ x y m)).
     + rewrite weaveSequencesOdd. reflexivity.

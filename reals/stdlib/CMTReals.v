@@ -666,13 +666,13 @@ Proof.
   - apply (CR_cv_bound_down
              (fun n : nat => x (CSUCposPointApproxSequence n)) _ _ n).
     intros. destruct (Nat.le_exists_sub n n0 H0). destruct H1. subst n0.
-    rewrite plus_comm. specialize (H x1).
+    rewrite Nat.add_comm. specialize (H x1).
     destruct (CSUCposPointApproxSequence (n + x1)); simpl; simpl in H.
     apply H. apply lcv.
   - apply (CR_cv_bound_up
              (fun n : nat => x (CSUCposPointApproxSequence n)) _ _ n).
     intros. destruct (Nat.le_exists_sub n n0 H0). destruct H1. subst n0.
-    rewrite plus_comm. specialize (H x1).
+    rewrite Nat.add_comm. specialize (H x1).
     destruct (CSUCposPointApproxSequence (n + x1)); simpl; simpl in H.
     apply (CRle_trans _ y1). exact lexy1. apply H. apply lcv.
 Qed.

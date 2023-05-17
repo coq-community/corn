@@ -487,7 +487,7 @@ Proof.
     rewrite CRplus_assoc.
     rewrite <- sum_assoc. rewrite CRplus_comm. simpl in maj. apply maj.
     apply (Nat.le_trans k (S i)). assumption. simpl.
-    apply le_n_S. rewrite plus_comm. rewrite <- (Nat.add_0_r i). rewrite <- Nat.add_assoc.
+    apply le_n_S. rewrite Nat.add_comm. rewrite <- (Nat.add_0_r i). rewrite <- Nat.add_assoc.
     apply Nat.add_le_mono_l. apply Nat.le_0_l.
     intros. rewrite Nat.add_succ_r. reflexivity. apply le_n_S.
     apply Nat.le_0_l.
@@ -520,10 +520,10 @@ Proof.
   rewrite CRopp_involutive. rewrite CRplus_assoc.
   rewrite (CRplus_comm (-s)). rewrite <- CRplus_assoc.
   rewrite (CRsum_eq _ (fun i : nat => un (N + S i)%nat)). apply maj.
-  rewrite plus_comm in kLen. apply Nat.add_le_mono_r in kLen.
+  rewrite Nat.add_comm in kLen. apply Nat.add_le_mono_r in kLen.
   apply (Nat.le_trans k m). assumption. apply le_S. apply Nat.le_refl.
   intros. rewrite Nat.add_succ_r. reflexivity. apply le_n_S.
-  apply Nat.le_0_l. rewrite plus_comm. reflexivity.
+  apply Nat.le_0_l. rewrite Nat.add_comm. reflexivity.
 Qed.
 
 Definition domainSumPackIncReverse
@@ -538,7 +538,7 @@ Proof.
   - exact (domainXsumIncReverse fn n N x (xn O) l).
   - pose (xn (n - N)%nat). unfold PackFirstFunctions in d.
     destruct (n - N)%nat eqn:des. exfalso. apply (Nat.sub_gt n N); assumption.
-    rewrite <- (Nat.sub_add N n). rewrite des. rewrite plus_comm.
+    rewrite <- (Nat.sub_add N n). rewrite des. rewrite Nat.add_comm.
     exact d. subst d.
     apply (Nat.le_trans N (S N)). apply le_S. apply Nat.le_refl. assumption.
 Qed.
@@ -591,7 +591,7 @@ Proof.
     apply Nat.le_0_l. assumption. subst n.
     rewrite <- (applyPackFirstSum X fn m N x x1 x0).
     apply maj. apply (Nat.add_le_mono_l k m (S N)).
-    apply (Nat.le_trans _ (m + N)). assumption. rewrite plus_comm.
+    apply (Nat.le_trans _ (m + N)). assumption. rewrite Nat.add_comm.
     apply Nat.add_le_mono_r. apply le_S. apply Nat.le_refl.
 Qed.
 
@@ -699,7 +699,7 @@ Proof.
                                  (fun a => fnL (S N + a)%nat) k))).
     apply INonDecreasing.
     intros. rewrite applyXabs. rewrite applyXabs.
-    remember (S k + N)%nat. rewrite plus_comm in Heqn.
+    remember (S k + N)%nat. rewrite Nat.add_comm in Heqn.
     replace (N + S k)%nat with (S N + k)%nat in Heqn. subst n.
     rewrite (Xsum_assocMinus fn N k x _ y).
     apply CRle_refl. rewrite Nat.add_succ_r. reflexivity.

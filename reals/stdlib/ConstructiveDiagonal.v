@@ -167,7 +167,7 @@ Proof.
     assert (sub p < sub (S n))%nat.
     { rewrite absurd. apply (Nat.lt_le_trans _ (S (sub n)
                                             + (sub (S n) - S (sub n)))).
-      simpl. apply le_n_S. apply Nat.add_lt_mono_l. assumption. rewrite plus_comm.
+      simpl. apply le_n_S. apply Nat.add_lt_mono_l. assumption. rewrite Nat.add_comm.
       rewrite Nat.sub_add. apply Nat.le_refl. apply inc. apply Nat.le_refl. }
     destruct (Nat.lt_trichotomy p (S n)).
     apply Nat.le_succ_r in H2. destruct H2.
@@ -180,7 +180,7 @@ Proof.
     apply Nat.add_le_mono_l. apply Nat.le_0_l. rewrite <- absurd. apply Nat.le_refl.
     destruct H2. subst p. exact (lt_irrefl (sub (S n)) H1).
     specialize (inc (S n) p H2). apply (lt_asym (sub p) (sub (S n))); assumption.
-  - rewrite plus_comm. rewrite Nat.sub_add.
+  - rewrite Nat.add_comm. rewrite Nat.sub_add.
     unfold FillSubSeqWithZeros.
     destruct (Nat.eq_dec (SubSeqInv sub (proj1_sig sub (S n)) (proj1_sig sub (S n))) (S (proj1_sig sub (S n)))).
     exfalso. pose proof (SubSeqInvNotFound sub (proj1_sig sub (S n)) (proj1_sig sub (S n))) as [H _].
@@ -219,8 +219,8 @@ Proof.
       destruct (Nat.le_exists_sub (S (proj1_sig sub n)) (proj1_sig sub (S n)))
         as [p [inf _]].
       destruct sub. simpl. apply l. apply le_n_S. apply Nat.le_refl.
-      rewrite inf. rewrite plus_comm. rewrite sum_assoc.
-      apply CRplus_morph. reflexivity. rewrite plus_comm. rewrite <- inf.
+      rewrite inf. rewrite Nat.add_comm. rewrite sum_assoc.
+      apply CRplus_morph. reflexivity. rewrite Nat.add_comm. rewrite <- inf.
       apply eq_sym in inf. apply Nat.add_sub_eq_r in inf.
       subst p. apply FillSubSeqWithZerosStep.
     + apply (SubSeqCv _ sub lim cv).
@@ -408,8 +408,8 @@ Proof.
   intros. specialize (H0 (diagPlane 0 (n + k))). rewrite diagSumTriangle in H0.
   apply (CRle_trans _ (CRsum (fun i : nat => CRsum (u i) (n + k - i)) (n + k))).
   pose proof (selectOneInSum (fun i : nat => CRsum (u i) (n + k - i)) (n + k) n).
-  simpl in H1. rewrite plus_comm in H1. rewrite Nat.add_sub in H1.
-  rewrite plus_comm in H1. apply H1. rewrite <- (Nat.add_0_r n). rewrite <- Nat.add_assoc.
+  simpl in H1. rewrite Nat.add_comm in H1. rewrite Nat.add_sub in H1.
+  rewrite Nat.add_comm in H1. apply H1. rewrite <- (Nat.add_0_r n). rewrite <- Nat.add_assoc.
   apply Nat.add_le_mono_l. apply Nat.le_0_l. intros. apply cond_pos_sum. intros.
   apply H. assumption.
 Qed.
@@ -542,7 +542,7 @@ Proof.
   rewrite <- (Nat.add_0_r n). rewrite <- Nat.add_assoc.
   apply Nat.add_le_mono_l. apply Nat.le_0_l. apply CRsum_eq. intros.
   replace (S n + p - (S n + i))%nat with (p - i)%nat. reflexivity. simpl.
-  rewrite Nat.sub_add_distr. rewrite plus_comm. rewrite Nat.add_sub. reflexivity.
+  rewrite Nat.sub_add_distr. rewrite Nat.add_comm. rewrite Nat.add_sub. reflexivity.
   apply (CRle_lt_trans _ _ _ (CRle_abs _)).
   setoid_replace
     (CRsum (diagSeq (fun i j : nat => CRabs _ (u i j))) (diagPlane 0 (S n + p)) -
@@ -732,9 +732,9 @@ Proof.
       unfold CRminus. rewrite CRplus_assoc, CRplus_opp_r, CRplus_0_r.
       apply CRsum_eq. intros. replace (S n + p - i0)%nat with (S p + (n - i0))%nat.
       reflexivity. rewrite Nat.add_sub_assoc. simpl. destruct i0.
-      rewrite plus_comm. reflexivity. rewrite plus_comm. reflexivity. assumption.
+      rewrite Nat.add_comm. reflexivity. rewrite Nat.add_comm. reflexivity. assumption.
       intros. replace (S n + p - (S n + i0))%nat with (p - i0)%nat. reflexivity.
-      simpl. rewrite Nat.sub_add_distr. rewrite plus_comm. rewrite Nat.add_sub.
+      simpl. rewrite Nat.sub_add_distr. rewrite Nat.add_comm. rewrite Nat.add_sub.
       reflexivity.
     + setoid_replace (@INR R 7) with (1 + @INR R 6).
       do 2 rewrite CRmult_plus_distr_r. rewrite CRmult_1_l. reflexivity.
@@ -845,7 +845,7 @@ Proof.
     apply (CRle_trans _ _ _ (CRle_abs _)).
     pose proof (CRabs_minus_sym (sumCol n0)). unfold CRminus in H3.
     rewrite H3. clear H3. apply CRlt_asym, H2.
-    exact H0. rewrite plus_comm.
+    exact H0. rewrite Nat.add_comm.
     rewrite <- Nat.add_sub_assoc. rewrite <- (Nat.add_0_r p).
     rewrite <- Nat.add_assoc. apply Nat.add_le_mono_l. apply Nat.le_0_l.
     assumption.
@@ -960,22 +960,22 @@ Proof.
       destruct (Nat.le_exists_sub 1 (Pn (S p))) as [r [H3 _]].
       specialize (H p). apply (Nat.le_trans _ (S (Pn p))). 2: apply H.
       apply le_n_S. apply Nat.le_0_l.
-      assert (r+1 = S r)%nat. rewrite plus_comm. reflexivity.
+      assert (r+1 = S r)%nat. rewrite Nat.add_comm. reflexivity.
       rewrite H3. rewrite Nat.add_sub.
       rewrite (CRsum_eq (fun k : nat => xn (k + (r + 1))%nat) (fun k : nat => xn (S r + k)%nat)).
       rewrite <- (sum_assoc xn r).
       replace (S r + (Pn (S (S p)) - (r + 1) - 1))%nat
         with (Pn (S (S p)) - 1)%nat.
       reflexivity. rewrite Nat.add_sub_assoc.
-      rewrite <- H4. rewrite plus_comm. rewrite Nat.sub_add.
+      rewrite <- H4. rewrite Nat.add_comm. rewrite Nat.sub_add.
       reflexivity. rewrite <- H3. apply (Nat.le_trans _ (S (Pn (S p)))).
       apply le_S. apply Nat.le_refl. apply H. rewrite <- H3.
       destruct (Nat.le_exists_sub (S (Pn (S p))) (Pn (S (S p)))).
       apply H. destruct H5. rewrite H5. simpl.
       replace (S (Pn (S p))) with (1 + Pn (S p))%nat.
       rewrite Nat.add_assoc. rewrite Nat.add_sub. 2: reflexivity.
-      rewrite plus_comm. apply le_n_S. apply Nat.le_0_l.
-      intros. rewrite plus_comm. rewrite (plus_comm r). reflexivity. }
+      rewrite Nat.add_comm. apply le_n_S. apply Nat.le_0_l.
+      intros. rewrite Nat.add_comm. rewrite (Nat.add_comm r). reflexivity. }
   assert (forall n:nat,
              (Pn 1 <= n)%nat
              -> let (p,_) := FindPointInSubdivision Pn n H H1 in
@@ -990,7 +990,7 @@ Proof.
     simpl. rewrite Nat.sub_0_r. apply (Nat.le_trans _ (Pn (S p))).
     2: apply pmaj. apply Nat.le_sub_l.
     apply pos_sum_more. apply H0. apply Nat.le_add_le_sub_r.
-    rewrite plus_comm. apply pmaj. }
+    rewrite Nat.add_comm. apply pmaj. }
   intros n. specialize (H2 n) as [p pmaj].
   exists (Pn (S p)). intros. specialize (H3 i).
   pose proof (FindPointInSubdivisionSmallest Pn H H1 i).
@@ -1008,7 +1008,7 @@ Proof.
   apply PnInc. apply le_n_S. apply Nat.le_0_l.
   rewrite CRabs_minus_sym.
   apply pmaj. apply Nat.le_add_le_sub_r.
-  rewrite plus_comm. apply H5.
+  rewrite Nat.add_comm. apply H5.
   rewrite CRabs_minus_sym; apply pmaj.
   apply (Nat.le_trans _ (S p)).
   apply le_S. apply Nat.le_refl. apply H5.
