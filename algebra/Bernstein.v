@@ -279,7 +279,7 @@ match v in Vector.t _ i return i <= n -> cpoly_cring R with
 |Vector.nil => fun _ => [0]
 |Vector.cons a i' v' =>
   match n as n return (S i' <= n) -> cpoly_cring R with
-  | O => fun p => False_rect _ (le_Sn_O _ p)
+  | O => fun p => False_rect _ (Nat.nle_succ_0 _ p)
   | S n' => fun p => _C_ a[*]Bernstein (le_S_n _ _ p)[+]evalBernsteinBasisH v' (le_Sn_le _ _ p)
   end
 end.
@@ -399,7 +399,7 @@ Fixpoint BernsteinBasisTimesXH (n i:nat) (v:Vector.t R i) : i <= n -> Vector.t R
 match v in Vector.t _ i return i <= n -> Vector.t R (S i) with
 | Vector.nil => fun _ => Vector.cons [0] _ Vector.nil
 | Vector.cons a i' v' => match n as n return S i' <= n -> Vector.t R (S (S i')) with
-  | O => fun p => False_rect _ (le_Sn_O _ p)
+  | O => fun p => False_rect _ (Nat.nle_succ_0 _ p)
   | S n' => fun p => Vector.cons (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
   end
 end.

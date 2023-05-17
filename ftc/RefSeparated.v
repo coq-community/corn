@@ -453,7 +453,7 @@ Proof.
  intros.
  unfold sep__sep_fun in |- *.
  elim (le_lt_dec (S i) 0); intro; simpl in |- *.
-  exfalso; apply (le_Sn_O _ a0).
+  exfalso; apply (Nat.nle_succ_0 _ a0).
  elim (le_lt_dec i 0); intro; simpl in |- *.
   elim (le_lt_eq_dec _ _ Hi'); intro; simpl in |- *.
    apply less_leEq_trans with (P (S i) Hi').

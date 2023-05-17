@@ -606,7 +606,7 @@ Proof.
   apply False_rect.
   generalize H.
   change (~ 4 <= 0) in |- *.
-  apply le_Sn_O.
+  apply Nat.nle_succ_0.
  case (le_lt_eq_dec 4 (S m) H).
   intro.
   apply less_transitive_unfolded with (Two [/]ThreeNZ[*]
