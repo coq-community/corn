@@ -165,7 +165,7 @@ Proof.
     specialize (xn (diagPlane n k)). rewrite H in xn. exact xn. }
   destruct xdf as [xnDiag cvDiag].
   assert (forall a b:nat, lt a b -> lt (diagPlane n a) (diagPlane n b)).
-  { intros. unfold diagPlane. apply plus_lt_le_compat. assumption.
+  { intros. unfold diagPlane. apply Nat.add_lt_le_mono. assumption.
     apply Nat.div_le_mono. auto. apply Nat.mul_le_mono.
     apply Nat.add_le_mono. apply Nat.le_refl. unfold lt in H0.
     apply (Nat.le_trans _ (S a)). apply le_S. apply Nat.le_refl. assumption.
