@@ -338,7 +338,7 @@ Proof.
   - simpl. unfold diagSeq. reflexivity.
   - (* The bigger triangle is the smaller one plus the diagonal *)
     assert (forall i:nat, i <= S n -> diagPlane 0 n + S i = diagPlane (S n - i) i)%nat.
-    { intros. unfold diagPlane. rewrite plus_0_l. rewrite Nat.sub_add.
+    { intros. unfold diagPlane. rewrite Nat.add_0_l. rewrite Nat.sub_add.
       rewrite diagPlaneAbsNext. ring. assumption. }
     pose proof (H (S n)). rewrite Nat.sub_diag in H0. rewrite <- H0.
     assert (diagPlane 0 n + S (S n) = S (diagPlane 0 n) + (S n))%nat. ring.
@@ -391,7 +391,7 @@ Proof.
   apply (CRle_trans _ (CRsum (diagSeq u) (n+i))).
   - apply pos_sum_more. unfold diagSeq. intros. destruct (diagPlaneInv k).
     apply H. rewrite <- (Nat.add_0_r n). rewrite <- Nat.add_assoc.
-    apply Nat.add_le_mono_l. rewrite plus_0_l. apply Nat.le_0_l.
+    apply Nat.add_le_mono_l. rewrite Nat.add_0_l. apply Nat.le_0_l.
   - assert (diagPlane 0 (i+j) = n + i)%nat.
     pose proof (diagPlaneSurject n). rewrite desN in H1.
     unfold diagPlane in H1. unfold diagPlane. rewrite <- H1.
@@ -431,8 +431,8 @@ Proof.
   rewrite <- (Nat.add_0_r p). rewrite <- Nat.add_assoc. apply Nat.add_le_mono_l.
   apply Nat.le_0_l. pose proof (diagPlaneSurject p).
   rewrite des in H0. unfold diagPlane in H0. unfold diagPlane.
-  subst p. rewrite plus_0_l. ring. unfold diagPlane. rewrite plus_0_l.
-  rewrite plus_0_l. remember (i + j)%nat. apply Nat.add_le_mono. assumption.
+  subst p. rewrite Nat.add_0_l. ring. unfold diagPlane. rewrite Nat.add_0_l.
+  rewrite Nat.add_0_l. remember (i + j)%nat. apply Nat.add_le_mono. assumption.
   apply Nat.div_le_mono. auto. apply Nat.mul_le_mono_nonneg.
   apply Nat.le_0_l. assumption. apply Nat.le_0_l. apply le_n_S. assumption.
 Qed.
@@ -478,7 +478,7 @@ Proof.
     exists (p + pp)%nat. intros. apply Nat.le_succ_r in H0.
     apply CRltEpsilon. destruct H0.
     + apply CRltForget. apply geo. assumption. apply (Nat.le_trans pp (p + pp)).
-      rewrite <- (plus_0_l pp). rewrite Nat.add_assoc. apply Nat.add_le_mono_r.
+      rewrite <- (Nat.add_0_l pp). rewrite Nat.add_assoc. apply Nat.add_le_mono_r.
       apply Nat.le_0_l. assumption.
     + subst k. apply CRltForget.
       apply (CRle_lt_trans _ (CR_of_Q R (1 # Pos.of_nat epsN))).
@@ -554,7 +554,7 @@ Proof.
   rewrite (CR_of_Q_plus R 1 1), CRmult_plus_distr_l, CRmult_1_r.
   apply CRplus_le_lt_compat. apply CRlt_asym.
   apply (H (diagPlane 0 (S n + p))).
-  unfold diagPlane. rewrite plus_0_l. rewrite plus_0_l.
+  unfold diagPlane. rewrite Nat.add_0_l. rewrite Nat.add_0_l.
   remember (S n + p)%nat as n0. assert (n <= n0)%nat.
   subst n0. simpl. apply le_S. rewrite <- (Nat.add_0_r n). rewrite <- Nat.add_assoc.
   apply Nat.add_le_mono_l. apply Nat.le_0_l.

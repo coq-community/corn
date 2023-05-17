@@ -411,7 +411,7 @@ Proof.
       apply (Nat.le_trans n (n*2)). rewrite <- (mult_1_r n).
       rewrite <- mult_assoc. apply Nat.mul_le_mono_nonneg_l.
       apply Nat.le_0_l. apply le_S. apply Nat.le_refl.
-      rewrite <- (plus_0_l (n*2)). rewrite Nat.add_assoc.
+      rewrite <- (Nat.add_0_l (n*2)). rewrite Nat.add_assoc.
       apply Nat.add_le_mono_r. auto.
     + auto.
 Qed.
