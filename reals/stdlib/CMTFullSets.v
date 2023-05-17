@@ -487,7 +487,7 @@ Proof.
     rewrite CRplus_assoc.
     rewrite <- sum_assoc. rewrite CRplus_comm. simpl in maj. apply maj.
     apply (Nat.le_trans k (S i)). assumption. simpl.
-    apply le_n_S. rewrite plus_comm. rewrite <- (plus_0_r i). rewrite <- plus_assoc.
+    apply le_n_S. rewrite plus_comm. rewrite <- (Nat.add_0_r i). rewrite <- plus_assoc.
     apply Nat.add_le_mono_l. apply Nat.le_0_l.
     intros. rewrite Nat.add_succ_r. reflexivity. apply le_n_S.
     apply Nat.le_0_l.
@@ -506,7 +506,7 @@ Proof.
   exists (S N + k)%nat. (* translated same modulus of convergence *)
   intros n kLen.
   destruct (Nat.le_exists_sub (S N) n) as [m [inf _]].
-  apply (Nat.le_trans _ (S N + k)). rewrite <- (plus_0_r (S N)).
+  apply (Nat.le_trans _ (S N + k)). rewrite <- (Nat.add_0_r (S N)).
   rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply Nat.le_0_l.
   assumption.
   subst n. replace (m + S N)%nat with (S N + m)%nat. rewrite sum_assoc.
@@ -586,7 +586,7 @@ Proof.
     exists (S N + k)%nat. (* translated modulus of convergence *)
     intros n H0. destruct (Nat.le_exists_sub N n) as [m [inf _]].
     apply (Nat.le_trans _ (S N + k)).
-    simpl. apply le_S. rewrite <- (plus_0_r N).
+    simpl. apply le_S. rewrite <- (Nat.add_0_r N).
     rewrite <- plus_assoc. apply Nat.add_le_mono_l.
     apply Nat.le_0_l. assumption. subst n.
     rewrite <- (applyPackFirstSum X fn m N x x1 x0).

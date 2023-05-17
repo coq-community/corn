@@ -377,7 +377,7 @@ Proof.
                  (if Nat.even (i * 2) then Init.Nat.pred i else i)
            end) with (CR_of_Q R 0) in cv.
     rewrite CRplus_0_r in cv. apply cv. apply (Nat.le_trans _ i).
-    assumption. rewrite mult_comm. simpl. rewrite <- (plus_0_r i).
+    assumption. rewrite mult_comm. simpl. rewrite <- (Nat.add_0_r i).
     rewrite <- plus_assoc. apply Nat.add_le_mono_l. apply Nat.le_0_l.
     destruct (i*2)%nat eqn:des. reflexivity.
     rewrite sum_const. rewrite CRmult_0_l. reflexivity. auto.
