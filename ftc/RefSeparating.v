@@ -600,7 +600,7 @@ Proof.
   rewrite sep__part_fun_i.
    2: assumption.
   intros.
-  cut (pred (sep__part_h (S i)) <= n); [ intro | eapply Nat.le_trans; [ apply le_pred_n | auto ] ].
+  cut (pred (sep__part_h (S i)) <= n); [ intro | eapply Nat.le_trans; [ apply Nat.le_pred_l | auto ] ].
   rstepl (P _ Ha[-]P _ H0[+](P _ H0[-]P _ Hb)).
   apply plus_resp_leEq_both.
    generalize Ha; pattern (sep__part_h (S i)) at 1 2 in |- *;
@@ -626,7 +626,7 @@ Proof.
    cut (i = RS'_m1); [ intro | unfold sep__part_length in b0; rewrite <- b0 in H0; auto with arith ].
    rewrite H2.
    intros.
-   cut (pred (sep__part_h (S RS'_m1)) <= n); [ intro | eapply Nat.le_trans; [ apply le_pred_n | auto ] ].
+   cut (pred (sep__part_h (S RS'_m1)) <= n); [ intro | eapply Nat.le_trans; [ apply Nat.le_pred_l | auto ] ].
    rstepl (P _ Ha0[-]P _ H3[+](P _ H3[-]P _ Hb0)).
    apply plus_resp_leEq_both.
     generalize Ha0; pattern (sep__part_h (S RS'_m1)) at 1 2 in |- *;
