@@ -152,7 +152,7 @@ Proof with auto.
  apply mult_cancel_lft with (a_ i[-]a_ (S n0)).
   apply minus_ap_zero.
   apply distinct_a_...
-  intro; rewrite H3 in H2; exact (le_Sn_n _ H2).
+  intro; rewrite H3 in H2; exact (Nat.nle_succ_diag_l _ H2).
  astepr ([0]:R).
  cut (a_ i[-]a_ (S n0) [=] (_X_[-]_C_ (a_ (S n0))) ! (a_ i)). intro.
   astepl ((_X_[-]_C_ (a_ (S n0))) ! (a_ i) [*]f' ! (a_ i)).
@@ -394,7 +394,7 @@ Proof.
    auto with arith.
   intros.
   apply H1.
-  intro; rewrite H4 in H3; exact (le_Sn_n _ H3).
+  intro; rewrite H4 in H3; exact (Nat.nle_succ_diag_l _ H3).
  astepl (a (S i') [+]Sum (S (S i')) n a).
  astepr (a (S i') [+][0]).
  apply bin_op_wd_unfolded.
@@ -403,7 +403,7 @@ Proof.
   auto with arith.
  intros.
  apply H1.
- intro; rewrite H4 in H2; exact (le_Sn_n _ H2).
+ intro; rewrite H4 in H2; exact (Nat.nle_succ_diag_l _ H2).
 Qed.
 
 Lemma poly_representation' : forall (f_ : nat -> RX) k,

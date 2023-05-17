@@ -106,14 +106,14 @@ Proof.
  intros x y z H H0.
  induction  z as [| z Hrecz].
   elim (Nat.lt_irrefl _ H0).
- rewrite mult_comm.
+ rewrite Nat.mul_comm.
  replace (y * S z) with (S z * y); auto with arith.
 Qed.
 
 Lemma le_mult_right : forall x y z : nat, x <= y -> x * z <= y * z.
 Proof.
  intros x y z H.
- rewrite mult_comm. rewrite (mult_comm y).
+ rewrite Nat.mul_comm. rewrite (Nat.mul_comm y).
  auto with arith.
 Qed.
 

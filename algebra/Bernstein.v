@@ -145,7 +145,7 @@ Proof.
   apply eq_reflexive.
  destruct i; intros Hi; unfold B, A, part_tot_nat_fun.
   simpl. symmetry.
-  rewrite <- (le_irrelevent _ _ (le_0_n _) _).
+  rewrite <- (le_irrelevent _ _ (Nat.le_0_l _) _).
   ring.
  destruct (le_lt_dec (S n) i).
   exfalso; lia.
@@ -174,7 +174,7 @@ Proof.
   rewrite -> IHn.
   rstepl ((([1][-]_X_)[*]Bernstein (le_n_S _ _ (Nat.le_0_l n))[+]_X_[*]Bernstein H)).
   rstepr (Bernstein (le_n_S 0 (S n) H)).
-  set (le_n_S 0 n (le_0_n n)).
+  set (le_n_S 0 n (Nat.le_0_l n)).
   rewrite (Bernstein_inv1 l).
   rewrite (le_irrelevent _ _ (lt_n_Sm_le 1 (S n) (lt_n_S 0 (S n) l)) l).
   rewrite (le_irrelevent _ _ H (le_S_n 0 (S n) (le_n_S 0 (S n) H))).

@@ -419,7 +419,7 @@ Proof.
   apply mult_resp_leEq_rht.
    unfold Smaller in |- *.
    apply p3m_mon'.
-   apply mult_le_compat_r; auto with arith.
+   apply Nat.mul_le_mono_r; auto with arith.
   apply less_leEq; apply a_0_pos.
  apply Main_3a with k_0; auto.
 Qed.

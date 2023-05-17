@@ -525,7 +525,7 @@ Lemma Xsum_assoc : forall {X : Set} {R : ConstructiveReals}
 Proof.
   induction p.
   - intros. simpl in z. simpl. destruct xd.
-    remember (n + 0)%nat as sn. rewrite plus_0_r in Heqsn. subst sn.
+    remember (n + 0)%nat as sn. rewrite Nat.add_0_r in Heqsn. subst sn.
     apply CRplus_morph. apply DomainProp. apply DomainProp.
   - intros. simpl. destruct xd. simpl in z.
     remember (n + S p)%nat as sn. rewrite Nat.add_succ_r in Heqsn. subst sn.

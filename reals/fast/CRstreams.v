@@ -410,7 +410,7 @@ Proof.
   unfold Str_nth.
   simpl.
   rewrite Nat.add_comm.
-  now rewrite mult_comm.
+  now rewrite Nat.mul_comm.
  intros a b.
  unfold Str_nth in *.
  simpl.

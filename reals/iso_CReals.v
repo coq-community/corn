@@ -95,7 +95,7 @@ Proof.
        assumption.
       apply H3.
       apply Nat.le_trans with (m := N1 + N2).
-       apply le_plus_l.
+       apply Nat.le_add_r.
       assumption.
      apply H5.
      apply Nat.le_trans with (m := N1 + N2).
@@ -167,15 +167,15 @@ Proof.
          apply inv_resp_leEq.
          assumption.
         apply H3.
-        apply le_plus_l.
+        apply Nat.le_add_r.
        assumption.
       apply H9.
       rewrite -> Nat.add_comm with (m := N2).
       rewrite -> plus_permute with (m := N2).
-      apply le_plus_l.
+      apply Nat.le_add_r.
      apply H8.
      rewrite -> plus_permute with (m := N1).
-     apply le_plus_l.
+     apply Nat.le_add_r.
     apply H5.
     apply pos_div_three.
     assumption.
@@ -300,7 +300,7 @@ Proof.
      elim (H3 (N1 + N2)); intros.
       apply inv_cancel_leEq.
       rstepr ((Lim g[-]y) [/]ThreeNZ); rstepl (g (N1 + N2)[-]y); auto.
-     apply le_plus_l.
+     apply Nat.le_add_r.
     apply H4.
     apply pos_div_three.
     apply shift_zero_less_minus.
@@ -339,7 +339,7 @@ Proof.
      apply le_plus_r.
     elim (H3 (N1 + N2)); intros.
      rstepl ([--]((y[-]Lim g) [/]ThreeNZ)); auto.
-    apply le_plus_l.
+    apply Nat.le_add_r.
    apply H4.
    apply pos_div_three.
    apply shift_zero_less_minus.
@@ -385,7 +385,7 @@ Proof.
        apply AbsSmall_minus.
        apply H6.
        apply Nat.le_trans with (m := N1 + N2).
-        apply le_plus_l.
+        apply Nat.le_add_r.
        assumption.
       apply H7.
       apply Nat.le_trans with (m := N1 + N2).
@@ -439,7 +439,7 @@ Proof.
       apply AbsSmall_plus.
        apply H5.
        apply Nat.le_trans with (m := N1 + N2).
-        apply le_plus_l.
+        apply Nat.le_add_r.
        assumption.
       apply AbsSmall_minus.
       apply H6.
@@ -600,7 +600,7 @@ Proof.
    apply AbsSmall_plus.
     apply H3.
     apply Nat.le_trans with (m := N1 + N2).
-     apply le_plus_l.
+     apply Nat.le_add_r.
     assumption.
    apply H5.
    apply Nat.le_trans with (m := N1 + N2).
@@ -674,14 +674,14 @@ Proof.
              in |- *.
            apply H8.
            apply Nat.le_trans with (m := K + (N1 + N2)).
-            apply le_plus_l.
+            apply Nat.le_add_r.
            assumption.
           apply AbsSmall_minus.
           change (AbsSmall (inj_Q IR (e [/]ThreeNZ)) (CS_seq IR (inj_Q_G_as_CauchySeq IR x) m[-]x)) in |- *.
           apply a.
           apply Nat.le_trans with (m := K + (N1 + N2)).
            rewrite -> plus_permute with (m := N1).
-           apply le_plus_l.
+           apply Nat.le_add_r.
           assumption.
          apply AbsSmall_minus.
          change (AbsSmall (inj_Q IR (e [/]ThreeNZ)) (CS_seq IR (inj_Q_G_as_CauchySeq IR y) m[-]y)) in |- *.
@@ -689,7 +689,7 @@ Proof.
          apply Nat.le_trans with (m := K + (N1 + N2)).
           rewrite -> Nat.add_comm with (m := N2).
           rewrite -> plus_permute with (m := N2).
-          apply le_plus_l.
+          apply Nat.le_add_r.
          assumption.
         apply eq_transitive_unfolded with (y := inj_Q IR (e [/]ThreeNZ[+]e [/]ThreeNZ[+]e [/]ThreeNZ)).
          apply eq_transitive_unfolded with
@@ -770,7 +770,7 @@ Proof.
   apply AbsSmall_plus.
    apply AbsSmall_minus.
    apply a.
-   apply le_plus_l.
+   apply Nat.le_add_r.
   apply H2.
   apply le_plus_r.
  apply Lim_Cauchy.
@@ -830,18 +830,18 @@ Proof.
      apply Nat.le_trans with (m := N1 + (N2 + M1)).
       rewrite -> Nat.add_comm with (m := M1).
       rewrite -> plus_permute with (m := M1).
-      apply le_plus_l.
+      apply Nat.le_add_r.
      assumption.
     apply H12.
     apply Nat.le_trans with (m := N1 + (N2 + M1)).
      rewrite -> plus_permute with (m := N2).
-     apply le_plus_l.
+     apply Nat.le_add_r.
     assumption.
    apply AbsSmall_mult.
     assumption.
    apply H11.
    apply Nat.le_trans with (m := N1 + (N2 + M1)).
-    apply le_plus_l.
+    apply Nat.le_add_r.
    assumption.
   apply Greater_imp_ap.
   apply mult_resp_pos.
@@ -957,7 +957,7 @@ Proof.
          apply Nat.le_trans with (m := N1 + (N2 + (N3 + M1))).
           rewrite -> plus_permute with (m := N3).
           rewrite -> plus_permute with (m := N3).
-          apply le_plus_l.
+          apply Nat.le_add_r.
          assumption.
         apply AbsSmall_mult.
          apply AbsSmall_wdr_unfolded with (y := Lim (inj_Q_G_as_CauchySeq IR x)).
@@ -971,7 +971,7 @@ Proof.
         apply H13.
         apply Nat.le_trans with (m := N1 + (N2 + (N3 + M1))).
          rewrite ->  plus_permute with (m := N2).
-         apply le_plus_l.
+         apply Nat.le_add_r.
         assumption.
        apply AbsSmall_mult.
         apply inj_Q_AbsSmall.
@@ -980,14 +980,14 @@ Proof.
          rewrite -> Nat.add_comm with (m := M1).
          rewrite -> plus_permute with (m := M1).
          rewrite -> plus_permute with (m := M1).
-         apply le_plus_l.
+         apply Nat.le_add_r.
         assumption.
        apply AbsSmall_minus.
        unfold inj_Q_G_as_CauchySeq in H12.
        unfold CS_seq at 1 in H12.
        apply H12.
        apply Nat.le_trans with (m := N1 + (N2 + (N3 + M1))).
-        apply le_plus_l.
+        apply Nat.le_add_r.
        assumption.
       apply eq_transitive_unfolded with (y := inj_Q IR (G IR (x[*]y) m)[-]inj_Q IR (G IR x m[*]G IR y m)).
        apply cg_minus_wd.

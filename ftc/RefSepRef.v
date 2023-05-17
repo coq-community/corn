@@ -296,7 +296,7 @@ Proof.
    apply leEq_wdr with (R _ (le_n _)).
     apply Partition_mon; apply Nat.le_trans with (pred m); auto with arith.
    apply finish.
-  exfalso; rewrite <- b0 in H'; apply (le_Sn_n _ H').
+  exfalso; rewrite <- b0 in H'; apply (Nat.nle_succ_diag_l _ H').
  apply leEq_reflexive.
 Qed.
 

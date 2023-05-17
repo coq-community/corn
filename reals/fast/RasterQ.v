@@ -134,7 +134,7 @@ Lemma In_filter_list
 Proof.
   induction filterList.
   - intros. destruct j; contradiction.
-  - intros. destruct j. simpl. apply le_n_S, le_0_n.
+  - intros. destruct j. simpl. apply le_n_S, Nat.le_0_l.
     simpl. apply le_n_S. apply IHfilterList, H.
 Qed.
 
@@ -145,7 +145,7 @@ Proof.
   induction v.
   - intros j H. destruct j; contradiction H.
   - intros j H. simpl in H.
-    destruct j. apply le_n_S, le_0_n.
+    destruct j. apply le_n_S, Nat.le_0_l.
     simpl. apply le_n_S, IHv, H.
 Qed.
 
@@ -166,7 +166,7 @@ Proof.
     inversion H1. subst l0. subst x. clear H1.
     specialize (IHl H4).
     destruct i.
-    + split. apply le_n_S, le_0_n.
+    + split. apply le_n_S, Nat.le_0_l.
       apply Vector_bool_in in H0.
       rewrite <- H3. exact H0.
     + specialize (IHl i j H0).

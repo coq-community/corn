@@ -1504,7 +1504,7 @@ Proof.
    rstepl (e [/]TwoNZ[+]e [/]TwoNZ).
    apply AbsSmall_plus.
     apply a.
-    apply le_plus_l.
+    apply Nat.le_add_r.
    apply AbsSmall_minus.
    apply a.
    assumption.
@@ -1542,7 +1542,7 @@ Proof.
    apply a.
    apply Nat.le_trans with (m := m).
     assumption.
-   apply le_plus_l.
+   apply Nat.le_add_r.
   apply pos_div_two'.
   assumption.
  apply pg.
@@ -1576,7 +1576,7 @@ Proof.
    apply sup_tail_leEq.
    apply Nat.le_trans with (m := n).
     assumption.
-   apply le_plus_l.
+   apply Nat.le_add_r.
   apply eq_symmetric_unfolded.
   assumption.
  assumption.
@@ -1641,8 +1641,8 @@ Proof.
  intros.
  exists (k + N + j).
   apply Nat.le_trans with (m := k + N).
-   apply le_plus_l.
-  apply le_plus_l.
+   apply Nat.le_add_r.
+  apply Nat.le_add_r.
  split.
   apply shift_leEq_minus.
   rstepl (L[-]one_div_succ k).
@@ -1699,13 +1699,13 @@ Proof.
    apply a.
    apply Nat.le_trans with (m := Nk).
     apply Nat.le_trans with (m := N1 + k).
-     apply le_plus_l.
+     apply Nat.le_add_r.
     assumption.
    assumption.
   apply AbsSmall_minus.
   apply a.
   apply Nat.le_trans with (m := N1 + k).
-   apply le_plus_l.
+   apply Nat.le_add_r.
   assumption.
  apply AbsSmall_leEq_trans with (e1 := one_div_succ (R:=OF) (N1 + k)).
   unfold one_div_succ in |- *.

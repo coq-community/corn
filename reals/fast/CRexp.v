@@ -103,10 +103,10 @@ Proof.
   induction n.
   - apply Nat.le_refl.
   - apply (Nat.le_trans _ ((S n) * 2^pred n)).
-    2: apply Nat.mul_le_mono_nonneg_l; [apply le_0_n | exact IHn].
+    2: apply Nat.mul_le_mono_nonneg_l; [apply Nat.le_0_l | exact IHn].
     clear IHn. destruct n. simpl. apply Nat.le_refl.
     simpl.
-    apply Nat.add_le_mono_l, Nat.add_le_mono_l, le_0_n.
+    apply Nat.add_le_mono_l, Nat.add_le_mono_l, Nat.le_0_l.
 Qed.
   
 Lemma Qceiling_fact_le : forall q:Q,
@@ -151,7 +151,7 @@ Proof.
   + apply Nat.le_refl.
   + intros. rewrite Pos2Nat.inj_succ, Pos.pow_succ_r. 
     rewrite Pos2Nat.inj_mul.
-    apply Nat.mul_le_mono_nonneg_l. apply le_0_n.
+    apply Nat.mul_le_mono_nonneg_l. apply Nat.le_0_l.
     exact H.
 Qed.
 

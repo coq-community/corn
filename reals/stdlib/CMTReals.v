@@ -666,13 +666,13 @@ Proof.
   - apply (CR_cv_bound_down
              (fun n : nat => x (CSUCposPointApproxSequence n)) _ _ n).
     intros. destruct (Nat.le_exists_sub n n0 H0). destruct H1. subst n0.
-    rewrite plus_comm. specialize (H x1).
+    rewrite Nat.add_comm. specialize (H x1).
     destruct (CSUCposPointApproxSequence (n + x1)); simpl; simpl in H.
     apply H. apply lcv.
   - apply (CR_cv_bound_up
              (fun n : nat => x (CSUCposPointApproxSequence n)) _ _ n).
     intros. destruct (Nat.le_exists_sub n n0 H0). destruct H1. subst n0.
-    rewrite plus_comm. specialize (H x1).
+    rewrite Nat.add_comm. specialize (H x1).
     destruct (CSUCposPointApproxSequence (n + x1)); simpl; simpl in H.
     apply (CRle_trans _ y1). exact lexy1. apply H. apply lcv.
 Qed.
@@ -693,7 +693,7 @@ Proof.
   { apply (CRlt_trans _ (CRinv R eta (inr etaPos))).
     apply CRinv_0_lt_compat. exact etaPos. exact pmaj. }
   assert (0 < p)%nat.
-  { unfold INR in qpPos. destruct p. 2: apply le_n_S, le_0_n.
+  { unfold INR in qpPos. destruct p. 2: apply le_n_S, Nat.le_0_l.
     exfalso. contradict qpPos. apply (CRle_trans _ (CR_of_Q R 0)).
     apply CR_of_Q_le. discriminate. apply CRle_refl. }
   destruct (CSUCposPointApproxSequenceCvZero (Pos.of_nat p)) as [i imaj].
@@ -1210,7 +1210,7 @@ Proof.
     rewrite CRmult_1_l. apply CR_of_Q_le.
     unfold Qle,Qnum,Qden. rewrite Z.mul_1_r, Z.mul_1_l.
     apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-    rewrite Nat2Pos.id. rewrite Nat.add_comm. apply le_n_S, le_n_S, le_0_n.
+    rewrite Nat2Pos.id. rewrite Nat.add_comm. apply le_n_S, le_n_S, Nat.le_0_l.
     intro abs. rewrite Nat.add_comm in abs. discriminate. }
 
   assert (PartialRestriction (XpointwiseLimit fn)
@@ -1289,7 +1289,7 @@ Proof.
         apply CR_of_Q_le.
         unfold Qle, Qnum, Qden. rewrite Z.mul_1_r, Z.mul_1_l.
         apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-        rewrite Nat2Pos.id. rewrite Nat.add_comm. apply le_n_S, le_0_n.
+        rewrite Nat2Pos.id. rewrite Nat.add_comm. apply le_n_S, Nat.le_0_l.
         intro abs. rewrite Nat.add_comm in abs. discriminate.
         assert (x0 <= a).
         { intro abs. apply n. split. apply CRltForget, abs. apply CRltForget, c. }
@@ -1308,7 +1308,7 @@ Proof.
         apply CRplus_le_compat_r, CRlt_asym, H. apply CR_of_Q_le.
         unfold Qle, Qnum, Qden. rewrite Z.mul_1_r, Z.mul_1_l.
         apply Pos2Z.pos_le_pos. apply Pos2Nat.inj_le.
-        rewrite Nat2Pos.id. rewrite Nat.add_comm. apply le_n_S, le_0_n.
+        rewrite Nat2Pos.id. rewrite Nat.add_comm. apply le_n_S, Nat.le_0_l.
         intro abs. rewrite Nat.add_comm in abs. discriminate.
         unfold CRminus. rewrite CRopp_plus_distr, CRopp_involutive. reflexivity.
         apply (CRle_trans _ _ _ (CRmin_r _ _)).

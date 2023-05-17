@@ -769,7 +769,7 @@ Proof.
  generalize Hi; clear Hi.
  rewrite H; clear H; intro.
  elim le_lt_dec; intro; simpl in |- *.
-  exfalso; apply (le_Sn_n _ a0).
+  exfalso; apply (Nat.nle_succ_diag_l _ a0).
  cut (forall H, Q (n - n) H [=] c); auto.
  cut (n - n = 0); [ intro | auto with arith ].
  rewrite H; intros; apply start.
@@ -840,7 +840,7 @@ Proof.
  intro.
  unfold partition_join_fun in |- *.
  elim le_lt_dec; intro; simpl in |- *.
-  exfalso; apply le_Sn_n with n; apply Nat.le_trans with (S (n + m)); auto with arith.
+  exfalso; apply Nat.nle_succ_diag_l with n; apply Nat.le_trans with (S (n + m)); auto with arith.
  apply eq_transitive_unfolded with (Q _ (le_n _)).
   apply prf1; auto with arith.
  apply finish.
@@ -941,7 +941,7 @@ Proof.
      eapply leEq_wdr.
       apply b0.
      apply prf1; auto.
-    exfalso; clear H'; rewrite b0 in a0; apply (le_Sn_n _ a0).
+    exfalso; clear H'; rewrite b0 in a0; apply (Nat.nle_succ_diag_l _ a0).
    cut (i = n); [ intro | clear H'; apply le_antisym; auto with arith ].
    generalize H a0 b0 H'; clear H' a0 b0 H; rewrite H0; intros.
    apply compact_wd with c.
@@ -1023,7 +1023,7 @@ Proof.
    Opaque minus.
    unfold partition_join, partition_join_fun in |- *.
    elim le_lt_dec; simpl in |- *; intro.
-    exfalso; apply le_Sn_n with n; eapply Nat.le_trans.
+    exfalso; apply Nat.nle_succ_diag_l with n; eapply Nat.le_trans.
      2: apply a0.
     auto with arith.
    Transparent minus.
@@ -1031,7 +1031,7 @@ Proof.
   Opaque minus.
   unfold partition_join, partition_join_fun in |- *.
   elim le_lt_dec; simpl in |- *; intro.
-   exfalso; apply le_Sn_n with n; eapply Nat.le_trans.
+   exfalso; apply Nat.nle_succ_diag_l with n; eapply Nat.le_trans.
     2: apply a0.
    auto with arith.
   Transparent minus.
@@ -1045,7 +1045,7 @@ Proof.
    elim le_lt_dec; simpl in |- *.
     intro; apply finish.
    intro; exfalso; apply (Nat.lt_irrefl _ b0).
-  intro; exfalso; apply (le_Sn_n _ a0).
+  intro; exfalso; apply (Nat.nle_succ_diag_l _ a0).
  intro; apply eq_symmetric_unfolded.
  apply eq_transitive_unfolded with (Q _ (Nat.le_0_l _)).
   apply prf1; auto with arith.
@@ -1191,7 +1191,7 @@ Proof.
       unfold partition_join_pts in |- *.
       elim le_lt_dec; intro; simpl in |- *.
        elim le_lt_eq_dec; intro; simpl in |- *.
-        exfalso; apply le_Sn_n with (S i); eapply Nat.le_trans.
+        exfalso; apply Nat.nle_succ_diag_l with (S i); eapply Nat.le_trans.
          2: apply a0.
         auto with arith.
        exfalso; apply Nat.lt_irrefl with (S i); pattern (S i) at 2 in |- *;

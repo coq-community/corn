@@ -79,7 +79,7 @@ Proof.
   apply Nat.mul_le_mono_nonneg_r.
   apply (Nat.le_trans _ 1).
   auto. exact (lt_O_fact n).
-  apply le_n_S, le_0_n.
+  apply le_n_S, Nat.le_0_l.
 Qed.
 
 Lemma fact_inc_recurse : forall p n:nat, (n <= p)%nat -> (fact n <= fact p)%nat.
@@ -309,7 +309,7 @@ Proof.
     apply le_n_S.
     rewrite <- (Nat.mul_1_l (Pos.to_nat p)) at 1.
     apply Nat.mul_le_mono_nonneg_r.
-    apply le_0_n. apply le_S, Nat.le_refl.
+    apply Nat.le_0_l. apply le_S, Nat.le_refl.
 Qed.
 
 End SinSeries.
@@ -643,7 +643,7 @@ Proof.
   rewrite ZBinary.Z.pow_add_r, Z.mul_comm.
   apply Z.le_refl.
   discriminate.
-  apply (Nat2Z.inj_le 0), le_0_n.
+  apply (Nat2Z.inj_le 0), Nat.le_0_l.
 Qed.
 
 Fixpoint rational_sin_bounded (n:nat) (a:Q) : -(3^n)%Z <= a <= (3^n)%Z -> CR :=

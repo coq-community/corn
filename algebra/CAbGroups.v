@@ -330,10 +330,10 @@ Proof.
   intro. rewrite mult_0_r. algebra.
   clear n; intros.
  simpl in |- *.
- rewrite mult_comm. simpl in |- *.
+ rewrite Nat.mul_comm. simpl in |- *.
  eapply eq_transitive_unfolded.
   2: apply nmult_plus.
- rewrite mult_comm. algebra.
+ rewrite Nat.mul_comm. algebra.
 Qed.
 
 Lemma nmult_inv : forall n x, nmult [--]x n [=] [--] (nmult x n).

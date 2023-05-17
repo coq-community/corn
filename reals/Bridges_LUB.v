@@ -648,7 +648,7 @@ Proof.
    apply nring_less.
    apply le_lt_n_Sm.
    constructor.
-   apply le_plus_l.
+   apply Nat.le_add_r.
   apply U_conversion_rate2 with (m := S (N + 3)).
    apply le_n_S.
    apply le_plus_r.
@@ -953,7 +953,7 @@ Proof.
    apply AbsSmall_plus.
     apply H2.
     apply Nat.le_trans with (m := N1 + N2).
-     apply le_plus_l.
+     apply Nat.le_add_r.
     assumption.
    apply H3.
    apply Nat.le_trans with (m := N1 + N2).
@@ -1054,7 +1054,7 @@ Proof.
    apply AbsSmall_plus.
     apply a.
     apply Nat.le_trans with (m := N1 + N2).
-     apply le_plus_l.
+     apply Nat.le_add_r.
     assumption.
    apply a0.
    apply Nat.le_trans with (m := N1 + N2).

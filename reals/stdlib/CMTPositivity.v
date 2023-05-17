@@ -113,7 +113,7 @@ Proof.
   rewrite decomp_sum. simpl.
   setoid_replace (x + CRsum (fun i0 : nat => un i0) i - (x + l))
     with (CRsum (fun i0 : nat => un i0) i - l).
-  apply pmaj. exact H. 2: apply le_n_S, le_0_n.
+  apply pmaj. exact H. 2: apply le_n_S, Nat.le_0_l.
   unfold CRminus. rewrite (CRplus_comm x).
   rewrite CRplus_assoc. apply CRplus_morph.
   reflexivity. rewrite CRopp_plus_distr, <- CRplus_assoc.
@@ -214,7 +214,7 @@ Proof.
   { intro k. unfold n, PrependSeq. destruct k.
     unfold ControlSubSeqCv.
     destruct (Un_cv_nat_real (CRsum (fun n0 : nat => I (fn n0) (fnL n0))) l lcv).
-    apply le_n_S, le_0_n. apply le_n_S.
+    apply le_n_S, Nat.le_0_l. apply le_n_S.
     apply (ControlSubSeqCvInc
              (CRsum (fun n0 : nat => I (fn n0) (fnL n0))) l
              (fun k0 : nat => CRpow (CR_of_Q _ (1#2)) (2 * k0 + 2) * alpha)). }
@@ -446,8 +446,8 @@ Proof.
                                  (xseqn (S i0))).
       unfold weaveSequences. destruct (Nat.even i0). reflexivity.
       rewrite applyXscale. apply CRmult_morph. reflexivity.
-      apply applyXsum. apply le_n_S, le_0_n.
-      apply le_n_S, le_0_n.
+      apply applyXsum. apply le_n_S, Nat.le_0_l.
+      apply le_n_S, Nat.le_0_l.
       rewrite <- (CRplus_0_r (partialApply f x xf)).
       unfold CRminus. rewrite CRplus_assoc. apply CRplus_lt_compat_l.
       apply (CRplus_lt_reg_l _ alpha).
