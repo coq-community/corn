@@ -179,7 +179,7 @@ Proof.
     rewrite <- (Nat.add_0_r (sub n)). rewrite <- Nat.add_assoc.
     apply Nat.add_le_mono_l. apply Nat.le_0_l. rewrite <- absurd. apply Nat.le_refl.
     destruct H2. subst p. exact (Nat.lt_irrefl (sub (S n)) H1).
-    specialize (inc (S n) p H2). apply (lt_asym (sub p) (sub (S n))); assumption.
+    specialize (inc (S n) p H2). apply (Nat.lt_asymm (sub p) (sub (S n))); assumption.
   - rewrite Nat.add_comm. rewrite Nat.sub_add.
     unfold FillSubSeqWithZeros.
     destruct (Nat.eq_dec (SubSeqInv sub (proj1_sig sub (S n)) (proj1_sig sub (S n))) (S (proj1_sig sub (S n)))).
