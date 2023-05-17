@@ -460,7 +460,7 @@ Proof.
     apply Nat.div_le_mono. auto.
     apply (Nat.le_trans (N0*2) (N*2 + (S N0)*2)). rewrite Nat.add_comm.
     apply (Nat.le_trans (N0 * 2) (S N0 * 2)).
-    apply mult_le_compat_r. apply le_S. apply Nat.le_refl.
+    apply Nat.mul_le_mono_r. apply le_S. apply Nat.le_refl.
     apply Nat.le_add_r.
     apply (Nat.le_trans _ i). assumption. apply le_S. apply Nat.le_refl. auto.
     rewrite Qinv_plus_distr. reflexivity.

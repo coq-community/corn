@@ -725,7 +725,7 @@ Proof.
     algebra.
    apply eq_symmetric_unfolded; apply nring_comm_mult.
   rewrite Hk.
-  apply mult_le_compat_r; assumption.
+  apply Nat.mul_le_mono_r; assumption.
  apply Hm.
  rewrite Hk.
  rewrite <- H0.
