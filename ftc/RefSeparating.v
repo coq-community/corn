@@ -1050,7 +1050,7 @@ Proof.
  apply sep__part_h_mon_3.
   rewrite <- sep__part_fun_i with (H := Nat.le_0_l m).
    2: apply RS'_pos_m.
-  2: apply lt_O_Sn.
+  2: apply Nat.lt_0_succ.
  rewrite <- sep__part_fun_m with (H := le_n m).
  apply sep__part_fun_mon.
  apply RS'_pos_m.

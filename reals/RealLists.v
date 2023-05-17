@@ -256,7 +256,7 @@ Proof.
  apply Max_less.
   apply H0; left; right; algebra.
  apply Hrecl.
-  simpl in |- *; apply lt_O_Sn.
+  simpl in |- *; apply Nat.lt_0_succ.
  intros y H1.  apply H0.
  inversion_clear H1.
   left; left; assumption.

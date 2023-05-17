@@ -147,7 +147,7 @@ Proof.
    unfold degree_le in H1; apply not_gt; intro; unfold gt in H3.
    set (tmp := (H1 (S n) (lt_n_S _ _ H3))); rewrite -> H in tmp.
    apply (eq_imp_not_ap _ _ _ tmp); apply ring_non_triv.
-  intro; unfold degree_le in H1; rewrite -> H1 in H; [ | apply lt_O_Sn ].
+  intro; unfold degree_le in H1; rewrite -> H1 in H; [ | apply Nat.lt_0_succ ].
   destruct (eq_imp_not_ap _ _ _ H); apply ap_symmetric; apply ring_non_triv.
  exists (q,r); [ | assumption ].
  intros y1 X0; destruct y1 as [q1 r1]; simpl (fst (q1, r1)); simpl (snd (q1, r1)) in X0.

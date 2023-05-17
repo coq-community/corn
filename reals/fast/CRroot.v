@@ -950,9 +950,9 @@ Lemma CRsqrt_correct : forall x H,
  (IRasCR (sqrt x H) == CRsqrt (IRasCR x))%CR.
 Proof.
  intros x H.
- assert (X:Dom (FNRoot FId 2 (lt_O_Sn 1)) x).
+ assert (X:Dom (FNRoot FId 2 (Nat.lt_0_succ 1)) x).
   simpl; split; auto.
- transitivity (IRasCR (FNRoot FId 2 (lt_O_Sn 1) x X)).
+ transitivity (IRasCR (FNRoot FId 2 (Nat.lt_0_succ 1) x X)).
   apply IRasCR_wd.
   apply: NRoot_wd.
   apply eq_reflexive.

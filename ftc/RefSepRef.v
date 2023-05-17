@@ -138,8 +138,8 @@ Lemma RSR_f'_ap_g' : forall (i j : nat) Hi Hj, f' i Hi[#]g' j Hj.
 Proof.
  intros.
  unfold f', g' in |- *; apply RSR_H'.
-    apply lt_O_Sn.
-   apply lt_O_Sn.
+    apply Nat.lt_0_succ.
+   apply Nat.lt_0_succ.
   apply pred_lt; assumption.
  apply pred_lt; assumption.
 Qed.
@@ -395,7 +395,7 @@ Proof.
    apply Nat.lt_le_trans with j; try apply Nat.le_lt_trans with i; auto with arith.
   elim (le_lt_dec n j); intros; simpl in |- *.
    lia.
-  apply lt_O_Sn.
+  apply Nat.lt_0_succ.
  elim (le_lt_dec n i); elim (le_lt_dec j 0); intros; simpl in |- *.
     elim (Nat.lt_irrefl 0); apply Nat.lt_le_trans with j; try apply Nat.le_lt_trans with i; auto with arith.
    elim (le_lt_dec n j); intro; simpl in |- *.
@@ -586,7 +586,7 @@ Proof.
    apply Nat.le_lt_trans with i; try apply Nat.lt_le_trans with j; auto with arith.
   elim (le_lt_dec m j); intros; simpl in |- *.
    lia.
-  apply lt_O_Sn.
+  apply Nat.lt_0_succ.
  elim (le_lt_dec m i); elim (le_lt_dec j 0); intros; simpl in |- *.
     elim (Nat.lt_irrefl 0); apply Nat.le_lt_trans with i; try apply Nat.lt_le_trans with j; auto with arith.
    elim (le_lt_dec m j); intro; simpl in |- *.

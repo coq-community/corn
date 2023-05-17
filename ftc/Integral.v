@@ -1057,7 +1057,7 @@ Proof.
  unfold Mesh at 1 in |- *.
  apply maxlist_leEq.
   apply length_Part_Mesh_List.
-  apply lt_O_Sn.
+  apply Nat.lt_0_succ.
  intros x H.
  elim (Part_Mesh_List_lemma _ _ _ _ _ _ H); intros i Hi.
  elim Hi; clear Hi; intros Hi Hi'.
