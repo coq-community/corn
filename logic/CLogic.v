@@ -750,7 +750,7 @@ Qed.
 Lemma lt_5 : forall i n : nat, i < n -> pred i < n.
 Proof.
  intros; apply Nat.le_lt_trans with (pred n).
-  apply le_pred; auto with arith.
+  apply Nat.pred_le_mono; auto with arith.
  apply lt_pred_n_n; apply Nat.le_lt_trans with i; auto with arith.
 Qed.
 
@@ -788,7 +788,7 @@ Proof.
  intros.
  cut (m <= n); [ intro | apply Cle_to; assumption ].
  apply Nat.le_trans with (pred n); auto with arith.
- apply le_pred; auto.
+ apply Nat.pred_le_mono; auto.
 Qed.
 
 Lemma le_2 : forall i j : nat, i < j -> i <= pred j.

@@ -439,7 +439,7 @@ Proof.
     apply (Nat.le_trans _ i). assumption.
     apply le_S. apply Nat.le_refl. auto.
     apply H0. assert (N0 = pred (S N0)). reflexivity.
-    rewrite H2. apply le_pred. rewrite <- (Nat.div_mul (S N0) 2).
+    rewrite H2. apply Nat.pred_le_mono. rewrite <- (Nat.div_mul (S N0) 2).
     apply Nat.div_le_mono. auto.
     apply (Nat.le_trans _ (N*2 + (S N0)*2)).
     rewrite Nat.add_comm. apply Nat.le_add_r.
