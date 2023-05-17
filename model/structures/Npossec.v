@@ -75,7 +75,7 @@ Proof.
  clear H0 H2 y0 y.
  intro y0.
  induction  y0 as [| y0 Hrecy0].
-  rewrite mult_comm.
+  rewrite Nat.mul_comm.
   rewrite mult_1_l.
   exact H.
  rewrite <- mult_n_Sm.

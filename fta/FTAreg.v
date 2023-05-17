@@ -334,7 +334,7 @@ Proof.
  astepl (q[^]i[*]c).
  astepr ((nrtq[^]i) [^]n[*]nrtc[^]n).
  astepr (nrtq[^] (i * n) [*]nrtc[^]n).
- rewrite mult_comm.
+ rewrite Nat.mul_comm.
  astepr ((nrtq[^]n) [^]i[*]nrtc[^]n).
  unfold nrtq in |- *. unfold nrtc in |- *.
  apply bin_op_wd_unfolded.

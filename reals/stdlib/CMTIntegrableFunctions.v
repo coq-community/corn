@@ -195,7 +195,7 @@ Proof.
   intros. unfold weaveSequences. destruct (Nat.even (n * 2)) eqn:even.
   rewrite Nat.div_mul. reflexivity. discriminate.
   exfalso. assert (Nat.even (n * 2) = true).
-  apply Nat.even_spec. exists n. rewrite mult_comm. reflexivity.
+  apply Nat.even_spec. exists n. rewrite Nat.mul_comm. reflexivity.
   rewrite even in H. discriminate.
 Qed.
 
@@ -204,7 +204,7 @@ Lemma weaveSequencesOdd : forall (X : Set) (fn gn : nat -> X) (n : nat),
 Proof.
   intros. unfold weaveSequences. destruct (Nat.even (1 + n * 2)) eqn:even.
   exfalso. rewrite evenSuccessor in even. assert (Nat.even (n * 2) = true).
-  apply Nat.even_spec. exists n. rewrite mult_comm. reflexivity.
+  apply Nat.even_spec. exists n. rewrite Nat.mul_comm. reflexivity.
   rewrite H in even. discriminate. rewrite Nat.div_add. simpl.
   reflexivity. auto.
 Qed.
@@ -242,14 +242,14 @@ Proof.
       rewrite evenSuccessor in nEven. rewrite snEven in nEven. inversion nEven.
       rewrite divModSucc. rewrite H. rewrite H0.
       pose proof (Nat.even_spec (S n)) as [H1 _].
-      destruct (H1 nEven). rewrite mult_comm in H2.
+      destruct (H1 nEven). rewrite Nat.mul_comm in H2.
       rewrite H2. rewrite Nat.div_add. rewrite Nat.div_mul.
       simpl. do 2 rewrite CRplus_assoc. apply CRplus_morph. reflexivity.
       apply CRplus_comm. auto. auto.
     + destruct n. exfalso. inversion nEven. destruct (Nat.even n) eqn:snEven.
       rewrite divModSucc. rewrite H. rewrite H0.
       pose proof (Nat.odd_spec (S n)) as [H1 _]. destruct H1. unfold Nat.odd.
-      rewrite nEven. trivial. rewrite mult_comm in H1. rewrite Nat.add_comm in H1.
+      rewrite nEven. trivial. rewrite Nat.mul_comm in H1. rewrite Nat.add_comm in H1.
       rewrite H1. rewrite Nat.div_add.
       assert ((1 + (1 + x * 2)) / 2 = (2 + x * 2) / 2)%nat. reflexivity.
       rewrite H2. rewrite Nat.div_add. simpl.
@@ -289,7 +289,7 @@ Proof.
   - remember (n*2/2)%nat. rewrite Nat.div_mul in Heqn0. subst n0.
     exact xD. auto.
   - exfalso. assert (Nat.even (n * 2) = true).
-    apply Nat.even_spec. exists n. rewrite mult_comm. reflexivity.
+    apply Nat.even_spec. exists n. rewrite Nat.mul_comm. reflexivity.
     rewrite des in H. discriminate.
 Qed.
 
@@ -309,7 +309,7 @@ Proof.
   remember ((n * 2) / 2)%nat as doubleN. rewrite Nat.div_mul in HeqdoubleN.
   subst doubleN. apply DomainProp. auto.
   exfalso. assert (Nat.even (n * 2) = true).
-  apply Nat.even_spec. exists n. rewrite mult_comm. reflexivity. rewrite des in H.
+  apply Nat.even_spec. exists n. rewrite Nat.mul_comm. reflexivity. rewrite des in H.
   discriminate.
 Qed.
 
@@ -323,7 +323,7 @@ Proof.
   unfold weaveSequences. unfold weaveSequences in xD.
   destruct (Nat.even (1+n*2)) eqn:des.
   - exfalso. assert (Nat.odd (1+ n * 2) = true).
-    apply Nat.odd_spec. exists n. rewrite mult_comm.
+    apply Nat.odd_spec. exists n. rewrite Nat.mul_comm.
     rewrite Nat.add_comm. reflexivity.
     unfold Nat.odd in H. rewrite des in H. discriminate.
   - remember ((1+n*2)/2)%nat. rewrite Nat.div_add in Heqn0. subst n0.
@@ -343,7 +343,7 @@ Proof.
   intros. unfold weaveSequences. unfold weaveSequences in y.
   destruct (Nat.even (1+(n * 2))) eqn:even.
   exfalso. assert (Nat.even (n * 2) = true).
-  apply Nat.even_spec. exists n. rewrite mult_comm. reflexivity.
+  apply Nat.even_spec. exists n. rewrite Nat.mul_comm. reflexivity.
   rewrite evenSuccessor in even.
   rewrite H in even. discriminate.
   (* Hide 2 * n / 2 in a single variable, to substitute it *)
@@ -377,7 +377,7 @@ Proof.
                  (if Nat.even (i * 2) then Init.Nat.pred i else i)
            end) with (CR_of_Q R 0) in cv.
     rewrite CRplus_0_r in cv. apply cv. apply (Nat.le_trans _ i).
-    assumption. rewrite mult_comm. simpl. rewrite <- (Nat.add_0_r i).
+    assumption. rewrite Nat.mul_comm. simpl. rewrite <- (Nat.add_0_r i).
     rewrite <- Nat.add_assoc. apply Nat.add_le_mono_l. apply Nat.le_0_l.
     destruct (i*2)%nat eqn:des. reflexivity.
     rewrite sum_const. rewrite CRmult_0_l. reflexivity. auto.
@@ -405,7 +405,7 @@ Proof.
     + exfalso. inversion des.
     + rewrite <- des in cv. clear des. destruct (Nat.even (1+n*2)) eqn:des.
       exfalso. assert (Nat.Odd (1+n*2)). exists n. rewrite Nat.add_comm.
-      rewrite mult_comm. reflexivity. apply Nat.odd_spec in H3.
+      rewrite Nat.mul_comm. reflexivity. apply Nat.odd_spec in H3.
       unfold Nat.odd in H3. rewrite des in H3. inversion H3.
       apply cv. apply (Nat.le_trans N n). assumption.
       apply (Nat.le_trans n (n*2)). rewrite <- (mult_1_r n).
@@ -539,12 +539,12 @@ Proof.
                        (gn n) x (domainInfiniteSumAbsIncReverse _ x y n)))).
   intro n. destruct (Nat.even n) eqn:nEven.
   - pose proof (Nat.even_spec n) as [H2 _]. destruct (H2 nEven) as [m H3]. subst n.
-    rewrite mult_comm.
+    rewrite Nat.mul_comm.
     rewrite <- (partialApplyWeaveEven
                  X fn gn m x (domainInfiniteSumAbsIncReverse _ x xD m)).
     + rewrite weaveSequencesEven. reflexivity.
   - pose proof (Nat.odd_spec n) as [H2 _]. destruct H2 as [m H3]. unfold Nat.odd.
-    rewrite nEven. trivial. subst n. rewrite Nat.add_comm. rewrite mult_comm.
+    rewrite nEven. trivial. subst n. rewrite Nat.add_comm. rewrite Nat.mul_comm.
     rewrite <- (partialApplyWeaveOdd
                  X fn gn m x (domainInfiniteSumAbsIncReverse _ x y m)).
     + rewrite weaveSequencesOdd. reflexivity.

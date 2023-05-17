@@ -162,7 +162,7 @@ Lemma Qmult_Σ (f: nat -> Q) n (k: nat):
   Σ n f * inject_Z (Z.of_nat k) == Σ (k * n) (f ∘ flip Nat.div k).
 Proof with auto with *.
  unfold Basics.compose.
- rewrite mult_comm.
+ rewrite Nat.mul_comm.
  rewrite Σ_mult_bound.
  unfold Qdiv.
  rewrite Σ_mult.
@@ -194,7 +194,7 @@ Proof.
  intros.
  rewrite (Σ_multiply_bound (Pos.to_nat n) m).
  rewrite (Σ_multiply_bound (nat_of_P m) n).
- rewrite mult_comm.
+ rewrite Nat.mul_comm.
  rewrite <- nat_of_P_mult_morphism.
  unfold Qdiv.
  rewrite Σ_mult.
