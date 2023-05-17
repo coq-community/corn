@@ -65,7 +65,7 @@ Proof.
   intro k.
   intros.
   exists (S k).
-  rewrite <- (plus_Snm_nSm m k).
+  rewrite <- (Nat.add_succ_comm m k).
   simpl in |- *.
   apply eq_S.
   assumption.
