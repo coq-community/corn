@@ -76,7 +76,7 @@ Proof.
  intro y0.
  induction  y0 as [| y0 Hrecy0].
   rewrite Nat.mul_comm.
-  rewrite mult_1_l.
+  rewrite Nat.mul_1_l.
   exact H.
  rewrite <- mult_n_Sm.
  cut (0 <> (x*S y0+x) -> (x*S y0+x) <> 0).
