@@ -1147,7 +1147,7 @@ Proof.
         assumption.
        apply nring_less.
        apply Nat.le_lt_trans with p.
-        unfold p in |- *; apply le_max_r.
+        unfold p in |- *; apply Nat.le_max_r.
        auto with arith.
       unfold EP2 in |- *; eapply less_wdl.
        2: apply eq_symmetric_unfolded; apply even_partition_Mesh.

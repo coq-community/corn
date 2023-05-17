@@ -804,7 +804,7 @@ Proof.
  elim (convF _ (pos_div_two _ _ H0)); intros Nf HNf.
  elim (convG _ (pos_div_two _ _ H0)); intros Ng HNg.
  cut (Nf <= Nat.max Nf Ng); [ intro | apply Nat.le_max_l ].
- cut (Ng <= Nat.max Nf Ng); [ intro | apply le_max_r ].
+ cut (Ng <= Nat.max Nf Ng); [ intro | apply Nat.le_max_r ].
  exists (Nat.max Nf Ng); intros.
  apply leEq_wdl with (AbsIR (Part _ _ (incf n x Hx) [+]Part _ _ (incg n x Hx) [-]
    (Part _ _ (incF x Hx) [+]Part _ _ (incG x Hx)))).
@@ -827,7 +827,7 @@ Proof.
  elim (convF _ (pos_div_two _ _ H0)); intros Nf HNf.
  elim (convG _ (pos_div_two _ _ H0)); intros Ng HNg.
  cut (Nf <= Nat.max Nf Ng); [ intro | apply Nat.le_max_l ].
- cut (Ng <= Nat.max Nf Ng); [ intro | apply le_max_r ].
+ cut (Ng <= Nat.max Nf Ng); [ intro | apply Nat.le_max_r ].
  exists (Nat.max Nf Ng); intros.
  apply leEq_wdl with (AbsIR (Part _ _ (incf n x Hx) [-]Part _ _ (incg n x Hx) [-]
    (Part _ _ (incF x Hx) [-]Part _ _ (incG x Hx)))).
@@ -861,7 +861,7 @@ Proof.
     elim (convF _ Hef); intros NF HNF; clear convF.
     elim (convG _ Heg); intros NG HNG; clear convG.
     cut (NF <= Nat.max NF NG); [ intro | apply Nat.le_max_l ].
-    cut (NG <= Nat.max NF NG); [ intro | apply le_max_r ].
+    cut (NG <= Nat.max NF NG); [ intro | apply Nat.le_max_r ].
     exists (Nat.max NF NG); intros.
     apply leEq_transitive with ee.
      2: unfold ee in |- *; apply Min_leEq_lft.

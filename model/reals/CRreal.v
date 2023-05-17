@@ -113,7 +113,7 @@ Proof.
  abstract ( intros e1 e2; destruct (Hf (inject_Q_CR (proj1_sig e1)) (CRlt_Qlt _ _ (Qpos_ispos e1))) as [n1 Hn1];
    destruct (Hf (inject_Q_CR (proj1_sig e2)) (CRlt_Qlt _ _ (Qpos_ispos e2))) as [n2 Hn2];
      eapply ball_triangle;[apply ball_sym|];rewrite <- CRAbsSmall_ball; [apply Hn1;apply Nat.le_max_l|
-       apply Hn2;apply le_max_r]) using Rlim_subproof0.
+       apply Hn2;apply Nat.le_max_r]) using Rlim_subproof0.
 Defined.
 
 Lemma CRisCReals : is_CReals CRasCOrdField CRlim.

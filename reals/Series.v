@@ -614,7 +614,7 @@ Proof.
   intros; apply Hn.
   apply Nat.le_trans with (Nat.max n N); auto with arith.
   apply Nat.le_trans with k; unfold k in |- *; auto with arith.
- unfold k in |- *; apply le_max_r.
+ unfold k in |- *; apply Nat.le_max_r.
 Qed.
 
 End Almost_Everywhere.
@@ -692,7 +692,7 @@ Proof.
  elim (H _ (pos_div_two _ _ H1)).
  intros N HN; exists (S (Nat.max N k)).
  cut (N <= Nat.max N k); [ intro | apply Nat.le_max_l ].
- cut (k <= Nat.max N k); [ intro | apply le_max_r ].
+ cut (k <= Nat.max N k); [ intro | apply Nat.le_max_r ].
  split.
   auto with arith.
  intros.

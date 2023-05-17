@@ -94,7 +94,7 @@ Proof.
  destruct (Cpoly_ex_degree _ (AbsPoly P)) as [m HdegA].
  unfold CPoly_bound.
  generalize (degree_le_mon _ _ _ _ (Nat.le_max_l n m) Hdeg).
- generalize (degree_le_mon _ _ _ _ (le_max_r n m) HdegA).
+ generalize (degree_le_mon _ _ _ _ (Nat.le_max_r n m) HdegA).
  revert HI.
  generalize (Nat.max n m). clear.
  intros n HI HdegP HdegA.
