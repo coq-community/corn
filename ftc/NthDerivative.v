@@ -199,7 +199,7 @@ Lemma Diffble_I_n_imp_diffble : forall n : nat,
  0 < n -> forall F : PartIR, Diffble_I_n Hab' n F -> Diffble_I Hab' F.
 Proof.
  intros n H F.
- rewrite (S_pred n 0);auto. simpl. intro H0. simpl in H0.
+ rewrite <- (Nat.lt_succ_pred 0 n);auto. simpl. intro H0. simpl in H0.
  inversion_clear H0; assumption.
 Qed.
 

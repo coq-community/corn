@@ -197,7 +197,7 @@ Proof.
  cut (0 < sub (S i)); [ intro | apply RL_sub_S ].
  rewrite <- RL_sub_n.
  rewrite <- b0.
- rewrite (S_pred _ _ H1); auto with arith.
+ rewrite <- (Nat.lt_succ_pred _ _ H1); auto with arith.
 Qed.
 
 Let H' : forall i j : nat, i < n -> j <= pred (sub (S i)) -> S j <= m.
@@ -213,7 +213,7 @@ Qed.
 Lemma RL_sub_SS : forall i : nat, sub i <= S (pred (sub (S i))).
 Proof.
  intro; cut (sub i < sub (S i)); [ intro | apply H0 ].
- rewrite <- (S_pred _ _ H1); apply Nat.lt_le_incl; apply H0.
+ rewrite (Nat.lt_succ_pred _ _ H1); apply Nat.lt_le_incl; apply H0.
 Qed.
 
 Definition RL_h : nat -> IR.
@@ -249,7 +249,7 @@ Proof.
  apply eq_transitive_unfolded with (Q _ P1[-]Q _ P2).
   2: apply eq_symmetric_unfolded; apply cg_minus_wd; [ apply HP1 | apply HP2 ].
  cut (sub (S i) = S (pred (sub (S i)))).
-  2: apply S_pred with 0; apply RL_sub_S.
+  2: symmetry; apply Nat.lt_succ_pred with 0; apply RL_sub_S.
  intro.
  generalize P1 HP1; clear HP1 P1. pattern (sub (S i)) at 1 2 11 in |- *.
  rewrite H1; intros.
@@ -337,7 +337,7 @@ Proof.
       apply HfQ'; auto.
      apply cg_minus_wd; apply prf1; auto.
     exfalso; apply (le_not_lt _ _ b0).
-    rewrite <- (S_pred _ _ (RL_sub_S i)); auto.
+    rewrite (Nat.lt_succ_pred _ _ (RL_sub_S i)); auto.
    exfalso; apply (le_not_lt _ _ H1 b0).
   symmetry  in |- *; apply RL_sub_n.
  apply Sumx_wd; intros.
@@ -544,7 +544,7 @@ Proof.
   apply leEq_transitive with (Q _ (H i j H1 Hj')).
    assumption.
   apply Partition_mon.
-  rewrite (S_pred _ _ (RL_sub_S i)); auto with arith.
+  rewrite <- (Nat.lt_succ_pred _ _ (RL_sub_S i)); auto with arith.
  apply eq_imp_leEq; apply AbsIR_eq_x.
  apply shift_leEq_minus; astepl (Q j (Nat.lt_le_incl _ _ (H _ _ H1 Hj'))); apply prf2.
 Qed.

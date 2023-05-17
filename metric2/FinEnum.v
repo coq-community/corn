@@ -386,7 +386,7 @@ Proof.
   rewrite Pos.of_nat_succ.
   rewrite <- (Pos2Nat.id d) at 2.
   apply f_equal.
-  symmetry. apply (S_pred _ O).
+  apply (Nat.lt_succ_pred O _).
   apply Pos2Nat.is_pos.
  - revert abs. apply IHa.
    intros e y0 Hy.

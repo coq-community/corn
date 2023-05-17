@@ -327,9 +327,9 @@ Proof.
  elim Taylor_Series_conv_lemma1 with (t := a) (Hxy := Hxy) (e := e); auto.
  intros N HN; exists (S N).
  intros n H0 z H2 Hz.
- assert (n = S (pred n)). apply S_pred with N; auto with arith.
+ assert (n = S (pred n)). symmetry; apply Nat.lt_succ_pred with N; auto with arith.
   set (p := pred n) in *.
- assert (N <= p). unfold p in |- *; apply le_S_n; rewrite <- S_pred with n N; auto with arith.
+ assert (N <= p). unfold p in |- *; apply le_S_n; rewrite Nat.lt_succ_pred with N n; auto with arith.
   clearbody p; rewrite H3.
  assert (H5 : forall c d : IR, Dom (c{**} ((FId{-} [-C-]d) {^}p{*} (FId{-} [-C-]a))) z).
   repeat split.
@@ -469,7 +469,7 @@ Proof.
  set (Hab' := Min_leEq_Max' a0 b a) in *.
  elim (Taylor_Series_conv_lemma1 a _ _ Hab _ (pos_div_two _ _ H4)); intros N HN.
  exists (S N); intros p Hp.
- cut (p = S (pred p)); [ intro Hn | apply S_pred with N; auto ].
+ cut (p = S (pred p)); [ intro Hn | symmetry; apply Nat.lt_succ_pred with N; auto ].
  set (n := pred p) in *; clearbody n.
  generalize Hp; clear Hp; rewrite Hn; clear Hn p.
  intros.

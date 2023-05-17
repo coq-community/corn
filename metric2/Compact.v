@@ -1398,7 +1398,7 @@ Proof.
    rewrite Pos.of_nat_succ.
    apply Pos2Nat.inj_le.
    rewrite Nat2Pos.id.
-   rewrite (S_pred _ O).
+   rewrite <- (Nat.lt_succ_pred O _).
    apply le_n_S.
    exact Hm0.
    apply Pos2Nat.is_pos.
@@ -1448,7 +1448,7 @@ Proof.
    rewrite Pos.of_nat_succ.
    apply Pos2Nat.inj_le.
    rewrite Nat2Pos.id.
-   rewrite (S_pred _ O).
+   rewrite <- (Nat.lt_succ_pred O _).
    apply le_n_S.
    exact Hm0.
    apply Pos2Nat.is_pos.

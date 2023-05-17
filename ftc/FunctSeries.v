@@ -183,7 +183,7 @@ Proof.
   unfold I in |- *; apply contin_imp_inc; Contin.
  intros; simpl in |- *.
  unfold Sum, Sum1 in |- *.
- rewrite (S_pred n 0); auto.
+ rewrite <- (Nat.lt_succ_pred 0 n); auto.
  apply cg_minus_wd; apply Sum0_wd; intros; rational.
 Qed.
 
@@ -608,7 +608,7 @@ Proof.
         Transparent Frestr.
         eapply leEq_wdr.
          apply triangle_SumIR.
-         rewrite <- (S_pred m k); auto; apply Nat.lt_le_trans with N; auto.
+         rewrite -> (Nat.lt_succ_pred k m); auto; apply Nat.lt_le_trans with N; auto.
         apply Sum_wd; intros.
         Opaque FAbs.
         simpl in |- *.
@@ -641,7 +641,7 @@ Proof.
      cut (Dom (FSum N (pred m) g) x). intro H6.
       apply leEq_wdr with (Part _ _ H6).
        apply FSum_resp_leEq.
-        rewrite <- (S_pred m k); auto; apply Nat.lt_le_trans with N; auto.
+        rewrite -> (Nat.lt_succ_pred k m); auto; apply Nat.lt_le_trans with N; auto.
        intros.
        Opaque FAbs.
        simpl in |- *.

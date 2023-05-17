@@ -409,13 +409,13 @@ Proof.
    apply lt_n_S.
    apply (ProjT1 (ProjT2 (RSR_h_f' (pred i) (lt_pred' _ _ b0 b2)))).
   rewrite plus_n_Sm.
-  rewrite <- S_pred with n 0.
+  rewrite Nat.lt_succ_pred with 0 n.
    2: apply Nat.lt_trans with i; auto.
   replace (pred m + n) with (pred (m + n)).
    auto with arith.
   cut (S (pred (m + n)) = S (pred m + n)); auto.
   rewrite <- plus_Sn_m.
-  rewrite (S_pred m 0); auto with arith.
+  rewrite <- (Nat.lt_succ_pred 0 m); auto with arith.
   apply neq_O_lt.
   intro.
   apply Nat.lt_irrefl with 0.
@@ -479,7 +479,7 @@ Proof.
   intros.
   simpl in b0; rewrite <- b0; auto.
  elim (le_lt_eq_dec _ _ H); intro.
-  cut (pred i < pred n); [ intro | apply lt_pred; rewrite <- S_pred with i 0; auto ].
+  cut (pred i < pred n); [ intro | apply lt_pred; rewrite Nat.lt_succ_pred with 0 i; auto ].
   cut (RSR_auxP i <= pred (m + n)).
    intro; exists H1.
    elim le_lt_eq_dec; intro; simpl in |- *.
@@ -496,7 +496,7 @@ Proof.
      2: eapply eq_transitive_unfolded.
       2: apply p.
      unfold f' in |- *.
-     apply prf1; apply S_pred with 0; auto.
+     apply prf1; symmetry; apply Nat.lt_succ_pred with 0; auto.
     apply RSR_h_nlnf; reflexivity.
    rewrite <- RSR_auxP_lemman in b1.
    cut (i = n).
@@ -600,14 +600,14 @@ Proof.
    apply lt_n_S.
    apply (ProjT1 (ProjT2 (RSR_h_g' (pred i) (lt_pred' _ _ b0 b2)))).
   rewrite <- plus_Sn_m.
-  rewrite <- S_pred with m 0.
+  rewrite Nat.lt_succ_pred with 0 m.
    2: apply Nat.lt_trans with i; auto.
   replace (m + pred n) with (pred (m + n)).
    auto with arith.
   cut (S (pred (m + n)) = S (m + pred n)); auto.
   rewrite plus_n_Sm.
-  rewrite <- S_pred with n 0; auto with arith.
-   symmetry  in |- *; apply S_pred with 0.
+  rewrite Nat.lt_succ_pred with 0 n; auto with arith.
+   apply Nat.lt_succ_pred with 0.
    apply Nat.lt_le_trans with m; auto with arith.
    apply Nat.lt_trans with i; auto.
   apply neq_O_lt.
@@ -673,7 +673,7 @@ Proof.
   intros.
   simpl in b0; rewrite <- b0; auto.
  elim (le_lt_eq_dec _ _ H); intro.
-  cut (pred j < pred m); [ intro | red in |- *; rewrite <- S_pred with j 0; auto; apply le_2; auto ].
+  cut (pred j < pred m); [ intro | red in |- *; rewrite Nat.lt_succ_pred with 0 j; auto; apply le_2; auto ].
   cut (RSR_auxR j <= pred (m + n)).
    intro; exists H1.
    elim le_lt_eq_dec; intro; simpl in |- *.
@@ -690,7 +690,7 @@ Proof.
      2: eapply eq_transitive_unfolded.
       2: apply p.
      unfold g' in |- *.
-     apply prf1; apply S_pred with 0; auto.
+     apply prf1; symmetry; apply Nat.lt_succ_pred with 0; auto.
     apply RSR_h_nlnf; reflexivity.
    rewrite <- RSR_auxR_lemmam in b1.
    cut (j = m).

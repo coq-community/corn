@@ -639,7 +639,7 @@ Proof.
  apply eq_transitive_unfolded with (Max (a[+]nring (S n) [*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hm) [-]
    (a[+]nring n[*] (b[-]a[/] _[//]nring_ap_zero' _ _ Hm)))
      (maxlist (Part_Mesh_List (Partition_Dom (Even_Partition Hab _ Hm))))).
-  cut (n = S (pred n)); [ intro | apply S_pred with 0; auto ].
+  cut (n = S (pred n)); [ intro | symmetry; apply Nat.lt_succ_pred with 0; auto ].
   generalize Hm; rewrite H0; clear Hm; intro.
   simpl in |- *; algebra.
  eapply eq_transitive_unfolded.

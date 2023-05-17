@@ -429,8 +429,9 @@ Proof.
    cut (N <= pred m).
     intro leNpm.
     exact (Hlt leNpm).
-   generalize (S_pred m N ltNm).
+   generalize (Nat.lt_succ_pred N m ltNm).
    intro Heq.
+   symmetry in Heq.
    apply lt_n_Sm_le.
    rewrite <- Heq.
    assumption.
@@ -447,7 +448,7 @@ Proof.
     intro Heq.
     rewrite Heq in Hs3.
     apply eq_imp_leEq; assumption.
-   generalize (S_pred m N ltNm).
+   generalize (Nat.lt_succ_pred N m ltNm).
    auto.
   exact (less_leEq _ _ _ zlt_nrtc).
  intro HNm.
@@ -488,8 +489,9 @@ Proof.
    cut (N <= pred m).
     intro leNpm.
     exact (Hlt leNpm).
-   generalize (S_pred m N ltNm).
+   generalize (Nat.lt_succ_pred N m ltNm).
    intro Heq.
+   symmetry in Heq.
    apply lt_n_Sm_le.
    simpl in |- *.
    rewrite <- Heq.
@@ -507,7 +509,7 @@ Proof.
     intro Heq.
     rewrite Heq in Hs3.
     apply eq_imp_leEq; assumption.
-   generalize (S_pred m N ltNm).
+   generalize (Nat.lt_succ_pred N m ltNm).
    auto.
   exact (less_leEq _ _ _ zlt_nrtc).
  intro HNm.

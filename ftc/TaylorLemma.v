@@ -470,7 +470,7 @@ Lemma Taylor_lemma7 : forall n Hf Hf' i (Hi : 0 < i) Hi', Derivative_I Hab'
  (funct_i' n Hf i Hi') (funct_aux n Hf' i Hi'{-}funct_aux n Hf' (pred i) (lt_5 i (S n) Hi')).
 Proof.
  do 5 intro.
- rewrite (S_pred _ _ Hi).
+ rewrite <- (Nat.lt_succ_pred _ _ Hi).
  set (p := pred i) in *; clearbody p; clear Hi i.
  intros.
  cut (Derivative_I Hab' (PartInt (fi n Hf _ Hi'))
