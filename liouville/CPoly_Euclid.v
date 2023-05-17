@@ -137,7 +137,7 @@ Proof.
   split; [ | reflexivity ].
   unfold degree_le; intros; apply nth_coeff_zero.
  destruct (@cpoly_div1 (Nat.max (lth_of_poly f) n) n f g); [ | destruct H; assumption | apply le_max_r | ].
-  apply (@degree_le_mon _ _ (lth_of_poly f)); [ apply le_max_l | apply poly_degree_lth ].
+  apply (@degree_le_mon _ _ (lth_of_poly f)); [ apply Nat.le_max_l | apply poly_degree_lth ].
  destruct H; destruct x as [q r].
  rewrite -> H, one_nexp, mult_one in y.
  assert (f[=]q[*]g[+]r and degree_lt_pair r g).

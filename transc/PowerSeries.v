@@ -269,7 +269,7 @@ Proof.
   apply pos_max_one.
  apply leEq_transitive with (c[*]AbsIR (a n)).
   apply H0.
-  apply Nat.le_trans with (Nat.max N y); auto; apply le_max_l.
+  apply Nat.le_trans with (Nat.max N y); auto; apply Nat.le_max_l.
  apply shift_leEq_div.
   apply pos_max_one.
  rstepl (c[*]Max (Max b x0[-]Min a0 x0) [1][*]AbsIR (a n)).

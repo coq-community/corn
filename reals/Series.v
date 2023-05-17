@@ -566,7 +566,7 @@ Proof.
   apply AbsSmall_minus; apply HN; apply Nat.le_trans with (Nat.max n N); auto with arith.
  apply cg_minus_wd; apply Hn.
   apply Nat.le_trans with (Nat.max n N); auto with arith.
- apply le_max_l.
+ apply Nat.le_max_l.
 Qed.
 
 Lemma aew_Cauchy2 : forall c, Cauchy_Lim_prop2 x c -> Cauchy_Lim_prop2 y c.
@@ -691,7 +691,7 @@ Proof.
   apply HN; assumption. rename X into H1.
  elim (H _ (pos_div_two _ _ H1)).
  intros N HN; exists (S (Nat.max N k)).
- cut (N <= Nat.max N k); [ intro | apply le_max_l ].
+ cut (N <= Nat.max N k); [ intro | apply Nat.le_max_l ].
  cut (k <= Nat.max N k); [ intro | apply le_max_r ].
  split.
   auto with arith.
@@ -917,7 +917,7 @@ Proof.
   intro H.
   clear Hn.
   intro n.
-  cut (S N <= Nat.max (S N) n); [ intro | apply le_max_l ].
+  cut (S N <= Nat.max (S N) n); [ intro | apply Nat.le_max_l ].
   elim (H _ H0); intros m Hm; elim Hm; clear H Hm; intros Hm H; exists m.
    apply Nat.le_trans with (Nat.max (S N) n); auto with arith.
   assumption.

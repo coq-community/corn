@@ -1158,7 +1158,7 @@ Proof.
        assumption.
       apply nring_less.
       apply Nat.le_lt_trans with p.
-       unfold p in |- *; apply le_max_l.
+       unfold p in |- *; apply Nat.le_max_l.
       auto with arith.
      red in |- *; do 3 intro.
      rewrite H2; clear H2; intros.

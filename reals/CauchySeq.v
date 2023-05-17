@@ -285,7 +285,7 @@ Proof.
    apply less_leEq_trans with Av.
     apply H4.
     apply Nat.le_trans with (Nat.max N1 N2).
-     apply le_max_l.
+     apply Nat.le_max_l.
     assumption.
    apply less_leEq.
    apply H5.
@@ -367,7 +367,7 @@ Proof.
  cut (y [<] y).
   apply less_irreflexive_unfolded.
  apply leEq_less_trans with (seq (Nat.max N M)).
-  apply HN; apply le_max_l.
+  apply HN; apply Nat.le_max_l.
  apply HM; apply le_max_r.
 Qed.
 
@@ -413,7 +413,7 @@ Proof.
   apply less_irreflexive_unfolded.
  apply less_leEq_trans with (seq (Nat.max N M)).
   apply HM; apply le_max_r.
- apply HN; apply le_max_l.
+ apply HN; apply Nat.le_max_l.
 Qed.
 
 Lemma Limits_unique : forall (seq : CauchySeq IR) y,
@@ -428,7 +428,7 @@ Proof.
   elim H5; intro N; intro H6.
   unfold Cauchy_Lim_prop2 in H.
   elim (H _ H4); intro N'; intro H7.
-  generalize (le_max_l N N'); intro H8.
+  generalize (Nat.le_max_l N N'); intro H8.
   generalize (le_max_r N N'); intro H9.
   generalize (H6 _ H8); intro H10.
   generalize (H7 _ H9); intro H11.
@@ -444,7 +444,7 @@ Proof.
  elim H5; intro N; intros H6.
  unfold Cauchy_Lim_prop2 in H.
  elim (H _ H4); intro N'; intros H7.
- generalize (le_max_l N N'); intro H8.
+ generalize (Nat.le_max_l N N'); intro H8.
  generalize (le_max_r N N'); intro H9.
  generalize (H6 _ H8); intro H10.
  generalize (H7 _ H9); intro H11.
@@ -880,7 +880,7 @@ Proof.
   apply AbsSmall_eps_div_two.
    apply H3.
    apply Nat.le_trans with (Nat.max x x0).
-    apply le_max_l.
+    apply Nat.le_max_l.
    assumption.
   apply H4.
   apply Nat.le_trans with (Nat.max x x0).

@@ -939,7 +939,7 @@ intros x a1 a2 N1 N2 A1 A2. apply -> mspc_eq; intros q A.
 assert (A3 : 0 < q / 2) by solve_propholds.
 specialize (A1 (q / 2) A3); specialize (A2 (q / 2) A3).
 set (M := Peano.max (N1 (q / 2)) (N2 (q / 2))).
-assert (A4 : N1 (q / 2) ≤ M) by apply le_max_l.
+assert (A4 : N1 (q / 2) ≤ M) by apply Nat.le_max_l.
 assert (A5 : N2 (q / 2) ≤ M) by apply le_max_r.
 specialize (A1 M A4); specialize (A2 M A5).
 apply mspc_symm in A1.

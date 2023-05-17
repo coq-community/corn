@@ -674,7 +674,7 @@ Proof.
   apply HN; assumption.
  elim (convG _ H2).
  intros N HN; exists (S (Nat.max N k)).
- cut (N <= Nat.max N k); [ intro | apply le_max_l ].
+ cut (N <= Nat.max N k); [ intro | apply Nat.le_max_l ].
  cut (k <= Nat.max N k); [ intro | apply le_max_r ].
  split.
   auto with arith.
