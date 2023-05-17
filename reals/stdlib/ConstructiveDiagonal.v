@@ -558,7 +558,7 @@ Proof.
   remember (S n + p)%nat as n0. assert (n <= n0)%nat.
   subst n0. simpl. apply le_S. rewrite <- (Nat.add_0_r n). rewrite <- Nat.add_assoc.
   apply Nat.add_le_mono_l. apply Nat.le_0_l.
-  apply plus_le_compat. assumption. apply Nat.div_le_mono. auto.
+  apply Nat.add_le_mono. assumption. apply Nat.div_le_mono. auto.
   apply mult_le_compat. assumption. apply le_n_S. assumption.
   rewrite CRabs_minus_sym. apply H. apply Nat.le_refl.
   unfold CRminus. rewrite CRplus_assoc. apply CRplus_morph. reflexivity.
