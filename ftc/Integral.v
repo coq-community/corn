@@ -808,7 +808,7 @@ Proof.
  unfold partition_join_fun in |- *.
  elim (le_lt_dec i n); elim (le_lt_dec (S i) n); intros; simpl in |- *.
     apply prf2.
-   cut (n = i); [ intro | apply le_antisym; auto with arith ].
+   cut (n = i); [ intro | apply Nat.le_antisymm; auto with arith ].
    change (P i a0 [<=] Q (S i - S n) (partition_join_aux _ _ _ b0 H')) in |- *.
    generalize H' a0 b0; clear H' a0 b0.
    rewrite <- H0; intros.
@@ -942,7 +942,7 @@ Proof.
       apply b0.
      apply prf1; auto.
     exfalso; clear H'; rewrite b0 in a0; apply (Nat.nle_succ_diag_l _ a0).
-   cut (i = n); [ intro | clear H'; apply le_antisym; auto with arith ].
+   cut (i = n); [ intro | clear H'; apply Nat.le_antisymm; auto with arith ].
    generalize H a0 b0 H'; clear H' a0 b0 H; rewrite H0; intros.
    apply compact_wd with c.
     2: apply eq_symmetric_unfolded; apply pjp_2; auto.
@@ -1073,7 +1073,7 @@ Proof.
    apply lft_leEq_Max.
   exfalso; apply le_not_lt with i n; auto with arith.
  elim le_lt_dec; intro; simpl in |- *.
-  cut (i = n); [ intro | apply le_antisym; auto with arith ].
+  cut (i = n); [ intro | apply Nat.le_antisymm; auto with arith ].
   generalize a0 b0 Hi'; clear Hx Hi Hi' a0 b0.
   rewrite H0; intros.
   apply leEq_wdl with ZeroR.

@@ -235,7 +235,7 @@ Proof.
  apply SPap_n.
  rewrite H in Hm.
  simpl in Hm.
- apply le_antisym; auto with arith.
+ apply Nat.le_antisymm; auto with arith.
 Qed.
 
 Lemma sep__part_h_lemma :
@@ -1112,7 +1112,7 @@ Proof.
       rewrite H4 in a2.
       rewrite H3 in Hk'.
       rewrite H4.
-      apply le_antisym; auto.
+      apply Nat.le_antisymm; auto.
      elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
      auto.
     rewrite H0; exact sep__part_fun_m.

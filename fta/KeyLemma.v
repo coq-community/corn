@@ -121,7 +121,7 @@ Proof.
    Step_final (NRoot a_0_eps_nonneg gt_n_0[^]n).
   intros i H1 H2.
   replace i with n.
-   2: apply le_antisym; auto.
+   2: apply Nat.le_antisymm; auto.
   astepl ([1][*]NRoot a_0_eps_nonneg gt_n_0[^]n).
   astepl (NRoot a_0_eps_nonneg gt_n_0[^]n).
   astepl (a_0[-]eps).

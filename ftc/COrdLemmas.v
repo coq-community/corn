@@ -435,7 +435,7 @@ Proof.
      unfold f' in |- *.
      elim (le_lt_dec i m); elim (le_lt_dec (S i) m); intros; simpl in |- *.
         apply H1; apply Nat.lt_succ_diag_r.
-       cut (i = m); [ intro | apply le_antisym; auto with arith ].
+       cut (i = m); [ intro | apply Nat.le_antisymm; auto with arith ].
        generalize a; clear a; pattern i at 1 2 in |- *; rewrite H5; intro.
        set (x := f m a) in *.
        cut (x = f m (le_n m)).

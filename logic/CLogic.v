@@ -965,7 +965,7 @@ Proof.
     assumption.
    rewrite <- H1.
    auto.
-  apply le_antisym.
+  apply Nat.le_antisymm.
    rewrite H1.
    apply H0.
   apply H0.

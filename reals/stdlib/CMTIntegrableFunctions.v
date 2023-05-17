@@ -479,7 +479,7 @@ Proof.
   - (* N < n so we can split the sum in 2 and use sum_assoc. *)
     destruct (Nat.le_exists_sub (S N) n) as [p [H0 _]].
     + pose proof (Nat.lt_ge_cases N n) as [H0|H1]. apply H0. exfalso.
-      exact (n0 (le_antisym N n H H1)).
+      exact (n0 (Nat.le_antisymm N n H H1)).
     + subst n. rewrite Nat.add_comm. rewrite sum_assoc.
       assert (CRsum (fun k : nat => if le_dec (S N + k) N then u (S N + k)%nat else 0) p == 0).
       { rewrite <- (CRsum_eq (fun k => 0)). rewrite sum_const.

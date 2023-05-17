@@ -1341,7 +1341,7 @@ Proof.
     destruct (le_lt_dec (S (S n0)) (S n0)). exfalso.
     exact (le_not_lt _ _ l0 (Nat.le_refl _)).
     destruct (le_lt_dec (S (S n0)) (S i)).
-    + apply le_S_n in l1. pose proof (le_antisym _ _ l l1).
+    + apply le_S_n in l1. pose proof (Nat.le_antisymm _ _ l l1).
       subst i. rewrite <- des. apply Nat.le_refl.
     + clear l0. apply le_S_n, le_S_n in l1. clear l. exfalso.
       apply (StepApproxIntegralIncr
@@ -1766,7 +1766,7 @@ Proof.
         destruct (H2 (max n m) k) as [x0 p0].
         destruct (le_lt_dec (S (2 ^ max n m)) (S x0)).
         destruct p0, p0. apply le_S_n in l.
-        apply (le_antisym _ _ l0) in l. subst x0. (* x0 = 2 ^ max n m *)
+        apply (Nat.le_antisymm _ _ l0) in l. subst x0. (* x0 = 2 ^ max n m *)
         clear l0 s c1.
         contradict ncv. apply (CRle_trans _ (b+0)).
         rewrite CRplus_0_r. apply (CRle_trans _ y _ (CRlt_asym _ _ (snd ltxy))).

@@ -306,7 +306,7 @@ Proof.
   exists 1.
   repeat split. 1-2: reflexivity.
   intros.
-  rewrite <- (le_antisym _ _ H H0).
+  rewrite <- (Nat.le_antisymm _ _ H H0).
   astepr (a 1[+][0]).
   unfold cg_minus in |- *.
   apply plus_resp_leEq_lft.
