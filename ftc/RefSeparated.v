@@ -207,7 +207,7 @@ Proof.
    assumption.
   exfalso; apply (le_not_lt j' m); auto.
  elim (le_lt_dec j 0); intro.
-  exfalso; apply lt_n_O with j'; red in |- *; apply Nat.le_trans with j; auto.
+  exfalso; apply Nat.nlt_0_r with j'; red in |- *; apply Nat.le_trans with j; auto.
  generalize Hj H H0; clear H0 H Hj.
  set (jj := pred j) in *.
  cut (j = S jj); [ intro | unfold jj in |- *; apply S_pred with 0; auto ].

@@ -63,7 +63,7 @@ Proof.
  assert (forall (n : nat) (a b : positive), nat_of_P b < n -> Acc pp_lt (a, b)).
   simple induction n.
    intros a b H0.
-   elim (lt_n_O _ H0).
+   elim (Nat.nlt_0_r _ H0).
   intros n0 Hind a b HSn0.
   assert (Hdisj : nat_of_P b < n0 \/ nat_of_P b = n0).
    lia.

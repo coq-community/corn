@@ -170,7 +170,7 @@ Qed.
 Lemma degree_le_x_ : degree_le 1 (_X_:RX).
 Proof.
  unfold degree_le in |- *.
- intro. elim m. intros. elim (lt_n_O _ H).
+ intro. elim m. intros. elim (Nat.nlt_0_r _ H).
  intro. elim n. intros. elim (Nat.lt_irrefl _ H0).
  intros. simpl in |- *. algebra.
 Qed.

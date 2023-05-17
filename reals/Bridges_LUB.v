@@ -784,7 +784,7 @@ Proof.
  do 3 intro.  intros H H0.
  induction  n as [| n Hrecn].
   apply False_rect.
-  apply (lt_n_O 0).
+  apply (Nat.nlt_0_r 0).
   apply Nat.lt_trans with (m := 1).
    apply Nat.lt_0_succ.
   assumption.

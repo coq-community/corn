@@ -832,7 +832,7 @@ Proof.
  unfold partition_join_fun in |- *.
  elim (le_lt_dec 0 n); intro; simpl in |- *.
   apply start.
- exfalso; apply (lt_n_O _ b0).
+ exfalso; apply (Nat.nlt_0_r _ b0).
 Qed.
 
 Lemma partition_join_finish : forall H, partition_join_fun (S (n + m)) H [=] b.
