@@ -718,7 +718,7 @@ Proof.
    apply nring_less.
    apply le_lt_n_Sm.
    constructor.
-   apply le_plus_l.
+   apply Nat.le_add_r.
   apply G_conversion_rate2 with (m := S (N + 3)).
    apply le_n_S.
    apply le_plus_r.
@@ -870,7 +870,7 @@ Proof.
      apply nring_less.
      apply lt_n_S.
      apply le_lt_n_Sm.
-     apply le_plus_l.
+     apply Nat.le_add_r.
     apply shift_zero_less_minus.
     apply l_less_r.
    astepl (inj_Q R1 (start_r x[-]start_l x)[/]nring (S N)[//]nringS_ap_zero R1 N).
