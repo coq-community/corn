@@ -429,7 +429,7 @@ Proof.
   apply AbsSmall_minus.
   apply Hn1.
   unfold n.
-  rewrite (max_comm n1).
+  rewrite (Nat.max_comm n1).
   rewrite max_assoc.
   auto with *.
  eapply Hn3; unfold n; auto with *.

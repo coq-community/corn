@@ -172,7 +172,7 @@ Proof.
  case (RX_dec q [0]).
   intro H; rewrite (RX_deg_wd _ _  H).
   transitivity (RX_deg p); [apply RX_deg_wd; rewrite -> H; unfold RX; ring|].
-  rewrite RX_deg_zero; rewrite max_comm; reflexivity.
+  rewrite RX_deg_zero; rewrite Nat.max_comm; reflexivity.
  intros Hq Hp.
  set (RX_deg_spec _ Hp).
  set (RX_deg_spec _ Hq).

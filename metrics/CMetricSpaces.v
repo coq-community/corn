@@ -671,7 +671,7 @@ Proof.
    cut (Nat.max x y = Nat.max y x -> seq (Nat.max x y)[=]seq (Nat.max y x)).
     intro H17.
     apply H17.
-    apply max_comm.
+    apply Nat.max_comm.
    intro H17.
    rewrite H17.
    apply eq_reflexive.
