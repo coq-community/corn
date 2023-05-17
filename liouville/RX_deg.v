@@ -177,7 +177,7 @@ Proof.
  set (RX_deg_spec _ Hp).
  set (RX_deg_spec _ Hq).
  case (le_lt_dec (RX_deg p) (RX_deg q)); intro.
-  rewrite max_r; [|assumption].
+  rewrite Nat.max_r; [|assumption].
   inversion l.
    destruct (Hneq H0).
   apply (degree_inj (p[+]q)).
