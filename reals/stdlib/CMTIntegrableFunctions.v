@@ -408,7 +408,7 @@ Proof.
       rewrite Nat.mul_comm. reflexivity. apply Nat.odd_spec in H3.
       unfold Nat.odd in H3. rewrite des in H3. inversion H3.
       apply cv. apply (Nat.le_trans N n). assumption.
-      apply (Nat.le_trans n (n*2)). rewrite <- (mult_1_r n).
+      apply (Nat.le_trans n (n*2)). rewrite <- (Nat.mul_1_r n).
       rewrite <- mult_assoc. apply Nat.mul_le_mono_nonneg_l.
       apply Nat.le_0_l. apply le_S. apply Nat.le_refl.
       rewrite <- (Nat.add_0_l (n*2)). rewrite Nat.add_assoc.
