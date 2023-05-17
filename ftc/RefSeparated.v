@@ -471,7 +471,7 @@ Proof.
    apply sep__sep_less with (Hi' := Hi').
   generalize Hi'; rewrite b2.
   intro; apply prf1; auto.
- exfalso; rewrite b2 in Hi'; apply (le_Sn_n _ Hi').
+ exfalso; rewrite b2 in Hi'; apply (Nat.nle_succ_diag_l _ Hi').
 Qed.
 
 Lemma sep__sep_fun_i_wd :
