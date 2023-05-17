@@ -46,7 +46,7 @@ Qed.
 
 Lemma Ple_le (p q: positive): Pos.le p q <-> le (nat_of_P p) (nat_of_P q).
 Proof.
- rewrite Pos.le_lteq, Plt_lt, Lt.le_lt_or_eq_iff, nat_of_P_inj_iff.
+ rewrite Pos.le_lteq, Plt_lt, Nat.lt_eq_cases, nat_of_P_inj_iff.
  reflexivity.
 Qed.
 
