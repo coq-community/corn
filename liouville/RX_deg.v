@@ -190,7 +190,7 @@ Proof.
   apply (degree_plus_rht _ _ _ m); [| |apply le_n].
    apply (degree_le_mon _ _ (RX_deg p)); [assumption|apply d].
   rewrite H; apply RX_deg_spec; assumption.
- rewrite max_l; [|apply Nat.lt_le_incl; assumption].
+ rewrite Nat.max_l; [|apply Nat.lt_le_incl; assumption].
  apply (degree_inj (p[+]q)).
   apply RX_deg_spec.
   case (RX_dec (p[+]q) [0]); [|tauto].
