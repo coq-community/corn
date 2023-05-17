@@ -138,7 +138,7 @@ Proof.
   - apply sumLastElem. intros. unfold FillSubSeqWithZeros.
     destruct (Nat.eq_dec (SubSeqInv sub k k) (S k)). reflexivity.
     exfalso. apply n. clear n. apply SubSeqInvNotFound. intros.
-    intro absurd. destruct p. rewrite absurd in H. exact (lt_irrefl k H).
+    intro absurd. destruct p. rewrite absurd in H. exact (Nat.lt_irrefl k H).
     destruct sub. simpl in absurd, H. apply (lt_not_le (x O) (x (S p))).
     apply l. apply le_n_S. apply Nat.le_0_l. rewrite absurd. apply le_S in H.
     apply le_S_n in H. apply H.
@@ -178,7 +178,7 @@ Proof.
     apply (lt_not_le (sub n) (S (sub n + k))). apply le_n_S.
     rewrite <- (Nat.add_0_r (sub n)). rewrite <- Nat.add_assoc.
     apply Nat.add_le_mono_l. apply Nat.le_0_l. rewrite <- absurd. apply Nat.le_refl.
-    destruct H2. subst p. exact (lt_irrefl (sub (S n)) H1).
+    destruct H2. subst p. exact (Nat.lt_irrefl (sub (S n)) H1).
     specialize (inc (S n) p H2). apply (lt_asym (sub p) (sub (S n))); assumption.
   - rewrite Nat.add_comm. rewrite Nat.sub_add.
     unfold FillSubSeqWithZeros.

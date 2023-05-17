@@ -692,7 +692,7 @@ Proof.
     apply IabsMinusMaj.
     destruct (Nat.le_exists_sub N m) as [k [add _]]. apply le_S in maj.
     apply le_S_n in maj. assumption. subst m. destruct k.
-    exfalso. exact (lt_irrefl N maj).
+    exfalso. exact (Nat.lt_irrefl N maj).
     apply (CRle_trans
              _ (Iabs (Xsum (fun a => fn (S N + a)%nat) k)
                      (LsumStable (fun a => fn (S N + a)%nat)

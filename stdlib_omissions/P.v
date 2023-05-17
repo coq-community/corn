@@ -1,5 +1,5 @@
 
-Require Import Coq.Setoids.Setoid Coq.PArith.BinPos Coq.PArith.Pnat.
+Require Import Coq.Setoids.Setoid Coq.PArith.BinPos Coq.PArith.Pnat ZArith_base.
 
 Set Automatic Introduction.
 
@@ -30,7 +30,7 @@ Qed.
 Lemma nat_of_P_nonzero (p: positive): nat_of_P p <> 0.
 Proof.
  intro H.
- apply Lt.lt_irrefl with 0.
+ apply Nat.lt_irrefl with 0.
  rewrite <- H at 2.
  apply lt_O_nat_of_P.
 Qed.
