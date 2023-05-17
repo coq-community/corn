@@ -183,7 +183,7 @@ Proof.
     assumption.
    apply leEq_transitive with (nring (R:=IR) N).
     exact (ProjT2 (Archimedes (b[-]a[/] d[//]pos_ap_zero _ _ H0))).
-   apply nring_leEq; apply le_n_Sn.
+   apply nring_leEq; apply Nat.le_succ_diag_r.
   unfold e' in |- *.
   rstepl (e[*] (b[-]a) [/] _[//]max_one_ap_zero (b[-]a)).
   apply shift_div_leEq.

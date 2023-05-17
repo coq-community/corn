@@ -634,7 +634,7 @@ Proof.
      apply Mesh_lemma.
     symmetry  in |- *; apply S_pred with (sep__part_h RS'_m1); apply sep__part_h_mon_2.
     cut (RS'_m1 <= m).
-     2: rewrite H0; apply le_n_Sn.
+     2: rewrite H0; apply Nat.le_succ_diag_r.
     intro.
     rewrite <- sep__part_fun_i with (H := H4).
      apply sep__part_fun_bnd'.

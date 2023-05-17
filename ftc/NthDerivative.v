@@ -274,7 +274,7 @@ Proof.
  intros n F H; induction  n as [| n Hrecn].
   simpl in H; Included.
  apply Hrecn.
- exact (le_imp_Diffble_I _ _ (le_n_Sn n) _ H).
+ exact (le_imp_Diffble_I _ _ (Nat.le_succ_diag_r n) _ H).
 Qed.
 
 (**
