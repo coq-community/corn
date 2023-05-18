@@ -235,7 +235,7 @@ Proof.
  apply SPap_n.
  rewrite H in Hm.
  simpl in Hm.
- apply le_antisym; auto with arith.
+ apply Nat.le_antisymm; auto with arith.
 Qed.
 
 Lemma sep__part_h_lemma :
@@ -600,7 +600,7 @@ Proof.
   rewrite sep__part_fun_i.
    2: assumption.
   intros.
-  cut (pred (sep__part_h (S i)) <= n); [ intro | eapply Nat.le_trans; [ apply le_pred_n | auto ] ].
+  cut (pred (sep__part_h (S i)) <= n); [ intro | eapply Nat.le_trans; [ apply Nat.le_pred_l | auto ] ].
   rstepl (P _ Ha[-]P _ H0[+](P _ H0[-]P _ Hb)).
   apply plus_resp_leEq_both.
    generalize Ha; pattern (sep__part_h (S i)) at 1 2 in |- *;
@@ -626,7 +626,7 @@ Proof.
    cut (i = RS'_m1); [ intro | unfold sep__part_length in b0; rewrite <- b0 in H0; auto with arith ].
    rewrite H2.
    intros.
-   cut (pred (sep__part_h (S RS'_m1)) <= n); [ intro | eapply Nat.le_trans; [ apply le_pred_n | auto ] ].
+   cut (pred (sep__part_h (S RS'_m1)) <= n); [ intro | eapply Nat.le_trans; [ apply Nat.le_pred_l | auto ] ].
    rstepl (P _ Ha0[-]P _ H3[+](P _ H3[-]P _ Hb0)).
    apply plus_resp_leEq_both.
     generalize Ha0; pattern (sep__part_h (S RS'_m1)) at 1 2 in |- *;
@@ -634,7 +634,7 @@ Proof.
      apply Mesh_lemma.
     symmetry  in |- *; apply S_pred with (sep__part_h RS'_m1); apply sep__part_h_mon_2.
     cut (RS'_m1 <= m).
-     2: rewrite H0; apply le_n_Sn.
+     2: rewrite H0; apply Nat.le_succ_diag_r.
     intro.
     rewrite <- sep__part_fun_i with (H := H4).
      apply sep__part_fun_bnd'.
@@ -1050,7 +1050,7 @@ Proof.
  apply sep__part_h_mon_3.
   rewrite <- sep__part_fun_i with (H := Nat.le_0_l m).
    2: apply RS'_pos_m.
-  2: apply lt_O_Sn.
+  2: apply Nat.lt_0_succ.
  rewrite <- sep__part_fun_m with (H := le_n m).
  apply sep__part_fun_mon.
  apply RS'_pos_m.
@@ -1112,7 +1112,7 @@ Proof.
       rewrite H4 in a2.
       rewrite H3 in Hk'.
       rewrite H4.
-      apply le_antisym; auto.
+      apply Nat.le_antisymm; auto.
      elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
      auto.
     rewrite H0; exact sep__part_fun_m.

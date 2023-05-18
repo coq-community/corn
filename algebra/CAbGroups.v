@@ -327,7 +327,7 @@ Qed.
 Lemma nmult_mult : forall n m x, nmult (nmult x m) n [=] nmult x (m * n).
 Proof.
  simple induction n.
-  intro. rewrite mult_0_r. algebra.
+  intro. rewrite Nat.mul_0_r. algebra.
   clear n; intros.
  simpl in |- *.
  rewrite Nat.mul_comm. simpl in |- *.

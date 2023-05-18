@@ -171,10 +171,10 @@ Proof.
        assumption.
       apply H9.
       rewrite -> Nat.add_comm with (m := N2).
-      rewrite -> plus_permute with (m := N2).
+      rewrite -> Nat.add_shuffle3 with (m := N2).
       apply Nat.le_add_r.
      apply H8.
-     rewrite -> plus_permute with (m := N1).
+     rewrite -> Nat.add_shuffle3 with (m := N1).
      apply Nat.le_add_r.
     apply H5.
     apply pos_div_three.
@@ -680,7 +680,7 @@ Proof.
           change (AbsSmall (inj_Q IR (e [/]ThreeNZ)) (CS_seq IR (inj_Q_G_as_CauchySeq IR x) m[-]x)) in |- *.
           apply a.
           apply Nat.le_trans with (m := K + (N1 + N2)).
-           rewrite -> plus_permute with (m := N1).
+           rewrite -> Nat.add_shuffle3 with (m := N1).
            apply Nat.le_add_r.
           assumption.
          apply AbsSmall_minus.
@@ -688,7 +688,7 @@ Proof.
          apply H5.
          apply Nat.le_trans with (m := K + (N1 + N2)).
           rewrite -> Nat.add_comm with (m := N2).
-          rewrite -> plus_permute with (m := N2).
+          rewrite -> Nat.add_shuffle3 with (m := N2).
           apply Nat.le_add_r.
          assumption.
         apply eq_transitive_unfolded with (y := inj_Q IR (e [/]ThreeNZ[+]e [/]ThreeNZ[+]e [/]ThreeNZ)).
@@ -829,12 +829,12 @@ Proof.
      apply H5.
      apply Nat.le_trans with (m := N1 + (N2 + M1)).
       rewrite -> Nat.add_comm with (m := M1).
-      rewrite -> plus_permute with (m := M1).
+      rewrite -> Nat.add_shuffle3 with (m := M1).
       apply Nat.le_add_r.
      assumption.
     apply H12.
     apply Nat.le_trans with (m := N1 + (N2 + M1)).
-     rewrite -> plus_permute with (m := N2).
+     rewrite -> Nat.add_shuffle3 with (m := N2).
      apply Nat.le_add_r.
     assumption.
    apply AbsSmall_mult.
@@ -955,8 +955,8 @@ Proof.
          unfold CS_seq at 1 in H14.
          apply H14.
          apply Nat.le_trans with (m := N1 + (N2 + (N3 + M1))).
-          rewrite -> plus_permute with (m := N3).
-          rewrite -> plus_permute with (m := N3).
+          rewrite -> Nat.add_shuffle3 with (m := N3).
+          rewrite -> Nat.add_shuffle3 with (m := N3).
           apply Nat.le_add_r.
          assumption.
         apply AbsSmall_mult.
@@ -970,7 +970,7 @@ Proof.
         unfold CS_seq at 1 in H13.
         apply H13.
         apply Nat.le_trans with (m := N1 + (N2 + (N3 + M1))).
-         rewrite ->  plus_permute with (m := N2).
+         rewrite ->  Nat.add_shuffle3 with (m := N2).
          apply Nat.le_add_r.
         assumption.
        apply AbsSmall_mult.
@@ -978,8 +978,8 @@ Proof.
         apply H6.
         apply Nat.le_trans with (m := N1 + (N2 + (N3 + M1))).
          rewrite -> Nat.add_comm with (m := M1).
-         rewrite -> plus_permute with (m := M1).
-         rewrite -> plus_permute with (m := M1).
+         rewrite -> Nat.add_shuffle3 with (m := M1).
+         rewrite -> Nat.add_shuffle3 with (m := M1).
          apply Nat.le_add_r.
         assumption.
        apply AbsSmall_minus.

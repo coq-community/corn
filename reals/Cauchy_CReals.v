@@ -541,13 +541,13 @@ Proof.
            rstepl ([0]:F).
            rstepr (Twelve:F).
            apply nring_pos.
-           apply lt_O_Sn.
+           apply Nat.lt_0_succ.
           apply plus_cancel_less with (R := F) (z := [--] ([1]:F)).
           rstepl ((Twelve[/] e[//]H0) [-][1]).
           rstepr (nring (R:=F) M).
           exact H2.
          apply nring_pos.
-         apply lt_O_Sn.
+         apply Nat.lt_0_succ.
         unfold one_div_succ in |- *.
         unfold Snring in |- *.
         change (Four[*] ([1][/] nring M[+][1][//]nringS_ap_zero F M) [*]
@@ -584,7 +584,7 @@ Proof.
           rstepl ([0]:F).
           rstepr (Twelve:F).
           apply nring_pos.
-          apply lt_O_Sn.
+          apply Nat.lt_0_succ.
          apply plus_cancel_less with (R := F) (z := [--] ([1]:F)).
          rstepl ((Twelve[/] e[//]H0) [-][1]).
          rstepr (nring (R:=F) M).

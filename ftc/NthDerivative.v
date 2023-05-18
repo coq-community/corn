@@ -274,7 +274,7 @@ Proof.
  intros n F H; induction  n as [| n Hrecn].
   simpl in H; Included.
  apply Hrecn.
- exact (le_imp_Diffble_I _ _ (le_n_Sn n) _ H).
+ exact (le_imp_Diffble_I _ _ (Nat.le_succ_diag_r n) _ H).
 Qed.
 
 (**
@@ -488,11 +488,11 @@ Proof.
   cut (n = pred (S n)); [ intro | simpl in |- *; reflexivity ].
   rewrite H1.
   apply Diffble_I_imp_le with F.
-    apply lt_O_Sn.
+    apply Nat.lt_0_succ.
    assumption.
   unfold f' in |- *; apply projT2.
  apply Diffble_I_n_imp_diffble with (S n).
-  apply lt_O_Sn.
+  apply Nat.lt_0_succ.
  assumption.
 Defined.
 
@@ -561,7 +561,7 @@ Proof.
   intros.
   apply Derivative_I_wdl with F.
    FEQ.
-  apply Derivative_I_wdr with (PartInt (ProjT1 (Diffble_I_n_imp_diffble _ _ _ _ (lt_O_Sn 0) _ HS))).
+  apply Derivative_I_wdr with (PartInt (ProjT1 (Diffble_I_n_imp_diffble _ _ _ _ (Nat.lt_0_succ 0) _ HS))).
    apply eq_imp_Feq.
      Included.
     Included.
@@ -615,7 +615,7 @@ Proof.
    FEQ.
    apply n_deriv_inc.
   cut (Diffble_I_n Hab' (m + n)
-    (PartInt (ProjT1 (Diffble_I_n_imp_diffble _ _ _ (S n) (lt_O_Sn n) F H0)))).
+    (PartInt (ProjT1 (Diffble_I_n_imp_diffble _ _ _ (S n) (Nat.lt_0_succ n) F H0)))).
    intro H1.
    eapply Derivative_I_n_wdr.
     2: eapply Derivative_I_n_wdl.

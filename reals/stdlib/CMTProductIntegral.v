@@ -687,7 +687,7 @@ Lemma nat_euclid_unique : forall i j q : nat,
     -> i = j.
 Proof.
   intros. assert (q <> O).
-  { destruct q. exfalso; exact (lt_irrefl O H). discriminate. }
+  { destruct q. exfalso; exact (Nat.lt_irrefl O H). discriminate. }
   rewrite (Nat.div_mod j q H2), <- H1, <- H0.
   apply Nat.div_mod, H2.
 Qed.
@@ -726,10 +726,10 @@ Proof.
     assert (b <> d).
     { intro abs. subst d. subst b. subst c. subst a.
       rewrite (nat_euclid_unique _ _ _ lenPos e abs) in H.
-      exact (lt_irrefl j H). }
+      exact (Nat.lt_irrefl j H). }
     assert (d < length (FreeSubsets (length hn)))%nat as din.
     { subst d. apply Nat.mod_upper_bound.
-      intro abs. rewrite abs in lenPos. exact (lt_irrefl _ lenPos). }
+      intro abs. rewrite abs in lenPos. exact (Nat.lt_irrefl _ lenPos). }
     apply (ProdIntegrableSubsetsDisjoint
              (map prodint_g hn) (nth d (FreeSubsets (length hn)) nil)
              (nth b (FreeSubsets (length hn)) nil) y).
@@ -737,7 +737,7 @@ Proof.
     rewrite (FreeSubsetsLength (length hn)).
     rewrite (FreeSubsetsLength (length hn)). reflexivity.
     apply nth_In. subst b. apply Nat.mod_upper_bound.
-    intro abs. rewrite abs in lenPos. exact (lt_irrefl _ lenPos).
+    intro abs. rewrite abs in lenPos. exact (Nat.lt_irrefl _ lenPos).
     apply nth_In. exact din.
     rewrite (FreeSubsetsLength (length hn)).
     rewrite map_length. reflexivity.
@@ -745,12 +745,12 @@ Proof.
     apply FreeSubsetsDifferent.
     intro abs. apply H1. symmetry. exact abs. exact din.
     subst b. apply Nat.mod_upper_bound.
-    intro abs. rewrite abs in lenPos. exact (lt_irrefl _ lenPos).
+    intro abs. rewrite abs in lenPos. exact (Nat.lt_irrefl _ lenPos).
   - (* If subsets a and c are different, the product on x's is zero. *)
     assert (c < length (FreeSubsets (length hn)))%nat as cin.
     { subst c.
       apply Nat.div_lt_upper_bound. intro abs.
-      rewrite abs in lenPos. exact (lt_irrefl 0 lenPos). exact H0. }
+      rewrite abs in lenPos. exact (Nat.lt_irrefl 0 lenPos). exact H0. }
     apply (ProdIntegrableSubsetsDisjoint
              (map prodint_f hn) (nth c (FreeSubsets (length hn)) nil)
              (nth a (FreeSubsets (length hn)) nil) x).
@@ -759,7 +759,7 @@ Proof.
     rewrite (FreeSubsetsLength (length hn)). reflexivity.
     apply nth_In. subst a.
     apply Nat.div_lt_upper_bound. intro abs.
-    rewrite abs in lenPos. exact (lt_irrefl 0 lenPos).
+    rewrite abs in lenPos. exact (Nat.lt_irrefl 0 lenPos).
     exact (Nat.lt_trans _ _ _ H H0).
     apply nth_In. exact cin.
     rewrite (FreeSubsetsLength (length hn)).
@@ -768,7 +768,7 @@ Proof.
     intro abs. apply n. symmetry. exact abs. exact cin.
     subst a.
     apply Nat.div_lt_upper_bound. intro abs.
-    rewrite abs in lenPos. exact (lt_irrefl 0 lenPos).
+    rewrite abs in lenPos. exact (Nat.lt_irrefl 0 lenPos).
     exact (Nat.lt_trans _ _ _ H H0).
 Qed.
 

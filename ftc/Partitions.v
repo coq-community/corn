@@ -118,7 +118,7 @@ Proof.
 Qed.
 
 Definition Partition_Dom a b Hab n P :
-  Partition a _ (part_pred_lemma a b Hab (S n) P n (le_n_Sn n)) n.
+  Partition a _ (part_pred_lemma a b Hab (S n) P n (Nat.le_succ_diag_r n)) n.
 Proof.
  intros.
  apply Build_Partition with (fun (i : nat) (Hi : i <= n) => P i (le_S _ _ Hi)).
@@ -146,7 +146,7 @@ Proof.
   apply (@nil IR).
  apply cons.
   apply (P _ (le_n (S n)) [-]P _ (le_S _ _ (le_n n))).
- apply Hrecn with a (P _ (le_n_Sn n)) (part_pred_lemma _ _ _ _ P n (le_n_Sn n)).
+ apply Hrecn with a (P _ (Nat.le_succ_diag_r n)) (part_pred_lemma _ _ _ _ P n (Nat.le_succ_diag_r n)).
  apply Partition_Dom.
 Defined.
 
@@ -655,7 +655,7 @@ Proof.
  cut (0 <> n); intro.
   eapply eq_transitive_unfolded.
    apply Mesh_wd' with (Q := Even_Partition (part_pred_lemma _ _ Hab (S n) (Even_Partition Hab _ Hm) n
-     (le_n_Sn n)) _ H0).
+     (Nat.le_succ_diag_r n)) _ H0).
    intros; simpl in |- *; rational.
   eapply eq_transitive_unfolded.
    apply H.

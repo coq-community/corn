@@ -183,7 +183,7 @@ Qed.
 Lemma RL_sub_S : forall i : nat, 0 < sub (S i).
 Proof.
  rewrite <- RL_sub_0.
- intro; apply RL_sub_mon; apply lt_O_Sn.
+ intro; apply RL_sub_mon; apply Nat.lt_0_succ.
 Qed.
 
 Let H : forall i j : nat, i < n -> j <= pred (sub (S i)) -> j < m.
@@ -193,7 +193,7 @@ Proof.
  elim (le_lt_eq_dec _ _ H1); clear H1; intro.
   cut (sub (S i) < sub n); [ intro | apply RL_sub_mon; assumption ].
   rewrite <- RL_sub_n.
-  apply Nat.le_lt_trans with (sub (S i)); auto; eapply Nat.le_trans; [ apply H0 | apply le_pred_n ].
+  apply Nat.le_lt_trans with (sub (S i)); auto; eapply Nat.le_trans; [ apply H0 | apply Nat.le_pred_l ].
  cut (0 < sub (S i)); [ intro | apply RL_sub_S ].
  rewrite <- RL_sub_n.
  rewrite <- b0.

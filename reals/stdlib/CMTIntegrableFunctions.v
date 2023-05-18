@@ -408,10 +408,10 @@ Proof.
       rewrite Nat.mul_comm. reflexivity. apply Nat.odd_spec in H3.
       unfold Nat.odd in H3. rewrite des in H3. inversion H3.
       apply cv. apply (Nat.le_trans N n). assumption.
-      apply (Nat.le_trans n (n*2)). rewrite <- (mult_1_r n).
-      rewrite <- mult_assoc. apply Nat.mul_le_mono_nonneg_l.
+      apply (Nat.le_trans n (n*2)). rewrite <- (Nat.mul_1_r n).
+      rewrite <- Nat.mul_assoc. apply Nat.mul_le_mono_nonneg_l.
       apply Nat.le_0_l. apply le_S. apply Nat.le_refl.
-      rewrite <- (plus_0_l (n*2)). rewrite Nat.add_assoc.
+      rewrite <- (Nat.add_0_l (n*2)). rewrite Nat.add_assoc.
       apply Nat.add_le_mono_r. auto.
     + auto.
 Qed.
@@ -439,7 +439,7 @@ Proof.
     apply (Nat.le_trans _ i). assumption.
     apply le_S. apply Nat.le_refl. auto.
     apply H0. assert (N0 = pred (S N0)). reflexivity.
-    rewrite H2. apply le_pred. rewrite <- (Nat.div_mul (S N0) 2).
+    rewrite H2. apply Nat.pred_le_mono. rewrite <- (Nat.div_mul (S N0) 2).
     apply Nat.div_le_mono. auto.
     apply (Nat.le_trans _ (N*2 + (S N0)*2)).
     rewrite Nat.add_comm. apply Nat.le_add_r.
@@ -479,7 +479,7 @@ Proof.
   - (* N < n so we can split the sum in 2 and use sum_assoc. *)
     destruct (Nat.le_exists_sub (S N) n) as [p [H0 _]].
     + pose proof (Nat.lt_ge_cases N n) as [H0|H1]. apply H0. exfalso.
-      exact (n0 (le_antisym N n H H1)).
+      exact (n0 (Nat.le_antisymm N n H H1)).
     + subst n. rewrite Nat.add_comm. rewrite sum_assoc.
       assert (CRsum (fun k : nat => if le_dec (S N + k) N then u (S N + k)%nat else 0) p == 0).
       { rewrite <- (CRsum_eq (fun k => 0)). rewrite sum_const.

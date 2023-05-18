@@ -1016,7 +1016,7 @@ Proof.
   astepr ((x[^]2)[^]m).
   apply nexp_resp_pos.
   apply pos_square. auto.
-  rewrite y. unfold double in |- *. lia.
+  rewrite y. unfold Nat.double in |- *. lia.
 Qed.
 
 

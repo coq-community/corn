@@ -233,7 +233,7 @@ Qed.
 (** Return the ith entry of a vector *)
 Fixpoint Vector_ix A (n i:nat) (H:(i < n)%nat) (v:Vector.t A n) : A :=
 match v in Vector.t _ m return (i < m)%nat -> A with
-| Vector.nil _ => fun p => False_rect _ (lt_n_O _ p)
+| Vector.nil _ => fun p => False_rect _ (Nat.nlt_0_r _ p)
 | Vector.cons _ c n' v' => fun _ => match lt_le_dec i n' with
                             | left p => Vector_ix p v'
                             | right _ => c

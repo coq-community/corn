@@ -183,7 +183,7 @@ Proof.
     assumption.
    apply leEq_transitive with (nring (R:=IR) N).
     exact (ProjT2 (Archimedes (b[-]a[/] d[//]pos_ap_zero _ _ H0))).
-   apply nring_leEq; apply le_n_Sn.
+   apply nring_leEq; apply Nat.le_succ_diag_r.
   unfold e' in |- *.
   rstepl (e[*] (b[-]a) [/] _[//]max_one_ap_zero (b[-]a)).
   apply shift_div_leEq.
@@ -808,7 +808,7 @@ Proof.
  unfold partition_join_fun in |- *.
  elim (le_lt_dec i n); elim (le_lt_dec (S i) n); intros; simpl in |- *.
     apply prf2.
-   cut (n = i); [ intro | apply le_antisym; auto with arith ].
+   cut (n = i); [ intro | apply Nat.le_antisymm; auto with arith ].
    change (P i a0 [<=] Q (S i - S n) (partition_join_aux _ _ _ b0 H')) in |- *.
    generalize H' a0 b0; clear H' a0 b0.
    rewrite <- H0; intros.
@@ -832,7 +832,7 @@ Proof.
  unfold partition_join_fun in |- *.
  elim (le_lt_dec 0 n); intro; simpl in |- *.
   apply start.
- exfalso; apply (lt_n_O _ b0).
+ exfalso; apply (Nat.nlt_0_r _ b0).
 Qed.
 
 Lemma partition_join_finish : forall H, partition_join_fun (S (n + m)) H [=] b.
@@ -942,7 +942,7 @@ Proof.
       apply b0.
      apply prf1; auto.
     exfalso; clear H'; rewrite b0 in a0; apply (Nat.nle_succ_diag_l _ a0).
-   cut (i = n); [ intro | clear H'; apply le_antisym; auto with arith ].
+   cut (i = n); [ intro | clear H'; apply Nat.le_antisymm; auto with arith ].
    generalize H a0 b0 H'; clear H' a0 b0 H; rewrite H0; intros.
    apply compact_wd with c.
     2: apply eq_symmetric_unfolded; apply pjp_2; auto.
@@ -1057,7 +1057,7 @@ Proof.
  unfold Mesh at 1 in |- *.
  apply maxlist_leEq.
   apply length_Part_Mesh_List.
-  apply lt_O_Sn.
+  apply Nat.lt_0_succ.
  intros x H.
  elim (Part_Mesh_List_lemma _ _ _ _ _ _ H); intros i Hi.
  elim Hi; clear Hi; intros Hi Hi'.
@@ -1073,7 +1073,7 @@ Proof.
    apply lft_leEq_Max.
   exfalso; apply le_not_lt with i n; auto with arith.
  elim le_lt_dec; intro; simpl in |- *.
-  cut (i = n); [ intro | apply le_antisym; auto with arith ].
+  cut (i = n); [ intro | apply Nat.le_antisymm; auto with arith ].
   generalize a0 b0 Hi'; clear Hx Hi Hi' a0 b0.
   rewrite H0; intros.
   apply leEq_wdl with ZeroR.
@@ -1147,7 +1147,7 @@ Proof.
         assumption.
        apply nring_less.
        apply Nat.le_lt_trans with p.
-        unfold p in |- *; apply le_max_r.
+        unfold p in |- *; apply Nat.le_max_r.
        auto with arith.
       unfold EP2 in |- *; eapply less_wdl.
        2: apply eq_symmetric_unfolded; apply even_partition_Mesh.
@@ -1158,7 +1158,7 @@ Proof.
        assumption.
       apply nring_less.
       apply Nat.le_lt_trans with p.
-       unfold p in |- *; apply le_max_l.
+       unfold p in |- *; apply Nat.le_max_l.
       auto with arith.
      red in |- *; do 3 intro.
      rewrite H2; clear H2; intros.

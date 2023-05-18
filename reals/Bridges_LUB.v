@@ -529,7 +529,7 @@ Proof.
   apply False_rect.
   generalize H.
   change (~ 4 <= 0) in |- *.
-  apply le_Sn_O.
+  apply Nat.nle_succ_0.
  case (le_lt_eq_dec 4 (S m) H).
   intro.
   apply less_transitive_unfolded with
@@ -784,9 +784,9 @@ Proof.
  do 3 intro.  intros H H0.
  induction  n as [| n Hrecn].
   apply False_rect.
-  apply (lt_n_O 0).
+  apply (Nat.nlt_0_r 0).
   apply Nat.lt_trans with (m := 1).
-   apply lt_O_Sn.
+   apply Nat.lt_0_succ.
   assumption.
  case (le_lt_eq_dec 2 (S n) (lt_le_S 1 (S n) H0)).
   intro.

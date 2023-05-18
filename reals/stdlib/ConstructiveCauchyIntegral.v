@@ -1223,7 +1223,7 @@ Proof.
     replace i with ipt_last0.
     + rewrite <- ipt_lastB0. rewrite Nat.sub_diag.
       rewrite <- ipt_head1. reflexivity.
-    + apply le_antisym. apply le_S_n, Nat.nlt_ge, n. exact H.
+    + apply Nat.le_antisymm. apply le_S_n, Nat.nlt_ge, n. exact H.
   - apply CRsum_eq. intros. unfold ConcatSequences.
     destruct (lt_dec (S ipt_last0 + i) (S ipt_last0)).
     exfalso. apply (lt_not_le _ _ l).
@@ -1271,7 +1271,7 @@ Proof.
       reflexivity.
       intros. destruct (lt_dec n0 n). reflexivity.
       replace n0 with n. rewrite Nat.sub_diag. symmetry. exact H.
-      apply le_antisym. 2: exact H0. apply Nat.nlt_ge. exact n1.
+      apply Nat.le_antisymm. 2: exact H0. apply Nat.nlt_ge. exact n1.
     - intros. rewrite Nat.add_succ_r. simpl.
       rewrite IHp. 2: exact H.
       assert (forall a b c : CRcarrier R,

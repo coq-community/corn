@@ -65,7 +65,7 @@ Proof.
   intro k.
   intros.
   exists (S k).
-  rewrite <- (plus_Snm_nSm m k).
+  rewrite <- (Nat.add_succ_comm m k).
   simpl in |- *.
   apply eq_S.
   assumption.
@@ -335,7 +335,7 @@ Proof.
  apply H.
  apply Nat.le_trans with (m := n).
   assumption.
- apply le_n_Sn.
+ apply Nat.le_succ_diag_r.
 Qed.
 
 Lemma bound_tk2 :
@@ -358,7 +358,7 @@ Proof.
  apply H.
  apply Nat.le_trans with (m := n).
   assumption.
- apply le_n_Sn.
+ apply Nat.le_succ_diag_r.
 Qed.
 
 
@@ -391,12 +391,12 @@ Proof.
      apply H.
      apply Nat.le_trans with (m := n).
       assumption.
-     apply le_n_Sn.
+     apply Nat.le_succ_diag_r.
     intros.
     apply H0.
     apply Nat.le_trans with (m := n).
      assumption.
-    apply le_n_Sn.
+    apply Nat.le_succ_diag_r.
    assumption.
   apply lt_n_Sm_le.
   assumption.
@@ -411,7 +411,7 @@ Proof.
  apply H.
  apply Nat.le_trans with (m := n).
   assumption.
- apply le_n_Sn.
+ apply Nat.le_succ_diag_r.
 Qed.
 
 
@@ -444,12 +444,12 @@ Proof.
      apply H.
      apply Nat.le_trans with (m := n).
       assumption.
-     apply le_n_Sn.
+     apply Nat.le_succ_diag_r.
     intros.
     apply H0.
     apply Nat.le_trans with (m := n).
      assumption.
-    apply le_n_Sn.
+    apply Nat.le_succ_diag_r.
    assumption.
   apply lt_n_Sm_le.
   assumption.
@@ -464,7 +464,7 @@ Proof.
  apply H.
  apply Nat.le_trans with (m := n).
   assumption.
- apply le_n_Sn.
+ apply Nat.le_succ_diag_r.
 Qed.
 
 Theorem up_bound_for_n_element :
@@ -658,7 +658,7 @@ Proof.
    apply H.
    apply Nat.le_trans with (m := N).
     assumption.
-   apply le_n_Sn.
+   apply Nat.le_succ_diag_r.
   intro.
   case (H (S N)).
     apply le_n.
@@ -690,7 +690,7 @@ Proof.
   apply Nat.le_trans with (m := N).
    apply Cle_to.
    assumption.
-  apply le_n_Sn.
+  apply Nat.le_succ_diag_r.
  assumption.
 Qed.
 

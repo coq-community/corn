@@ -168,7 +168,7 @@ Proof.
  revert Heq.
  unfold QX_deg; rewrite (RX_deg_wd _ Q_dec _ _ (RX_div_spec _ p a)).
  rewrite RX_deg_sum.
-  rewrite max_comm.
+  rewrite Nat.max_comm.
   rewrite -> QX_deg_mult.
     unfold QX_deg; rewrite RX_deg_minus.
      rewrite RX_deg_c_, RX_deg_x_, RX_deg_c_; fold QX_deg.

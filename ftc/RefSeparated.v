@@ -207,7 +207,7 @@ Proof.
    assumption.
   exfalso; apply (le_not_lt j' m); auto.
  elim (le_lt_dec j 0); intro.
-  exfalso; apply lt_n_O with j'; red in |- *; apply Nat.le_trans with j; auto.
+  exfalso; apply Nat.nlt_0_r with j'; red in |- *; apply Nat.le_trans with j; auto.
  generalize Hj H H0; clear H0 H Hj.
  set (jj := pred j) in *.
  cut (j = S jj); [ intro | unfold jj in |- *; apply S_pred with 0; auto ].
@@ -453,7 +453,7 @@ Proof.
  intros.
  unfold sep__sep_fun in |- *.
  elim (le_lt_dec (S i) 0); intro; simpl in |- *.
-  exfalso; apply (le_Sn_O _ a0).
+  exfalso; apply (Nat.nle_succ_0 _ a0).
  elim (le_lt_dec i 0); intro; simpl in |- *.
   elim (le_lt_eq_dec _ _ Hi'); intro; simpl in |- *.
    apply less_leEq_trans with (P (S i) Hi').

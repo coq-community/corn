@@ -1411,7 +1411,7 @@ Lemma Deriv_lemma : forall F diffF, Derivative I pI F (Deriv F diffF).
 Proof.
  intros; unfold Deriv in |- *.
  apply Derivative_wdl with (N_Deriv 0 F
-   (le_imp_Diffble_n 0 1 (le_n_Sn 0) F (Diffble_imp_Diffble_n _ diffF))).
+   (le_imp_Diffble_n 0 1 (Nat.le_succ_diag_r 0) F (Diffble_imp_Diffble_n _ diffF))).
   apply Derivative_n_unique with 0 F.
    apply N_Deriv_lemma.
   apply Derivative_n_O; elim diffF; auto.

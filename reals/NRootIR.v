@@ -280,7 +280,7 @@ Section Square_root.
 (**
 ** Square root *)
 
-Definition sqrt x xpos : IR := NRoot (x:=x) (n:=2) xpos (lt_O_Sn 1).
+Definition sqrt x xpos : IR := NRoot (x:=x) (n:=2) xpos (Nat.lt_0_succ 1).
 
 Lemma sqrt_sqr : forall x xpos, sqrt x xpos[^]2 [=] x.
 Proof.

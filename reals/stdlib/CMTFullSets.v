@@ -165,11 +165,11 @@ Proof.
     specialize (xn (diagPlane n k)). rewrite H in xn. exact xn. }
   destruct xdf as [xnDiag cvDiag].
   assert (forall a b:nat, lt a b -> lt (diagPlane n a) (diagPlane n b)).
-  { intros. unfold diagPlane. apply plus_lt_le_compat. assumption.
-    apply Nat.div_le_mono. auto. apply mult_le_compat.
-    apply plus_le_compat. apply Nat.le_refl. unfold lt in H0.
+  { intros. unfold diagPlane. apply Nat.add_lt_le_mono. assumption.
+    apply Nat.div_le_mono. auto. apply Nat.mul_le_mono.
+    apply Nat.add_le_mono. apply Nat.le_refl. unfold lt in H0.
     apply (Nat.le_trans _ (S a)). apply le_S. apply Nat.le_refl. assumption.
-    apply le_n_S. apply plus_le_compat. apply Nat.le_refl. unfold lt in H0.
+    apply le_n_S. apply Nat.add_le_mono. apply Nat.le_refl. unfold lt in H0.
     apply (Nat.le_trans _ (S a)). apply le_S. apply Nat.le_refl. assumption. }
   pose proof (CR_complete R _ cvDiag) as [lim cvlim].
   destruct (SubSeriesCv (fun k : nat =>
@@ -692,7 +692,7 @@ Proof.
     apply IabsMinusMaj.
     destruct (Nat.le_exists_sub N m) as [k [add _]]. apply le_S in maj.
     apply le_S_n in maj. assumption. subst m. destruct k.
-    exfalso. exact (lt_irrefl N maj).
+    exfalso. exact (Nat.lt_irrefl N maj).
     apply (CRle_trans
              _ (Iabs (Xsum (fun a => fn (S N + a)%nat) k)
                      (LsumStable (fun a => fn (S N + a)%nat)

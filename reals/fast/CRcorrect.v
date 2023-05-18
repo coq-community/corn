@@ -421,7 +421,7 @@ Proof.
    apply AbsSmall_minus.
    apply Hn2.
    unfold n.
-   rewrite max_assoc.
+   rewrite Nat.max_assoc.
    auto with *.
    unfold QAbsSmall.
    setoid_replace (x n1 + y n - (x n + y n))%Q with (x n1 - x n)%Q.
@@ -429,8 +429,8 @@ Proof.
   apply AbsSmall_minus.
   apply Hn1.
   unfold n.
-  rewrite (max_comm n1).
-  rewrite max_assoc.
+  rewrite (Nat.max_comm n1).
+  rewrite Nat.max_assoc.
   auto with *.
  eapply Hn3; unfold n; auto with *.
 Qed.

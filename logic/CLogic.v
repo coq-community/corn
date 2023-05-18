@@ -750,7 +750,7 @@ Qed.
 Lemma lt_5 : forall i n : nat, i < n -> pred i < n.
 Proof.
  intros; apply Nat.le_lt_trans with (pred n).
-  apply le_pred; auto with arith.
+  apply Nat.pred_le_mono; auto with arith.
  apply lt_pred_n_n; apply Nat.le_lt_trans with i; auto with arith.
 Qed.
 
@@ -788,7 +788,7 @@ Proof.
  intros.
  cut (m <= n); [ intro | apply Cle_to; assumption ].
  apply Nat.le_trans with (pred n); auto with arith.
- apply le_pred; auto.
+ apply Nat.pred_le_mono; auto.
 Qed.
 
 Lemma le_2 : forall i j : nat, i < j -> i <= pred j.
@@ -965,7 +965,7 @@ Proof.
     assumption.
    rewrite <- H1.
    auto.
-  apply le_antisym.
+  apply Nat.le_antisymm.
    rewrite H1.
    apply H0.
   apply H0.
@@ -1066,9 +1066,9 @@ Proof.
 Qed.
 
 Lemma odd_double_ind : forall P : nat -> CProp, (forall n, odd n -> P n) ->
- (forall n, 0 < n -> P n -> P (double n)) -> forall n, 0 < n -> P n.
+ (forall n, 0 < n -> P n -> P (Nat.double n)) -> forall n, 0 < n -> P n.
 Proof.
- cut (forall n : nat, 0 < double n -> 0 < n). intro.
+ cut (forall n : nat, 0 < Nat.double n -> 0 < n). intro.
   intro. intro H0. intro H1. intro n.
   pattern n in |- *.
   apply lt_wf_rect. intros n0 H2 H3.
@@ -1080,13 +1080,13 @@ Proof.
      rewrite <- (even_double n0). assumption.
       assumption.
     apply H2.
-     apply lt_div2. assumption.
+     apply Nat.lt_div2. assumption.
      rewrite (even_double n0) in H3.
      apply H. assumption.
      assumption.
    assumption.
   exact (H0 n0).
- unfold double in |- *. intros.
+ unfold Nat.double in |- *. intros.
  case (zerop n). intro.
   absurd (0 < n + n).
    rewrite e. auto with arith.

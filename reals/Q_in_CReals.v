@@ -295,7 +295,7 @@ Proof.
     intro a.
     intro H0.
     rewrite H0.
-    apply lt_O_Sn.
+    apply Nat.lt_0_succ.
    intros.
    apply False_rect.
    generalize H.

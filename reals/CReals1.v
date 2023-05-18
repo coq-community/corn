@@ -178,7 +178,7 @@ Proof.
   apply less_leEq_trans with K1; auto.
   apply lft_leEq_MAX.
  intros.
- elim (le_or_lt N m).
+ elim (Nat.le_gt_cases N m).
   intros.
   assert (AbsSmall (R:=IR) K1 (seq m)).
    apply H1. auto.
