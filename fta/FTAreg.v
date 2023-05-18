@@ -432,7 +432,7 @@ Proof.
    generalize (Nat.lt_succ_pred N m ltNm).
    intro Heq.
    symmetry in Heq.
-   apply lt_n_Sm_le.
+   apply Nat.lt_succ_r.
    rewrite <- Heq.
    assumption.
   generalize (Sum_c_exp nrtq nrtq_ N (pred m)).
@@ -492,7 +492,7 @@ Proof.
    generalize (Nat.lt_succ_pred N m ltNm).
    intro Heq.
    symmetry in Heq.
-   apply lt_n_Sm_le.
+   apply Nat.lt_succ_r.
    simpl in |- *.
    rewrite <- Heq.
    assumption.

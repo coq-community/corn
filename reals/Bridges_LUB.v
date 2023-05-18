@@ -408,7 +408,7 @@ Proof.
  case (le_lt_eq_dec m (S n) H).
   intro.
   right.
-  apply lt_n_Sm_le.
+  apply Nat.lt_succ_r.
   assumption.
  intro.
  left.
@@ -469,7 +469,7 @@ Proof.
  case (le_lt_eq_dec m (S n) H).
   intro.
   right.
-  apply lt_n_Sm_le.
+  apply Nat.lt_succ_r.
   assumption.
  intro.
  left.
@@ -538,7 +538,7 @@ Proof.
    astepl ((Two:R1) [/]ThreeNZ[*](Two [/]ThreeNZ)[^]m).
    apply mult_resp_less_lft.
     apply Hrecm.
-    apply lt_n_Sm_le.
+    apply Nat.lt_succ_r.
     assumption.
    apply div_resp_pos.
     apply pos_three.
