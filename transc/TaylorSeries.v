@@ -93,10 +93,10 @@ Proof.
   2: apply mult_wdl.
   apply eq_symmetric_unfolded.
   cut (ext_fun_seq' (fun (i : nat) (l : i < n) => [-C-] (N_Deriv _ _ _ _
-    (le_imp_Diffble_n _ _ _ _ (lt_n_Sm_le _ _ (Nat.lt_lt_succ_r _ _ l)) _ H) a Ha[/]
+    (le_imp_Diffble_n _ _ _ _ (proj1 (Nat.lt_succ_r _ _) (Nat.lt_lt_succ_r _ _ l)) _ H) a Ha[/]
       _[//]nring_fac_ap_zero _ i) {*} (FId{-} [-C-]a) {^}i)). intro H0.
    apply eq_transitive_unfolded with (Sumx (fun (i : nat) (Hi : i < n) => Part ( [-C-] (N_Deriv _ _ _ _
-     (le_imp_Diffble_n _ _ _ _ (lt_n_Sm_le _ _ (Nat.lt_lt_succ_r _ _ Hi)) _ H) a
+     (le_imp_Diffble_n _ _ _ _ (proj1 (Nat.lt_succ_r _ _) (Nat.lt_lt_succ_r _ _ Hi)) _ H) a
        Ha[/] _[//]nring_fac_ap_zero _ i) {*} (FId{-} [-C-]a) {^}i) x
          (FSumx_pred _ _ H0 _ (ProjIR1 (TaylorB _ _ _ a x Ha _ H)) i Hi))).
     exact (FSumx_char _ _ _ _ H0).
