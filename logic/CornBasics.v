@@ -335,7 +335,7 @@ Proof.
   rewrite Pos.pred_succ.
   reflexivity.
  exists (pred (nat_of_P p)).
- apply S_pred with 0.
+ symmetry; apply Nat.lt_succ_pred with 0.
  unfold nat_of_P in |- *.
  apply lt_O_positive_to_nat.
  auto with arith.

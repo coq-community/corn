@@ -117,8 +117,9 @@ Lemma diff_is_sum : forall (s : nat -> IR) N m,
 Proof.
  intros s N m ltNm.
  unfold Sum in |- *. unfold Sum1 in |- *.
- generalize (S_pred m N ltNm).
+ generalize (Nat.lt_succ_pred N m ltNm).
  intro H.
+ symmetry in H.
  rewrite <- H.
  generalize (diff_is_Sum0 s N).
  intro HsN.

@@ -390,7 +390,7 @@ Proof.
        2: apply local_mon_imp_mon'.
         2: intro; apply pi_seq_incr; auto.
        2: auto.
-      cut (m = S (pred m)); [ intro | apply S_pred with (S N); auto ].
+      cut (m = S (pred m)); [ intro | symmetry; apply Nat.lt_succ_pred with (S N); auto ].
       apply leEq_wdl with (Sum (S (S N)) (pred m) (fun i : nat => pi_seq (S i) [-]pi_seq i)).
        2: eapply eq_transitive.
         2: apply Mengolli_Sum_gen with (f := pi_seq).
@@ -410,7 +410,7 @@ Proof.
       apply shift_mult_leEq with H1.
        auto.
       apply leEq_wdl with (Sum (S N) (pred (pred m)) (fun i : nat => z[^]i)).
-       2: cut (pred m = S (pred (pred m))); [ intro | apply S_pred with N; auto with arith ].
+       2: cut (pred m = S (pred (pred m))); [ intro | symmetry; apply Nat.lt_succ_pred with N; auto with arith ].
        2: pattern (pred m) at 2 in |- *; rewrite H4.
        2: apply Sum_shift; algebra.
       cut (z[-][1] [#] [0]). intro H4.

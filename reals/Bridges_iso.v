@@ -60,7 +60,7 @@ Proof.
    assumption.
   intro.
   case Hrecn.
-   apply lt_n_Sm_le.
+   apply Nat.lt_succ_r.
    assumption.
   intro k.
   intros.
@@ -398,7 +398,7 @@ Proof.
      assumption.
     apply Nat.le_succ_diag_r.
    assumption.
-  apply lt_n_Sm_le.
+  apply Nat.lt_succ_r.
   assumption.
  intros.
  rewrite e.
@@ -451,7 +451,7 @@ Proof.
      assumption.
     apply Nat.le_succ_diag_r.
    assumption.
-  apply lt_n_Sm_le.
+  apply Nat.lt_succ_r.
   assumption.
  intro H2.
  rewrite H2.
@@ -669,7 +669,7 @@ Proof.
      assumption.
     intros.
     apply p.
-    apply (lt_n_Sm_le m N).
+    apply (Nat.lt_succ_r m N).
     assumption.
    intro.
    rewrite e.

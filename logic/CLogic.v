@@ -778,7 +778,7 @@ Proof.
  intros m n H H0; red in |- *.
  destruct n.
   inversion H0.
- rewrite <- (S_pred m 0); auto.
+ rewrite (Nat.lt_succ_pred 0 m); auto.
  simpl in |- *.
  auto with arith.
 Qed.
@@ -1504,7 +1504,7 @@ Theorem S_predn : forall m : nat, m <> 0 -> S (pred m) = m.
 Proof.
  intros m H.
  symmetry  in |- *.
- apply S_pred with 0.
+ symmetry; apply Nat.lt_succ_pred with 0.
  lia.
 Qed.
 

@@ -1467,7 +1467,7 @@ Proof.
   apply Derivative_imp_Continuous' with pI (N_Deriv _ _ H1).
   apply Derivative_wdr with (N_Deriv _ _ (Derivative_n_imp_Diffble_n _ _ _ H0)).
    apply Derivative_n_unique with n F; auto; apply N_Deriv_lemma.
-  cut (n = S (pred n)); [ intro | apply S_pred with 0; auto ].
+  cut (n = S (pred n)); [ intro | symmetry; apply Nat.lt_succ_pred with 0; auto ].
   generalize H0 H1. rewrite H2. intros.
   apply N_Deriv_S.
  apply le_imp_Diffble_n with n.

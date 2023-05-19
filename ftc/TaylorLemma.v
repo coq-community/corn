@@ -71,7 +71,7 @@ Hypothesis Hb : Dom F b.
 
 (* begin show *)
 Let fi n (Hf : Diffble_I_n Hab' n F) i Hi := ProjT1 (Diffble_I_n_imp_deriv_n _ _ _
- i F (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le i n Hi) _ Hf)).
+ i F (le_imp_Diffble_I _ _ _ _ _ (proj1 (Nat.lt_succ_r i n) Hi) _ Hf)).
 (* end show *)
 
 (**
@@ -385,7 +385,7 @@ Proof.
      2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
     apply Feq_imp_eq with (Compact Hab).
      apply (ProjT2 (Diffble_I_n_imp_deriv_n _ _ _ _ _
-       (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le 0 n b0) _ Hf))).
+       (le_imp_Diffble_I _ _ _ _ _ (proj1 (Nat.lt_succ_r 0 n) b0) _ Hf))).
     apply TL_compact_b.
    apply Sum_zero.
     auto with arith.
@@ -436,9 +436,9 @@ Proof.
    apply Taylor_lemma1.
   apply Taylor_lemma1.
  apply Derivative_I_n_wdl with (n_deriv_I _ _ _ _ _
-   (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le i n Hi) _ Hf)).
+   (le_imp_Diffble_I _ _ _ _ _ (proj1 (Nat.lt_succ_r i n) Hi) _ Hf)).
   2: apply Derivative_I_n_wdr with (n_deriv_I _ _ _ _ _
-    (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ H0) _ Hf')).
+    (le_imp_Diffble_I _ _ _ _ _ (proj1 (Nat.lt_succ_r _ _) H0) _ Hf')).
    3: apply n_deriv_plus.
   apply Derivative_I_n_unique with i F.
    apply n_deriv_lemma.
@@ -470,7 +470,7 @@ Lemma Taylor_lemma7 : forall n Hf Hf' i (Hi : 0 < i) Hi', Derivative_I Hab'
  (funct_i' n Hf i Hi') (funct_aux n Hf' i Hi'{-}funct_aux n Hf' (pred i) (lt_5 i (S n) Hi')).
 Proof.
  do 5 intro.
- rewrite (S_pred _ _ Hi).
+ rewrite <- (Nat.lt_succ_pred _ _ Hi).
  set (p := pred i) in *; clearbody p; clear Hi i.
  intros.
  cut (Derivative_I Hab' (PartInt (fi n Hf _ Hi'))

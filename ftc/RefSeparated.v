@@ -210,7 +210,7 @@ Proof.
   exfalso; apply Nat.nlt_0_r with j'; red in |- *; apply Nat.le_trans with j; auto.
  generalize Hj H H0; clear H0 H Hj.
  set (jj := pred j) in *.
- cut (j = S jj); [ intro | unfold jj in |- *; apply S_pred with 0; auto ].
+ cut (j = S jj); [ intro | unfold jj in |- *; symmetry; apply Nat.lt_succ_pred with 0; auto ].
  rewrite H; intros.
  cut (jj <= m); [ intro | auto with arith ].
  cut (R j' Hj'[<=]R jj H2); intros.

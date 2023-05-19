@@ -93,10 +93,10 @@ Proof.
   2: apply mult_wdl.
   apply eq_symmetric_unfolded.
   cut (ext_fun_seq' (fun (i : nat) (l : i < n) => [-C-] (N_Deriv _ _ _ _
-    (le_imp_Diffble_n _ _ _ _ (lt_n_Sm_le _ _ (Nat.lt_lt_succ_r _ _ l)) _ H) a Ha[/]
+    (le_imp_Diffble_n _ _ _ _ (proj1 (Nat.lt_succ_r _ _) (Nat.lt_lt_succ_r _ _ l)) _ H) a Ha[/]
       _[//]nring_fac_ap_zero _ i) {*} (FId{-} [-C-]a) {^}i)). intro H0.
    apply eq_transitive_unfolded with (Sumx (fun (i : nat) (Hi : i < n) => Part ( [-C-] (N_Deriv _ _ _ _
-     (le_imp_Diffble_n _ _ _ _ (lt_n_Sm_le _ _ (Nat.lt_lt_succ_r _ _ Hi)) _ H) a
+     (le_imp_Diffble_n _ _ _ _ (proj1 (Nat.lt_succ_r _ _) (Nat.lt_lt_succ_r _ _ Hi)) _ H) a
        Ha[/] _[//]nring_fac_ap_zero _ i) {*} (FId{-} [-C-]a) {^}i) x
          (FSumx_pred _ _ H0 _ (ProjIR1 (TaylorB _ _ _ a x Ha _ H)) i Hi))).
     exact (FSumx_char _ _ _ _ H0).
@@ -327,9 +327,9 @@ Proof.
  elim Taylor_Series_conv_lemma1 with (t := a) (Hxy := Hxy) (e := e); auto.
  intros N HN; exists (S N).
  intros n H0 z H2 Hz.
- assert (n = S (pred n)). apply S_pred with N; auto with arith.
+ assert (n = S (pred n)). symmetry; apply Nat.lt_succ_pred with N; auto with arith.
   set (p := pred n) in *.
- assert (N <= p). unfold p in |- *; apply le_S_n; rewrite <- S_pred with n N; auto with arith.
+ assert (N <= p). unfold p in |- *; apply le_S_n; rewrite Nat.lt_succ_pred with N n; auto with arith.
   clearbody p; rewrite H3.
  assert (H5 : forall c d : IR, Dom (c{**} ((FId{-} [-C-]d) {^}p{*} (FId{-} [-C-]a))) z).
   repeat split.
@@ -469,7 +469,7 @@ Proof.
  set (Hab' := Min_leEq_Max' a0 b a) in *.
  elim (Taylor_Series_conv_lemma1 a _ _ Hab _ (pos_div_two _ _ H4)); intros N HN.
  exists (S N); intros p Hp.
- cut (p = S (pred p)); [ intro Hn | apply S_pred with N; auto ].
+ cut (p = S (pred p)); [ intro Hn | symmetry; apply Nat.lt_succ_pred with N; auto ].
  set (n := pred p) in *; clearbody n.
  generalize Hp; clear Hp; rewrite Hn; clear Hn p.
  intros.

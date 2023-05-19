@@ -150,7 +150,7 @@ Proof.
    intro H3.
    astepl ((Three[^]S (pred k) [-]Three[^]1[/] Three[-][1][//]H3) [*]
      (a k[*] (r [/]ThreeNZ) [^]k[+]eps)).
-   rewrite <- (S_pred _ _ H0).
+   rewrite -> (Nat.lt_succ_pred _ _ H0).
    astepl ((Three[^]k[-]Three[/] Three[-][1][//]H3) [*] (a k[*] (r [/]ThreeNZ) [^]k[+]eps)).
    rstepl ([1] [/]TwoNZ[*] (Three[^]k[-]Three) [*] (a k[*] (r [/]ThreeNZ) [^]k) [+]
      [1] [/]TwoNZ[*] (Three[^]k[-]Three) [*]eps).
@@ -184,7 +184,7 @@ Proof.
         apply three_ap_zero.
        apply eq_div.
        pattern k at 1 in |- *.
-       rewrite (S_pred _ _ H0).
+       rewrite <- (Nat.lt_succ_pred _ _ H0).
        astepl ([1][*] (Three[*]Three[^]pred k):IR).
        clear H3 H4 H5.
        astepl ((Three[*]Three[^]pred k):IR). reflexivity.

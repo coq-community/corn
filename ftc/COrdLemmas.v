@@ -336,7 +336,7 @@ Proof.
      apply Sumx_to_Sum; try assumption.
      red in |- *; intros; rewrite H1; algebra.
     algebra.
-   cut (f n = S (pred (f n))); [ intro | apply S_pred with 0; auto ].
+   cut (f n = S (pred (f n))); [ intro | symmetry; apply Nat.lt_succ_pred with 0; auto ].
    setoid_rewrite H1 at 3.
    eapply eq_transitive_unfolded.
     2: apply Sum_Sum with (m := pred (f n)).
@@ -352,7 +352,7 @@ Proof.
      intros; unfold part_tot_nat_fun in |- *;
        elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try exfalso; try lia.
     rewrite <-H1; cut (0 < f (S n)); [ intro | rewrite <- f0; auto with arith ];
-      cut (f (S n) = S (pred (f (S n)))); [ intro | apply S_pred with 0; auto ];
+      cut (f (S n) = S (pred (f (S n)))); [ intro | symmetry; apply Nat.lt_succ_pred with 0; auto ];
         rewrite <- H3; apply Nat.lt_le_incl; auto with arith.
    intros; unfold part_tot_nat_fun in |- *;elim (le_lt_dec (f (S n)) i);
      [intro; simpl in |- *; exfalso; lia| reflexivity].
@@ -375,12 +375,12 @@ Proof.
  intros.
  apply Sum_wd'.
   cut (0 < f (S i)); [ intro | rewrite <- f0; auto with arith ].
-  cut (f (S i) = S (pred (f (S i)))); [ intro | apply S_pred with 0; auto ].
+  cut (f (S i) = S (pred (f (S i)))); [ intro | symmetry; apply Nat.lt_succ_pred with 0; auto ].
   rewrite <- H3.
   apply Nat.lt_le_incl; auto with arith.
  intros; apply H.
   assumption.
- rewrite (S_pred (f (S i)) 0); auto with arith.
+ rewrite <- (Nat.lt_succ_pred 0 (f (S i))); auto with arith.
  rewrite <- f0; auto with arith.
 Qed.
 
@@ -420,7 +420,7 @@ Proof.
     Sum (f' m f i) (pred (f' m f (S i))) (g i H3))).
    apply Sumx_wd; intros.
    rewrite <- (H4 i (Nat.lt_le_incl _ _ H5)); rewrite <- (H4 (S i) H5); apply Sum_wd'.
-    rewrite <- (S_pred (f (S i) H5) (f i (Nat.lt_le_incl _ _ H5)) (H1 _ _ _ _ (Nat.lt_succ_diag_r i))) .
+    rewrite -> (Nat.lt_succ_pred (f i (Nat.lt_le_incl _ _ H5)) (f (S i) H5) (H1 _ _ _ _ (Nat.lt_succ_diag_r i))) .
     apply Nat.lt_le_incl; apply H1; apply Nat.lt_succ_diag_r.
    intros; algebra.
   apply str_Sumx_Sum_Sum.

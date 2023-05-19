@@ -66,7 +66,7 @@ Hypothesis Hb : I b.
 
 (* begin show *)
 Let fi n Hf i Hi :=
-  N_Deriv _ pI _ _ (le_imp_Diffble_n _ _ _ _ (lt_n_Sm_le i n Hi) F Hf).
+  N_Deriv _ pI _ _ (le_imp_Diffble_n _ _ _ _ (proj1 (Nat.lt_succ_r i n) Hi) F Hf).
 
 Let funct_i n Hf i Hi :=
   [-C-] (fi n Hf i Hi a Ha[/] _[//]nring_fac_ap_zero _ i) {*} (FId{-} [-C-]a) {^}i.
@@ -234,28 +234,28 @@ Proof.
       apply div_wd.
        2: algebra.
       apply eq_transitive_unfolded with (PartInt (ProjT1 (Diffble_I_n_imp_deriv_n _ _ _ _ _
-        (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ (Nat.lt_lt_succ_r _ _ Hi)) _ H2)))
+        (le_imp_Diffble_I _ _ _ _ _ (proj1 (Nat.lt_succ_r _ _) (Nat.lt_lt_succ_r _ _ Hi)) _ H2)))
           a (compact_Min_lft _ _ (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1)))).
        simpl in |- *; algebra.
       apply Feq_imp_eq with (Compact (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1))).
        apply Derivative_I_n_unique with i F.
         apply projT2.
        unfold fi in |- *.
-       elim (N_Deriv_lemma _ _ _ _ (le_imp_Diffble_n I pI i n (lt_n_Sm_le _ _ (Nat.lt_lt_succ_r _ _ Hi)) _ Hf'));
+       elim (N_Deriv_lemma _ _ _ _ (le_imp_Diffble_n I pI i n (proj1 (Nat.lt_succ_r _ _) (Nat.lt_lt_succ_r _ _ Hi)) _ Hf'));
          intros incF0 H'.
        elim H'; intros Hinc derivF; clear H'.
        apply derivF.
        simpl in |- *; Included.
       apply compact_Min_lft.
      apply eq_transitive_unfolded with (PartInt (ProjT1 (Diffble_I_n_imp_deriv_n _ _ _ _ _
-       (le_imp_Diffble_I _ _ _ _ _ (lt_n_Sm_le _ _ (Nat.lt_succ_diag_r n)) _ H2)))
+       (le_imp_Diffble_I _ _ _ _ _ (proj1 (Nat.lt_succ_r _ _) (Nat.lt_succ_diag_r n)) _ H2)))
          a (compact_Min_lft _ _ (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1)))).
       simpl in |- *; algebra.
      apply Feq_imp_eq with (Compact (less_leEq _ _ _ (ap_imp_Min_less_Max _ _ H1))).
       apply Derivative_I_n_unique with n F.
        apply projT2.
       unfold fi in |- *.
-      elim (N_Deriv_lemma _ _ _ _ (le_imp_Diffble_n I pI n n (lt_n_Sm_le _ _ (Nat.lt_succ_diag_r n)) _ Hf'));
+      elim (N_Deriv_lemma _ _ _ _ (le_imp_Diffble_n I pI n n (proj1 (Nat.lt_succ_r _ _) (Nat.lt_succ_diag_r n)) _ Hf'));
         intros incF0 H'.
       elim H'; intros Hinc derivF; clear H'.
       apply derivF.

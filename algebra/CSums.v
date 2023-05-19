@@ -145,7 +145,7 @@ Lemma Sum_empty : forall n f, 0 < n -> Sum n (pred n) f [=] [0].
 Proof.
  intros n f H.
  unfold Sum in |- *.
- rewrite <- (S_pred _ _ H).
+ rewrite <- (Nat.lt_succ_pred _ _ H).
  unfold Sum1 in |- *; algebra.
 Qed.
 
@@ -727,7 +727,7 @@ Proof.
  cut (0 <= n); [ intro H0 | auto with arith ].
  elim (le_lt_eq_dec _ _ H0); clear H H0; intro H.
   simpl in |- *.
-  pattern n at 6 in |- *; rewrite -> (S_pred _ _ H).
+  pattern n at 6 in |- *; rewrite <- (Nat.lt_succ_pred _ _ H).
   eapply eq_transitive_unfolded.
    2: apply eq_symmetric_unfolded; apply Sum_last.
   apply bin_op_wd_unfolded.
@@ -746,7 +746,7 @@ Proof.
     apply part_tot_nat_fun_ch1 with (Hi := Nat.lt_lt_succ_r _ _ H0).
     red in |- *; intros; apply Hf; auto.
    algebra.
-  rewrite <- (S_pred _ _ H).
+  rewrite -> (Nat.lt_succ_pred _ _ H).
   apply eq_symmetric_unfolded; apply part_tot_nat_fun_ch1; auto.
  generalize f Hf; clear Hf f; rewrite <- H.
  simpl in |- *; intros f Hf.
