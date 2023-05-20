@@ -750,7 +750,7 @@ Proof.
  intros; unfold partition_join_fun in |- *.
  elim le_lt_dec; intro; simpl in |- *.
   apply prf1; auto.
- exfalso; apply le_not_lt with i n; auto.
+ exfalso; apply Nat.le_ngt with i n; auto.
 Qed.
 
 Lemma pjf_2 : forall (i : nat) Hi, i = n -> partition_join_fun i Hi [=] c.
@@ -781,7 +781,7 @@ Proof.
  intros; unfold partition_join_fun in |- *.
  generalize Hj; rewrite H0; clear Hj; intros.
  elim le_lt_dec; intro; simpl in |- *.
-  exfalso; apply le_not_lt with i n; auto.
+  exfalso; apply Nat.le_ngt with i n; auto.
  apply prf1; auto.
 Qed.
 
@@ -792,10 +792,10 @@ Proof.
  unfold partition_join_fun in |- *.
  elim (le_lt_dec i n); elim (le_lt_dec j n); intros; simpl in |- *.
     apply prf1; auto.
-   exfalso; apply le_not_lt with i n.
+   exfalso; apply Nat.le_ngt with i n.
     assumption.
    rewrite H; assumption.
-  exfalso; apply le_not_lt with j n.
+  exfalso; apply Nat.le_ngt with j n.
    assumption.
   rewrite <- H; assumption.
  apply prf1; auto.
@@ -818,7 +818,7 @@ Proof.
    apply eq_transitive_unfolded with (Q 0 (Nat.le_0_l _)).
     apply eq_symmetric_unfolded; apply start.
    apply prf1; auto with arith.
-  exfalso; apply le_not_lt with n i; auto with arith.
+  exfalso; apply Nat.le_ngt with n i; auto with arith.
  cut (i - n = S (i - S n)); [ intro | lia ].
  cut (S (i - S n) <= m); [ intro | lia ].
  apply leEq_wdr with (Q _ H1).
@@ -896,7 +896,7 @@ Proof.
   elim le_lt_eq_dec; intro; simpl in |- *.
    algebra.
   exfalso; rewrite b0 in Hi'; apply (Nat.lt_irrefl _ Hi').
- exfalso; apply le_not_lt with i n; auto with arith.
+ exfalso; apply Nat.le_ngt with i n; auto with arith.
 Qed.
 
 Lemma pjp_2 : forall (i : nat) Hi, i = n -> partition_join_pts i Hi [=] c.
@@ -914,7 +914,7 @@ Lemma pjp_3 : forall (i : nat) Hi Hi',
 Proof.
  intros; unfold partition_join_pts in |- *.
  elim le_lt_dec; intro; simpl in |- *.
-  exfalso; apply le_not_lt with i n; auto.
+  exfalso; apply Nat.le_ngt with i n; auto.
  cut (fQ _ (partition_join_aux' _ _ _ b0 Hi) [=] fQ _ Hi').
   2: apply HfQ'; auto.
  algebra.
@@ -952,7 +952,7 @@ Proof.
    cut (forall H, Q (n - n) H [=] c); auto.
    cut (n - n = 0); [ intro | auto with arith ].
    rewrite H1; intros; apply start.
-  exfalso; apply le_not_lt with n i; auto with arith.
+  exfalso; apply Nat.le_ngt with n i; auto with arith.
  elim (HfQ _ (partition_join_aux' _ _ _ b1 H)); intros.
  apply compact_wd with (fQ _ (partition_join_aux' _ _ _ b1 H)).
   2: apply eq_symmetric_unfolded; apply pjp_3; assumption.
@@ -1011,9 +1011,9 @@ Proof.
     apply pfwdef; apply eq_symmetric_unfolded; apply pjp_1.
    apply cg_minus_wd; simpl in |- *.
     unfold partition_join_fun in |- *; elim le_lt_dec; simpl in |- *; intro; [ apply prf1; auto
-      | exfalso; apply le_not_lt with n i; auto with arith ].
+      | exfalso; apply Nat.le_ngt with n i; auto with arith ].
    unfold partition_join_fun in |- *; elim le_lt_dec; simpl in |- *; intro; [ apply prf1; auto
-     | exfalso; apply le_not_lt with i n; auto with arith ].
+     | exfalso; apply Nat.le_ngt with i n; auto with arith ].
   intros; apply mult_wd.
    apply pfwdef.
    cut (i = S (n + i) - S n); [ intro | lia ].
@@ -1071,7 +1071,7 @@ Proof.
    eapply leEq_transitive.
     apply Mesh_lemma.
    apply lft_leEq_Max.
-  exfalso; apply le_not_lt with i n; auto with arith.
+  exfalso; apply Nat.le_ngt with i n; auto with arith.
  elim le_lt_dec; intro; simpl in |- *.
   cut (i = n); [ intro | apply Nat.le_antisymm; auto with arith ].
   generalize a0 b0 Hi'; clear Hx Hi Hi' a0 b0.
@@ -1182,7 +1182,7 @@ Proof.
         elim le_lt_eq_dec; intro; simpl in |- *.
          apply Partition_imp_points_2; auto.
         exfalso; rewrite b0 in Hi; apply (Nat.lt_irrefl _ Hi).
-       exfalso; apply le_not_lt with i0 (S i); auto with arith.
+       exfalso; apply Nat.le_ngt with i0 (S i); auto with arith.
       apply cg_minus_wd; simpl in |- *.
        apply eq_symmetric_unfolded; apply pjf_1.
       apply eq_symmetric_unfolded; apply pjf_1.

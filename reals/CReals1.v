@@ -248,7 +248,7 @@ Proof.
   intro; apply not_ge; auto.
  intro.
  cut (f n <= f m).
-  apply lt_not_le; auto.
+  apply Nat.lt_nge; auto.
  apply monF; assumption.
 Qed.
 (* end hide *)

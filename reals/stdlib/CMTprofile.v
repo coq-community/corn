@@ -40,6 +40,7 @@ Require Import CMTIntegrableFunctions.
 Require Import CMTIntegrableSets.
 Require Import CMTFullSets.
 Require Import CMTReals.
+Require Import Lia.
 
 Local Open Scope ConstructiveReals.
 
@@ -984,7 +985,7 @@ Proof.
       apply (CRle_trans _ b). apply BinarySubdivInside.
       apply CRlt_asym, ltab. apply le_S_n, l0. apply CRlt_asym, (snd beta).
       exfalso. pose proof (Nat.lt_le_trans _ _ _ l l0).
-      apply (lt_not_le _ _ H0). apply le_S, Nat.le_refl.
+      apply (proj1 (Nat.lt_nge _ _) H0). apply le_S, Nat.le_refl.
       apply StepApproxIntegralIncr.
       apply CRlt_asym, BinarySubdivIncr. exact (pair aPos ltab).
       apply CRlt_asym, BinarySubdivIncr. exact (pair aPos ltab).
@@ -1023,7 +1024,7 @@ Proof.
     + exfalso. apply le_S_n in l0.
       apply (Nat.le_trans _ _ _ H) in l0. clear H.
       apply (Nat.mul_le_mono_pos_l _ _ 2) in l0.
-      apply (Nat.le_trans _ _ _ l) in l0. apply (le_not_lt _ _ l0 (Nat.le_refl _)).
+      apply (Nat.le_trans _ _ _ l) in l0. apply (proj1 (Nat.le_ngt _ _) l0 (Nat.le_refl _)).
       apply le_n_S, Nat.le_0_l.
     + apply StepApproxIntegralIncr.
       apply BinarySubdivInside. apply CRlt_asym, ltab.
@@ -1098,7 +1099,7 @@ Proof.
       apply le_S_n, l0. apply CRlt_asym, (snd beta).
     + exfalso. apply le_S_n in l0. apply le_S_n in l.
       apply (Nat.le_trans _ _ (2^S n)) in H.
-      apply (Nat.le_trans _ _ _ H) in l0. apply (le_not_lt _ _ l0).
+      apply (Nat.le_trans _ _ _ H) in l0. apply (proj1 (Nat.le_ngt _ _) l0).
       apply le_S, Nat.le_refl. apply Nat.mul_le_mono_nonneg_l.
       apply Nat.le_0_l. exact l.
     + clear l l0.
@@ -1339,7 +1340,7 @@ Proof.
     unfold StepApproxDiscretize in c0.
     destruct (2^n)%nat eqn:des. apply Nat.le_0_l. rewrite <- des.
     destruct (le_lt_dec (S (S n0)) (S n0)). exfalso.
-    exact (le_not_lt _ _ l0 (Nat.le_refl _)).
+    lia.
     destruct (le_lt_dec (S (S n0)) (S i)).
     + apply le_S_n in l1. pose proof (Nat.le_antisymm _ _ l l1).
       subst i. rewrite <- des. apply Nat.le_refl.
@@ -1365,7 +1366,7 @@ Proof.
     apply (CRlt_trans _ _ _ H) in c0. unfold StepApproxDiscretize in c0.
     destruct j. apply Nat.le_0_l.
     destruct (le_lt_dec (S (2 ^ n)) (S j)).
-    exfalso. apply le_S_n in l1. exact (le_not_lt _ _ l1 l0).
+    exfalso. apply le_S_n in l1. lia.
     destruct (le_lt_dec (S (2 ^ n)) (S i)).
     apply le_S_n in l1. apply le_S_n in l2. exact (Nat.le_trans _ _ _ l1 l2).
     destruct (le_lt_dec (S j) i). exact l3. exfalso.
@@ -1625,7 +1626,7 @@ Proof.
                  (CRlt_trans 0 a b aPos ltab, right_ordered ext)
                  (IntExtRightPos ext (CRlt_asym a b ltab), right_ordered ext) ).
       apply CRlt_asym, c1.
-      exfalso; exact (lt_not_le _ _ l0 (Nat.le_refl _)). }
+      exfalso; exact (proj1 (Nat.lt_nge _ _) l0 (Nat.le_refl _)). }
   assert (forall k : nat, sk k <= sk (S k)) as skIncr.
   { unfold sk. intros k. destruct k.
     - destruct (H3 O).
@@ -1713,7 +1714,7 @@ Proof.
       apply (CRlt_trans _ _ _ H4), (CRlt_trans _ _ _ (snd ltxy)).
       apply (CRle_lt_trans _ _ _ H5), (snd ltuv).
       destruct (le_lt_dec (S (2 ^ m)) (S x0)).
-      exfalso. apply le_S_n in l0. exact (lt_not_le _ _ l l0).
+      exfalso. apply le_S_n in l0. exact (proj1 (Nat.lt_nge _ _) l l0).
       assert (v <= BinarySubdiv a b m x0).
       { apply (CRle_trans _ (BinarySubdiv a b m (S x0) +
                              CRpow (CR_of_Q (RealT (ElemFunc IS)) (1 # 2)) m * - (b - a))).
@@ -1805,7 +1806,7 @@ Proof.
         apply CRlt_asym, (snd ltuv).
         destruct (le_lt_dec (S (2 ^ max n m)) (S x0)).
         apply le_S_n in l0.
-        exfalso. exact (lt_not_le _ _ l l0).
+        exfalso. exact (proj1 (Nat.lt_nge _ _) l l0).
         apply CRlt_asym in mcv.
         rewrite <- BinarySubdivNext, CRplus_assoc, CRplus_opp_r, CRplus_0_r in mcv.
         apply StepApproxIntegralIncr.

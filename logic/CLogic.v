@@ -454,7 +454,7 @@ Proof.
  elim (gt_eq_gt_dec p q); intro H0.
   elim H0; auto.
  exfalso.
- apply lt_not_le with q p; auto.
+ apply Nat.lt_nge with q p; auto.
 Qed.
 
 Lemma Cnat_total_order : forall m n : nat, m <> n -> {m < n} + {n < m}.

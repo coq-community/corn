@@ -274,7 +274,7 @@ Proof.
   apply local_mon'_imp_mon'2_le with (f := fun (i : nat) Hi => P i Hi).
    intros; apply prf2.
   assumption.
- exfalso; apply (le_not_lt _ _ Hi b0).
+ exfalso; lia.
 Qed.
 
 Lemma sep__part_h_lemma2 :
@@ -303,7 +303,7 @@ Proof.
   unfold cg_minus in |- *; apply plus_resp_leEq_both.
    apply Partition_mon; assumption.
   apply inv_resp_leEq; apply eq_imp_leEq; apply prf1; auto.
- exfalso; exact (le_not_lt _ _ (sep__part_h_bnd _) b0).
+ exfalso; lia.
 Qed.
 
 Lemma sep__part_h_lemma3 :
@@ -691,7 +691,7 @@ Proof.
      apply cg_minus_wd; apply prf1; auto.
     astepl ([0][+]delta [/]TwoNZ); apply plus_resp_leEq; apply Mesh_nonneg.
    exfalso.
-   exact (le_not_lt _ _ (sep__part_h_bnd _) b2).
+   lia.
   rstepl (Mesh P[+]delta).
   apply plus_resp_leEq_lft; apply RS'_delta_csi.
  elim (ProjT2 sep__part_app_n); fold RS'_m1 in |- *; intros.
@@ -815,26 +815,26 @@ Proof.
      unfold h in |- *.
      do 2 elim le_lt_dec; intros; simpl in |- *.
         apply cg_minus_wd; apply prf1; auto.
-       exfalso; apply le_not_lt with j n.
+       exfalso; apply Nat.le_ngt with j n.
         apply Nat.le_trans with (S j); auto with arith.
        assumption.
-      exfalso; apply le_not_lt with (S j) n.
+      exfalso; apply Nat.le_ngt with (S j) n.
        exact (RS'_Hsep_S _ _ Hi a1).
       assumption.
-     exfalso; apply le_not_lt with (S j) n.
+     exfalso; apply Nat.le_ngt with (S j) n.
       exact (RS'_Hsep_S _ _ Hi a1).
      assumption.
-    exfalso; exact (le_not_lt _ _ H1 b0).
-   exfalso; exact (le_not_lt _ _ H2 b0).
-  exfalso; exact (le_not_lt _ _ H1 b0).
+    exfalso; lia.
+   exfalso; lia.
+  exfalso; lia.
  unfold h in |- *.
  apply cg_minus_wd.
   elim le_lt_dec; simpl in |- *; intros.
    apply prf1; auto.
-  exfalso; exact (le_not_lt _ _ H0 b0).
+  exfalso; lia.
  elim le_lt_dec; intro; simpl in |- *.
   apply prf1; auto.
- exfalso; rewrite <- H in H0; apply le_not_lt with (sep__part_fun i (Nat.lt_le_incl _ _ Hi)) n.
+ exfalso; rewrite <- H in H0; apply Nat.le_ngt with (sep__part_fun i (Nat.lt_le_incl _ _ Hi)) n.
   apply sep__part_fun_bnd.
  assumption.
 Qed.
@@ -877,7 +877,7 @@ Proof.
      unfold part_tot_nat_fun in |- *.
      elim (le_lt_dec n j); intro; simpl in |- *.
       exfalso.
-      apply le_not_lt with n j.
+      apply Nat.le_ngt with n j.
        assumption.
       apply Nat.lt_le_trans with (sep__part_fun (S i) Hi'').
        assumption.
@@ -885,13 +885,13 @@ Proof.
      apply mult_wd; algebra.
      apply cg_minus_wd; apply prf1; auto.
     exfalso.
-    apply le_not_lt with (sep__part_fun i Hi') j.
+    apply Nat.le_ngt with (sep__part_fun i Hi') j.
      assumption.
     cut (sep__part_fun i Hi' = sep__part_fun i (Nat.lt_le_incl _ _ Hi));
       [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; assumption.
    exfalso.
-   apply le_not_lt with (S j) (sep__part_fun (S i) Hi).
+   apply Nat.le_ngt with (S j) (sep__part_fun (S i) Hi).
     cut (sep__part_fun (S i) Hi = sep__part_fun (S i) Hi''); [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; apply H0.
    rewrite <- (Nat.lt_succ_pred (sep__part_fun i (Nat.lt_le_incl _ _ Hi)) (sep__part_fun (S i) Hi)) .
@@ -901,7 +901,7 @@ Proof.
  apply Sumx_wd; intros.
  unfold part_tot_nat_fun in |- *.
  elim (le_lt_dec n i); intro; simpl in |- *.
-  exfalso; apply le_not_lt with n i; auto.
+  exfalso; apply Nat.le_ngt with n i; auto.
  apply mult_wd; algebra.
  apply cg_minus_wd; apply prf1; auto.
 Qed.
@@ -996,7 +996,7 @@ Proof.
       apply Sumx_resp_leEq; intros.
       unfold part_tot_nat_fun in |- *.
       elim (le_lt_dec n i); intro; simpl in |- *.
-       exfalso; exact (le_not_lt _ _ a0 H).
+       exfalso; lia.
       unfold delta in |- *.
       apply leEq_transitive with ((M[+]M)[*] (alpha[/] _[//]
         mult_resp_ap_zero _ _ _ (nring_ap_zero _ _ SPap_n) (max_one_ap_zero M)) [/]TwoNZ).
@@ -1022,19 +1022,19 @@ Proof.
   intros; elim (le_lt_dec (sep__part_fun i (Nat.lt_le_incl _ _ Hi)) j); intro; simpl in |- *.
    elim (le_lt_dec j (pred (sep__part_fun (S i) Hi))); intro; simpl in |- *.
     elim (le_lt_dec n j); intro; simpl in |- *.
-     exfalso; apply (le_not_lt n j).
+     exfalso; apply (Nat.le_ngt n j).
       assumption.
      eapply Nat.lt_le_trans.
       apply H0.
      apply sep__part_fun_bnd.
     algebra.
-   exfalso; apply (le_not_lt _ _ H0).
+   exfalso; apply (proj1 (Nat.le_ngt _ _) H0).
    rewrite <- (Nat.lt_succ_pred (sep__part_fun i Hi') (sep__part_fun (S i) Hi'')).
     cut (sep__part_fun (S i) Hi'' = sep__part_fun (S i) Hi); [ intro | apply sep__part_fun_wd; auto ].
     rewrite H1; auto with arith.
    apply sep__part_fun_mon.
    apply Nat.lt_succ_diag_r.
-  exfalso; apply (le_not_lt _ _ H).
+  exfalso; apply (proj1 (Nat.le_ngt _ _) H).
   rewrite sep__part_fun_i.
    2: assumption.
   rewrite sep__part_fun_i in b0; assumption.

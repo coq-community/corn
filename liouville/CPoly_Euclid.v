@@ -104,7 +104,7 @@ Proof.
   destruct m; [ rewrite -> (nth_coeff_wd _ _ _ _ (s0 H1)); reflexivity | apply (d m H1); apply le_n ].
  apply (IHn (S m) _ ([0] [+X*] b) (c [-] _C_ s [*] b)); [ | | | rewrite <- H2, cpoly_lin, <- c_zero; unfold cg_minus; ring ].
    unfold degree_le; intros; rewrite <- (coeff_Sm_lin _ _ s).
-   apply H; apply lt_n_S; apply H3.
+   apply H; apply -> Nat.succ_lt_mono; apply H3.
   split; [ rewrite -> coeff_Sm_lin; destruct H0; apply H0 | unfold degree_le; intros ].
   destruct m0; [ inversion H3 | simpl; destruct H0 ].
   apply H4; apply lt_S_n; apply H3.
@@ -145,7 +145,7 @@ Proof.
   split.
    intros; unfold degree_le; intros; apply y0; apply Nat.le_lt_trans with n0; [ | assumption ].
    unfold degree_le in H1; apply not_gt; intro; unfold gt in H3.
-   set (tmp := (H1 (S n) (lt_n_S _ _ H3))); rewrite -> H in tmp.
+   set (tmp := (H1 (S n) (proj1 (Nat.succ_lt_mono _ _) H3))); rewrite -> H in tmp.
    apply (eq_imp_not_ap _ _ _ tmp); apply ring_non_triv.
   intro; unfold degree_le in H1; rewrite -> H1 in H; [ | apply Nat.lt_0_succ ].
   destruct (eq_imp_not_ap _ _ _ H); apply ap_symmetric; apply ring_non_triv.

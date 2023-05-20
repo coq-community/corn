@@ -592,7 +592,7 @@ Proof.
     eapply leEq_wdr.
      apply (HM (Nat.max K N)); auto with arith.
     unfold CS_seq_recip_seq in |- *; elim lt_le_dec; intro.
-     exfalso; apply le_not_lt with N (Nat.max K N); auto with arith.
+     exfalso; apply Nat.le_ngt with N (Nat.max K N); auto with arith.
     simpl in |- *; rational.
    apply (less_irreflexive_unfolded _ d).
    apply leEq_less_trans with ([0]:F); auto.
@@ -600,7 +600,7 @@ Proof.
    eapply leEq_wdr.
     apply (HM (Nat.max K N)); auto with arith.
    unfold CS_seq_recip_seq in |- *; elim lt_le_dec; intro.
-    exfalso; apply le_not_lt with N (Nat.max K N); auto with arith.
+    exfalso; apply Nat.le_ngt with N (Nat.max K N); auto with arith.
    simpl in |- *; rational.
   apply (less_irreflexive_unfolded _ d).
   apply leEq_less_trans with ([0]:F); auto.
@@ -608,7 +608,7 @@ Proof.
   eapply leEq_wdr.
    apply (HM (Nat.max K N)); auto with arith.
   unfold CS_seq_recip_seq in |- *; elim lt_le_dec; intro.
-   exfalso; apply le_not_lt with N (Nat.max K N); auto with arith.
+   exfalso; apply Nat.le_ngt with N (Nat.max K N); auto with arith.
   simpl in |- *; rational.
  apply (less_irreflexive_unfolded _ d).
  apply leEq_less_trans with ([0]:F); auto.
@@ -616,7 +616,7 @@ Proof.
  eapply leEq_wdr.
   apply (HM (Nat.max K N)); auto with arith.
  unfold CS_seq_recip_seq in |- *; elim lt_le_dec; intro.
-  exfalso; apply le_not_lt with N (Nat.max K N); auto with arith.
+  exfalso; apply Nat.le_ngt with N (Nat.max K N); auto with arith.
  simpl in |- *; rational.
 Qed.
 

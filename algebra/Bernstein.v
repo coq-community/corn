@@ -59,12 +59,12 @@ end.
 
 (** These lemmas provide an induction principle for polynomials using the Bernstien basis *)
 Lemma Bernstein_inv1 : forall n i (H:i < n) (H0:S i <= S n),
- Bernstein H0[=]([1][-]_X_)[*](Bernstein (proj1 (Nat.lt_succ_r _ _) (lt_n_S _ _ H)))[+]_X_[*](Bernstein (le_S_n _ _ H0)).
+ Bernstein H0[=]([1][-]_X_)[*](Bernstein (proj1 (Nat.lt_succ_r _ _) (proj1 (Nat.succ_lt_mono _ _) H)))[+]_X_[*](Bernstein (le_S_n _ _ H0)).
 Proof.
  intros n i H H0.
  simpl (Bernstein H0).
  destruct (le_lt_eq_dec _ _ H0).
-  replace (proj1 (Nat.lt_succ_r (S i) n) l) with (proj1 (Nat.lt_succ_r _ _) (lt_n_S _ _ H)) by apply le_irrelevent.
+  replace (proj1 (Nat.lt_succ_r (S i) n) l) with (proj1 (Nat.lt_succ_r _ _) (proj1 (Nat.succ_lt_mono _ _) H)) by apply le_irrelevent.
   reflexivity.
  exfalso; lia.
 Qed.
@@ -176,7 +176,7 @@ Proof.
   rstepr (Bernstein (le_n_S 0 (S n) H)).
   set (le_n_S 0 n (Nat.le_0_l n)).
   rewrite (Bernstein_inv1 l).
-  rewrite (le_irrelevent _ _ (proj1 (Nat.lt_succ_r 1 (S n)) (lt_n_S 0 (S n) l)) l).
+  rewrite (le_irrelevent _ _ (proj1 (Nat.lt_succ_r 1 (S n)) (proj1 (Nat.succ_lt_mono 0 (S n)) l)) l).
   rewrite (le_irrelevent _ _ H (le_S_n 0 (S n) (le_n_S 0 (S n) H))).
   reflexivity.
  simpl (Bernstein H) at 1.
@@ -189,7 +189,7 @@ Proof.
   replace (le_n_S i n (le_S_n i n H)) with H by apply le_irrelevent.
   rstepl ((nring (S i)[+][1])[*](([1][-]_X_)[*]Bernstein l0[+]_X_[*]Bernstein H)).
   rewrite (Bernstein_inv1 l).
-  replace (proj1 (Nat.lt_succ_r (S (S i)) (S n)) (lt_n_S (S i) (S n) l)) with l0 by apply le_irrelevent.
+  replace (proj1 (Nat.lt_succ_r (S (S i)) (S n)) (proj1 (Nat.succ_lt_mono (S i) (S n)) l)) with l0 by apply le_irrelevent.
   replace (le_S_n (S i) (S n) (le_n_S (S i) (S n) H)) with H by apply le_irrelevent.
   reflexivity.
  rstepl (_X_[*](nring (S n)[*]_X_[*]Bernstein (proj1 (Nat.lt_succ_r _ _) H))[+] _X_[*]Bernstein H).
@@ -240,7 +240,7 @@ Proof.
   rstepl ((nring (n - i)[+][1])[*](X0[*]Bernstein H[+]_X_[*]Bernstein l0)).
   rewrite -> (Bernstein_inv1 H).
   fold X0.
-  replace (proj1 (Nat.lt_succ_r _ _) (lt_n_S _ _ H)) with H by apply le_irrelevent.
+  replace (proj1 (Nat.lt_succ_r _ _) (proj1 (Nat.succ_lt_mono _ _) H)) with H by apply le_irrelevent.
   replace (le_S_n _ _ (le_S (S i) (S n) H)) with l0 by apply le_irrelevent.
   reflexivity.
  revert H.
@@ -256,7 +256,7 @@ Proof.
  replace (S (S n) - S n) with 1 by auto with *.
  replace (le_S_n n (S n) (le_S (S n) (S n) H))
    with (le_S n n (proj1 (Nat.lt_succ_r n n) H)) by apply le_irrelevent.
- replace (proj1 (Nat.lt_succ_r (S n) (S n)) (lt_n_S n (S n) l)) with H by apply le_irrelevent.
+ replace (proj1 (Nat.lt_succ_r (S n) (S n)) (proj1 (Nat.succ_lt_mono n (S n)) l)) with H by apply le_irrelevent.
  ring.
 Qed.
 

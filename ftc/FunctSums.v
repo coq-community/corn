@@ -390,7 +390,7 @@ Proof.
  do 6 intro.
  unfold FSumx_to_FSum in |- *.
  elim (le_lt_dec n i); intro; simpl in |- *.
-  exfalso; apply (le_not_lt n i); auto.
+  exfalso; apply (Nat.le_ngt n i); auto.
  intros; apply H; auto.
  algebra.
 Qed.
@@ -402,7 +402,7 @@ Proof.
  unfold FSumx_to_FSum in |- *.
  elim (le_lt_dec n i); intro; simpl in |- *.
   intro; algebra.
- intros; exfalso; apply (le_not_lt n i); auto.
+ intros; exfalso; apply (Nat.le_ngt n i); auto.
 Qed.
 
 Lemma FSum_FSumx_to_FSum : forall n (f : forall i, i < S n -> PartIR),

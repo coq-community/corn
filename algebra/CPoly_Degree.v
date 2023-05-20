@@ -457,13 +457,13 @@ Proof.
    simpl in |- *. auto with arith.
   induction  p as [| s p Hrecp]; intros.
   simpl in H. elim (ap_irreflexive_unfolded _ _ H).
-  simpl in |- *. simpl in H. apply lt_n_S. auto.
+  simpl in |- *. simpl in H. apply -> Nat.succ_lt_mono. auto.
 Qed.
 
 Lemma poly_degree_lth : forall p : RX, degree_le (lth_of_poly p) p.
 Proof.
  unfold degree_le in |- *. intros. apply not_ap_imp_eq. intro.
- elim (lt_not_le _ _ H). apply Nat.lt_le_incl.
+ elim (proj1 (Nat.lt_nge _ _) H). apply Nat.lt_le_incl.
  apply lt_i_lth_of_poly. auto.
 Qed.
 
@@ -495,7 +495,7 @@ Proof.
   cut (i <> i0). intro.
   Step_final (nth_coeff i0 p[*][0]).
  intro; rewrite <- H2 in H1.
- apply (le_not_lt i n); auto.
+ apply (Nat.le_ngt i n); auto.
 Qed.
 
 Hint Resolve poly_as_sum'': algebra.

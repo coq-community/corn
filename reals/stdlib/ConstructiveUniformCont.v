@@ -417,9 +417,9 @@ Proof.
     rewrite IHn.
     destruct (Pn (S (S n)) - Pn (S n))%nat eqn:des.
     exfalso. apply Nat.sub_0_le in des.
-    apply (le_not_lt _ _ des). apply H, Nat.le_refl. simpl.
+    apply (proj1 (Nat.le_ngt _ _) des). apply H, Nat.le_refl. simpl.
     pose proof (H n). destruct (Pn (S n)).
-    exfalso. apply (le_not_lt 0 (Pn n) (Nat.le_0_l _)). apply H1, le_S, Nat.le_refl.
+    exfalso. apply (proj1 (Nat.le_ngt 0 (Pn n)) (Nat.le_0_l _)). apply H1, le_S, Nat.le_refl.
     clear H1. simpl.
     rewrite (CRsum_eq (fun k : nat => xn (k + S n1)%nat)
                       (fun k : nat => xn (S n1 + k)%nat)).

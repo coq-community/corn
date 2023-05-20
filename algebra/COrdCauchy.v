@@ -266,9 +266,9 @@ Proof.
   apply less_leEq_trans with e; eauto with arith.
  unfold CS_seq_recip_seq in |- *.
  elim lt_le_dec; intro; simpl in |- *.
-  exfalso; apply le_not_lt with N n; eauto with arith.
+  exfalso; apply Nat.le_ngt with N n; eauto with arith.
  elim lt_le_dec; intro; simpl in |- *.
-  exfalso; apply le_not_lt with N (Nat.max K N); eauto with arith.
+  exfalso; apply Nat.le_ngt with N (Nat.max K N); eauto with arith.
  rstepr (f (Nat.max K N)[-]f n).
  apply AbsSmall_leEq_trans with (d[*]e[*]e).
   apply mult_resp_leEq_both.

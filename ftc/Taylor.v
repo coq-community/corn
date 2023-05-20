@@ -112,7 +112,7 @@ Proof.
  clear H; intros. rename X into H.
  elim (cg_minus_strext _ _ _ _ _ H); clear H; intro H.
   unfold Taylor_Rem, Taylor_Seq', funct_i in H.
-  cut (Dom (FSumx n (fun i (Hi : i < n) => [-C-] (fi n Hf' (S i) (lt_n_S _ _ Hi) a Ha[/] _[//]
+  cut (Dom (FSumx n (fun i (Hi : i < n) => [-C-] (fi n Hf' (S i) (proj1 (Nat.succ_lt_mono _ _) Hi) a Ha[/] _[//]
     nring_fac_ap_zero IR (S i)) {*} (FId{-} [-C-]a) {^}S i)) b).
    2: apply FSumx_pred'; repeat split.
   intro H0.
@@ -121,7 +121,7 @@ Proof.
     apply pfstrx with (Hx := Hpred a Ha) (Hy := Hpred b Hb).
     apply ap_symmetric_unfolded; apply zero_minus_apart; auto.
    cut (ext_fun_seq' (fun i (Hi : i < n) => [-C-]
-     (fi n Hf' (S i) (lt_n_S _ _ Hi) a Ha[/] _[//]nring_fac_ap_zero IR (S i)) {*}
+     (fi n Hf' (S i) (proj1 (Nat.succ_lt_mono _ _) Hi) a Ha[/] _[//]nring_fac_ap_zero IR (S i)) {*}
        (FId{-} [-C-]a) {^}S i)).
     2: red in |- *; repeat split.
    intro H1.
@@ -134,7 +134,7 @@ Proof.
     2: exact (FSumx_char _ _ _ _ H1).
    simpl in H2.
    cut (nat_less_n_fun (fun i (Hi : i < n) =>
-     (fi n Hf' (S i) (lt_n_S _ _ Hi) a Ha[/] _[//]nring_fac_ap_zero IR (S i)) [*]
+     (fi n Hf' (S i) (proj1 (Nat.succ_lt_mono _ _) Hi) a Ha[/] _[//]nring_fac_ap_zero IR (S i)) [*]
        (nexp IR i (b[+][--]a) [*] (b[+][--]a)))); intros.
     cut (nat_less_n_fun (fun i (Hi : i < n) => ([0]:IR))); intros.
      elim (Sumx_strext _ _ _ _ H3 H4 H2); clear H H0 H1 H2 H3 H4; intros N HN.
@@ -163,7 +163,7 @@ Proof.
      algebra.
     exact (FSumx_char _ _ _ _ H1).
    cut (ext_fun_seq' (fun i (Hi : i < n) => [-C-]
-     (fi n Hf' (S i) (lt_n_S _ _ Hi) a Ha[/] _[//]nring_fac_ap_zero IR (S i)) {*}
+     (fi n Hf' (S i) (proj1 (Nat.succ_lt_mono _ _) Hi) a Ha[/] _[//]nring_fac_ap_zero IR (S i)) {*}
        (FId{-} [-C-]a) {^}S i)). intro H2.
     apply eq_transitive_unfolded with (Part _ _ (Hpred b Hb) [-]Part _ _ (Hpred a Ha) [-] Sumx
       (fun i (Hi : i < n) => Part _ _ (FSumx_pred _ _ H2 b H0 i Hi))).

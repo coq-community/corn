@@ -347,7 +347,7 @@ Proof.
       exfalso; lia.
      elim (le_lt_dec (f (S n)) i); intro; simpl in |- *.
       cut (f n < f (S n)); [ intro | apply f_mon; apply Nat.lt_succ_diag_r ].
-      exfalso; apply (le_not_lt (f n) i); auto.
+      exfalso; apply (Nat.le_ngt (f n) i); auto.
       apply Nat.le_trans with (f (S n)); auto with arith.
      intros; unfold part_tot_nat_fun in |- *;
        elim (le_lt_dec (f (S n)) i);elim (le_lt_dec (f n) i);simpl;intros; try reflexivity;try exfalso; try lia.
@@ -443,7 +443,7 @@ Proof.
        intro.
        rewrite <- H6.
        rewrite <- plus_n_Sm; auto with arith.
-      exfalso; apply (le_not_lt i m); auto with arith.
+      exfalso; apply (Nat.le_ngt i m); auto with arith.
      set (x := f m (le_n m)) in *; clearbody x; auto with arith.
     assumption.
    intros.
@@ -458,7 +458,7 @@ Proof.
  unfold f' in |- *.
  elim (le_lt_dec i m); intro; simpl in |- *.
   apply H0; auto.
- elim (le_not_lt i m); auto.
+ lia; auto.
 Qed.
 
 End More_Lemmas.

@@ -666,11 +666,11 @@ Proof.
   destruct b. destruct b0. exact (ndiff eq_refl). contradiction.
   destruct b0. contradiction. exact (ndiff eq_refl).
   rewrite nth_error_None, <- H in des0.
-  exact (lt_not_le _ _ nlen des0).
+  exact (proj1 (Nat.lt_nge _ _) nlen des0).
   rewrite nth_error_None in desl.
-  exact (lt_not_le _ _ nlen desl).
+  exact (proj1 (Nat.lt_nge _ _) nlen desl).
   rewrite nth_error_None, <- H0 in des.
-  exact (lt_not_le _ _ nlen des).
+  exact (proj1 (Nat.lt_nge _ _) nlen des).
 Qed.
 
 Definition ProdIntegrableSimplify
@@ -1122,12 +1122,12 @@ Proof.
       rewrite nth_list_prod in des2. unfold fst in des2.
       rewrite (FreeSubsetsLength
                  (length hn) (nth (nl / length (FreeSubsets (length hn))) (FreeSubsets (length hn)) nil)) in des2.
-      exact (lt_not_le _ _ H0 des2).
+      exact (proj1 (Nat.lt_nge _ _) H0 des2).
       apply nth_In.
       apply Nat.div_lt_upper_bound in H1. exact H1.
       intro abs. rewrite abs in flen. inversion flen. exact H1.
       exfalso. apply nth_error_None in des. rewrite map_length in des.
-      exact (lt_not_le _ _ H0 des).
+      exact (proj1 (Nat.lt_nge _ _) H0 des).
     + assert (Forall (fun h => ~h x) (map prodint_f hn)).
       { apply SubsetIntersectFilterOut. intros.
         destruct (FreeSubsetsFull filter) as [n [H2 H3]].
@@ -1180,11 +1180,11 @@ Proof.
       rewrite nth_list_prod in des2. unfold snd in des2.
       rewrite (FreeSubsetsLength
                  (length hn) (nth (nl mod length (FreeSubsets (length hn))) (FreeSubsets (length hn)) nil)) in des2.
-      exact (lt_not_le _ _ H0 des2).
+      exact (proj1 (Nat.lt_nge _ _) H0 des2).
       apply nth_In. apply Nat.mod_bound_pos. apply Nat.le_0_l.
       exact flen. exact H1.
       exfalso. apply nth_error_None in des. rewrite map_length in des.
-      exact (lt_not_le _ _ H0 des).
+      exact (proj1 (Nat.lt_nge _ _) H0 des).
     + assert (Forall (fun h => ~h y) (map prodint_g hn)).
       { apply SubsetIntersectFilterOut. intros.
         destruct (FreeSubsetsFull filter) as [n [H2 H3]].

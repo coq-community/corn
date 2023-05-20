@@ -264,23 +264,23 @@ Proof.
      elim (le_lt_dec (S j) m); intro; simpl in |- *.
       apply prf1; auto.
      cut (S j <= m); [ intro | apply H' with i; assumption ].
-     exfalso; apply (le_not_lt _ _ H2 b0).
+     exfalso; apply (proj1 (Nat.le_ngt _ _) H2 b0).
     elim (le_lt_dec j m); intro; simpl in |- *.
      apply prf1; auto.
     cut (j < m); [ intro | apply H with i; assumption ].
-    exfalso; apply le_not_lt with m j; auto with arith.
-   exfalso; apply le_not_lt with (sub i) j; auto with arith.
-  exfalso; apply (le_not_lt _ _ Hj' b0).
+    exfalso; apply Nat.le_ngt with m j; auto with arith.
+   exfalso; apply Nat.le_ngt with (sub i) j; auto with arith.
+  exfalso; apply (proj1 (Nat.le_ngt _ _) Hj' b0).
  unfold h in |- *.
  apply cg_minus_wd.
   elim (le_lt_dec (S (pred (sub (S i)))) m); intro; simpl in |- *.
    apply prf1; auto.
   exfalso.
-  apply (le_not_lt _ _ P1 b0).
+  apply (proj1 (Nat.le_ngt _ _) P1 b0).
  elim (le_lt_dec (sub i) m); intro; simpl in |- *.
   apply prf1; auto.
  exfalso.
- apply (le_not_lt _ _ P2 b0).
+ apply (proj1 (Nat.le_ngt _ _) P2 b0).
 Qed.
 
 Notation just1 := (incF _ (Pts_part_lemma _ _ _ _ _ _ HfP _ _)).
@@ -329,21 +329,21 @@ Proof.
       exfalso.
       cut (0 < sub (S i)); [ intro | apply RL_sub_S ].
       cut (sub (S i) <= m); intros.
-       apply (le_not_lt _ _ H4); apply Nat.le_lt_trans with j; auto.
+       apply (proj1 (Nat.le_ngt _ _) H4); apply Nat.le_lt_trans with j; auto.
       rewrite <- RL_sub_n.
       apply RL_sub_mon'; apply Hi.
      apply mult_wd.
       apply pfwdef.
       apply HfQ'; auto.
      apply cg_minus_wd; apply prf1; auto.
-    exfalso; apply (le_not_lt _ _ b0).
+    exfalso; apply (proj1 (Nat.le_ngt _ _) b0).
     rewrite (Nat.lt_succ_pred _ _ (RL_sub_S i)); auto.
-   exfalso; apply (le_not_lt _ _ H1 b0).
+   exfalso; apply (proj1 (Nat.le_ngt _ _) H1 b0).
   symmetry  in |- *; apply RL_sub_n.
  apply Sumx_wd; intros.
  unfold part_tot_nat_fun in |- *.
  elim (le_lt_dec m i); intro; simpl in |- *.
-  exfalso; apply le_not_lt with m i; auto.
+  exfalso; apply Nat.le_ngt with m i; auto.
  apply mult_wd.
   apply pfwdef; apply HfQ'; auto.
  apply cg_minus_wd; apply prf1; auto.

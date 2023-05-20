@@ -371,7 +371,7 @@ Proof.
       rewrite Nat.add_comm. apply Nat.lt_add_lt_sub_l. exact H5.
       intro abs.
       destruct H2, H6. specialize (H6 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs).
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs).
       apply H6, le_n_S, H4. apply H2. apply le_n_S, H4.
       apply (CRle_trans
                _ (CRsum
@@ -391,7 +391,7 @@ Proof.
       apply H2, le_n_S, H4.
       intro abs.
       destruct H2, H6. specialize (H6 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs).
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs).
       apply H6, le_n_S, H4.
       destruct H. apply CRlt_asym. apply (c0 eps _ _ epsPos).
       apply (CRle_lt_trans _ (PartitionMesh (ipt_seq P) (S (ipt_last P)))).
@@ -402,13 +402,13 @@ Proof.
       apply Nat.add_le_mono_r. apply Nat.le_0_l.
       intro abs.
       destruct H2, H2. specialize (H2 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs).
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs).
       apply H2. apply le_n_S, H4.
       rewrite Nat.add_comm. apply Nat.lt_add_lt_sub_l.
       apply le_n_S in H5. rewrite Nat.succ_pred in H5. exact H5.
       intro abs.
       destruct H2, H2. specialize (H2 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs).
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs).
       apply H2. apply le_n_S, H4.
       rewrite sum_scale, CRmult_comm. apply CRmult_le_compat_l.
       apply CRlt_asym, epsPos.
@@ -427,7 +427,7 @@ Proof.
       intro abs.
       destruct H2, H5.
       specialize (H5 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs), H5, le_n_S, H4.
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs), H5, le_n_S, H4.
     + rewrite (CRsum_eq _  (fun k : nat => (ipt_seq P (S k) - ipt_seq P k) * eps)).
       rewrite sum_scale, CRmult_comm. apply CRmult_le_compat_l.
       apply CRlt_asym, epsPos.
@@ -451,7 +451,7 @@ Proof.
       intro abs.
       destruct H2, H5.
       specialize (H5 i (S i) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs), H5, le_n_S, H4.
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs), H5, le_n_S, H4.
     + unfold IntegralFiniteSum.
       rewrite partition_sum_by_packets. reflexivity. exact H2.
 Qed.
@@ -1171,7 +1171,7 @@ Proof.
   - apply P.
   - unfold ConcatSequences.
     destruct (lt_dec (S (S (ipt_last P) + ipt_last Q)) (S (ipt_last P))).
-    + exfalso. apply (lt_not_le _ _ l), le_n_S, (Nat.le_trans _ (S (ipt_last P) + 0)).
+    + exfalso. apply (proj1 (Nat.lt_nge _ _) l), le_n_S, (Nat.le_trans _ (S (ipt_last P) + 0)).
       rewrite Nat.add_0_r. apply le_S, Nat.le_refl. apply Nat.add_le_mono_l, Nat.le_0_l.
     + replace (S (S (ipt_last P) + ipt_last Q) - (S (ipt_last P)))%nat
         with (S (ipt_last Q)).
@@ -1226,12 +1226,12 @@ Proof.
     + apply Nat.le_antisymm. apply le_S_n, Nat.nlt_ge, n. exact H.
   - apply CRsum_eq. intros. unfold ConcatSequences.
     destruct (lt_dec (S ipt_last0 + i) (S ipt_last0)).
-    exfalso. apply (lt_not_le _ _ l).
+    exfalso. apply (proj1 (Nat.lt_nge _ _) l).
     apply (Nat.le_trans _ (S ipt_last0 + 0)).
     rewrite Nat.add_0_r. apply Nat.le_refl. apply Nat.add_le_mono_l, Nat.le_0_l.
     clear n.
     destruct (lt_dec (S (S ipt_last0 + i)) (S ipt_last0)).
-    exfalso. apply lt_not_le in l. apply l, le_n_S.
+    exfalso. apply Nat.lt_nge in l. apply l, le_n_S.
     apply (Nat.le_trans _ (S ipt_last0 + 0)).
     rewrite Nat.add_0_r. apply le_S, Nat.le_refl. apply Nat.add_le_mono_l, Nat.le_0_l.
     clear n.
@@ -1280,10 +1280,10 @@ Proof.
       setoid_replace (ConcatSequences xn yn n (S (n + p)) - ConcatSequences xn yn n (n+p))
         with (yn (S p) - yn p).
       apply H0. unfold ConcatSequences.
-      destruct (lt_dec (S (n + p)) n). exfalso. apply (lt_not_le _ _ l).
+      destruct (lt_dec (S (n + p)) n). exfalso. apply (proj1 (Nat.lt_nge _ _) l).
       apply (Nat.le_trans _ (S n + 0)). rewrite Nat.add_0_r. apply le_S, Nat.le_refl.
       simpl. apply le_n_S, Nat.add_le_mono_l, Nat.le_0_l.
-      clear n0. destruct (lt_dec (n + p) n). exfalso. apply (lt_not_le _ _ l).
+      clear n0. destruct (lt_dec (n + p) n). exfalso. apply (proj1 (Nat.lt_nge _ _) l).
       apply (Nat.le_trans _ (n + 0)). rewrite Nat.add_0_r. apply Nat.le_refl.
       apply Nat.add_le_mono_l, Nat.le_0_l. clear n0.
       rewrite (Nat.add_comm n), Nat.add_sub. apply CRplus_morph.
@@ -1384,12 +1384,12 @@ Proof.
       rewrite (Nat.sub_succ_r _ (S ipt_last0)).
       rewrite Nat.succ_pred. reflexivity.
       intro abs. apply Nat.sub_0_le in abs.
-      exact (lt_not_le _ _ H4 abs).
+      exact (proj1 (Nat.lt_nge _ _) H4 abs).
       rewrite (Nat.sub_succ_r _ (S ipt_last0)).
       rewrite Nat.succ_pred.
       rewrite Nat.le_sub_le_add_l, Nat.add_succ_r. exact H3.
       intro abs. apply Nat.sub_0_le in abs.
-      exact (lt_not_le _ _ H4 abs).
+      exact (proj1 (Nat.lt_nge _ _) H4 abs).
 Qed.
 
 Lemma FunLocSorted : forall (xn : list Q),
