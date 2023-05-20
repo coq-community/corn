@@ -231,8 +231,8 @@ Proof.
   rstepl (X0[*](nring (S n)[*]X0[*]Bernstein (proj1 (Nat.lt_succ_r (S i) n) l))[+]
     _X_[*](nring (S n)[*]X0[*]Bernstein (le_S_n i n H))[+] X0[*]Bernstein H).
   do 2 rewrite -> IHn.
-  rewrite <- (minus_Sn_m n i) by auto with *.
-  rewrite <-(minus_Sn_m (S n) (S i)) by auto with *.
+  rewrite (Nat.sub_succ_l i n) by auto with *.
+  rewrite (Nat.sub_succ_l (S i) (S n)) by auto with *.
   replace (S n - S i) with (n - i) by auto with *.
   change (nring (S (n - i)):cpoly_cring R) with (nring (n - i)[+][1]:cpoly_cring R).
   replace (le_S (S i) n (proj1 (Nat.lt_succ_r (S i) n) l)) with H by apply le_irrelevent.

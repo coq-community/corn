@@ -182,7 +182,7 @@ Proof.
  rewrite <- CRings.mult_assoc.
  apply mult_wd.
   reflexivity.
- rewrite <- minus_Sn_m; [|assumption].
+ rewrite Nat.sub_succ_l; [|assumption].
  reflexivity.
 Qed.
 
