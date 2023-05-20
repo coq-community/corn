@@ -852,7 +852,7 @@ Proof.
      apply very_weak_binomial.
       apply recip_resp_pos.
       apply pos_nring_S.
-     apply lt_n_S.
+     apply -> Nat.succ_lt_mono.
      apply neq_O_lt.
      apply (nring_ap_zero_imp R1).
      apply Greater_imp_ap.

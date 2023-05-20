@@ -414,15 +414,15 @@ Qed.
 
 Transparent funct_i' FSumx.
 
-Let funct_aux n Hf i Hi := PartInt (fi (S n) Hf (S i) (lt_n_S _ _ Hi)) {*}
+Let funct_aux n Hf i Hi := PartInt (fi (S n) Hf (S i) (proj1 (Nat.succ_lt_mono _ _) Hi)) {*}
   [-C-] ([1][/] _[//]nring_fac_ap_zero IR i) {*} ( [-C-]b{-}FId) {^}i.
 
 Lemma Taylor_lemma6 :  forall n Hf Hf' i Hi, Derivative_I Hab'
- (PartInt (fi n Hf i Hi)) (PartInt (fi (S n) Hf' (S i) (lt_n_S _ _ Hi))).
+ (PartInt (fi n Hf i Hi)) (PartInt (fi (S n) Hf' (S i) (proj1 (Nat.succ_lt_mono _ _) Hi))).
 Proof.
  intros.
  cut (Derivative_I_n Hab' 1 (PartInt (fi n Hf i Hi))
-   (PartInt (fi (S n) Hf' (S i) (lt_n_S i (S n) Hi)))).
+   (PartInt (fi (S n) Hf' (S i) (proj1 (Nat.succ_lt_mono i (S n)) Hi)))).
   intro H.
   simpl in H.
   elim H; intros f' H1 H2.
@@ -474,7 +474,7 @@ Proof.
  set (p := pred i) in *; clearbody p; clear Hi i.
  intros.
  cut (Derivative_I Hab' (PartInt (fi n Hf _ Hi'))
-   (PartInt (fi (S n) Hf' (S (S p)) (lt_n_S _ _ Hi')))); [ intro | apply Taylor_lemma6 ].
+   (PartInt (fi (S n) Hf' (S (S p)) (proj1 (Nat.succ_lt_mono _ _) Hi')))); [ intro | apply Taylor_lemma6 ].
  unfold funct_aux, funct_i' in |- *.
  New_Deriv.
   apply Feq_reflexive.
@@ -485,7 +485,7 @@ Proof.
  intros x X0 Hx Hx'.
  simpl in Hx, Hx'; simpl in |- *.
  set (fiSp1 := fi n Hf (S p) Hi') in *.
- set (fiSp2 := fi (S n) Hf' (S p) (lt_n_S p (S n) (lt_5 (S p) (S n) Hi'))) in *.
+ set (fiSp2 := fi (S n) Hf' (S p) (proj1 (Nat.succ_lt_mono p (S n)) (lt_5 (S p) (S n) Hi'))) in *.
  cut (forall x y : subset I, scs_elem _ _ x [=] scs_elem _ _ y -> fiSp1 x [=] fiSp2 y); intros.
   set (x1 := Build_subcsetoid_crr IR _ _ (ProjIR1 (ProjIR1 (ProjIR1 Hx)))) in *.
   simpl in (value of x1); fold x1 in |- *.
@@ -497,7 +497,7 @@ Proof.
   simpl in (value of x4); fold x4 in |- *.
   set (x5 := Build_subcsetoid_crr IR _ _ (ProjIR1 (ProjIR2 (ProjIR1 (ProjIR2 Hx))))) in *.
   simpl in (value of x5); fold x5 in |- *.
-  set (fiSSp := fi (S n) Hf' (S (S p)) (lt_n_S (S p) (S n) Hi')) in *.
+  set (fiSSp := fi (S n) Hf' (S (S p)) (proj1 (Nat.succ_lt_mono (S p) (S n)) Hi')) in *.
   set (pp := [1][/] nring (fact p + p * fact p) [//]nring_fac_ap_zero IR (S p)) in *.
   set (bxp := nexp _ p (b[-]x)) in *.
   set (a1 := fiSp1 x1) in *; set (a5 := fiSSp x5) in *;
@@ -521,7 +521,7 @@ Proof.
   transitivity (S p * fact p); auto with arith.
  unfold fiSp1, fiSp2 in |- *.
  apply eq_transitive_unfolded with (PartInt (fi n Hf (S p) Hi') (scs_elem _ _ x0) (scs_prf _ _ x0)).
-  2: apply eq_transitive_unfolded with (PartInt (fi (S n) Hf' (S p) (lt_n_S _ _ (lt_5 _ _ Hi')))
+  2: apply eq_transitive_unfolded with (PartInt (fi (S n) Hf' (S p) (proj1 (Nat.succ_lt_mono _ _) (lt_5 _ _ Hi')))
     (scs_elem _ _ x0) (scs_prf _ _ x0)).
    simpl in |- *; apply csf_wd_unfolded.
    case x0; simpl in |- *; algebra.
@@ -536,7 +536,7 @@ Lemma Taylor_lemma8 : forall n Hf Hf' Hi,
   Derivative_I Hab' (funct_i' n Hf 0 Hi) (funct_aux n Hf' 0 Hi).
 Proof.
  intros.
- cut (Derivative_I Hab' (PartInt (fi n Hf _ Hi)) (PartInt (fi (S n) Hf' 1 (lt_n_S _ _ Hi))));
+ cut (Derivative_I Hab' (PartInt (fi n Hf _ Hi)) (PartInt (fi (S n) Hf' 1 (proj1 (Nat.succ_lt_mono _ _) Hi))));
    [ intro | apply Taylor_lemma6 ].
  unfold funct_aux, funct_i' in |- *; New_Deriv.
   apply Feq_reflexive; Lazy_Included.
@@ -544,7 +544,7 @@ Proof.
    Lazy_Included.
   Lazy_Included.
  intros; simpl in |- *.
- apply eq_transitive_unfolded with (fi (S n) Hf' 1 (lt_n_S _ _ Hi)
+ apply eq_transitive_unfolded with (fi (S n) Hf' 1 (proj1 (Nat.succ_lt_mono _ _) Hi)
    (Build_subcsetoid_crr _ _ _ (ProjIR1 (ProjIR2 (ProjIR1 (ProjIR2 Hx))))) [*]
      ([1][/] _[//]nring_fac_ap_zero IR 0) [*][1]).
   simpl in |- *; rational.
@@ -630,9 +630,9 @@ Proof.
     repeat (split; auto).
    intros x H2 Hx Hx'; simpl in |- *.
    repeat apply mult_wdl.
-   apply eq_transitive_unfolded with (PartInt (fi (S n) Hf (S n) (lt_n_S _ _ (Nat.lt_succ_diag_r _))) x H2).
+   apply eq_transitive_unfolded with (PartInt (fi (S n) Hf (S n) (proj1 (Nat.succ_lt_mono _ _) (Nat.lt_succ_diag_r _))) x H2).
     2: apply eq_transitive_unfolded with (PartInt
-      (fi (S (S n)) Hf' (S n) (lt_n_S _ _ (lt_5 _ _ (Nat.lt_succ_diag_r (S n))))) x H2).
+      (fi (S (S n)) Hf' (S n) (proj1 (Nat.succ_lt_mono _ _) (lt_5 _ _ (Nat.lt_succ_diag_r (S n))))) x H2).
      simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
     2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
    apply Feq_imp_eq with (Compact Hab).
@@ -808,7 +808,7 @@ Proof.
       ([1][/] _[//]nring_fac_ap_zero _ n) [*] (b[-]c) [^]n).
      repeat apply mult_wdl; apply pfwdef; algebra.
     repeat apply mult_wdl.
-    apply eq_transitive_unfolded with (PartInt (fi (S n) Hf' (S n) (lt_n_S _ _ (Nat.lt_succ_diag_r _))) c Hc').
+    apply eq_transitive_unfolded with (PartInt (fi (S n) Hf' (S n) (proj1 (Nat.succ_lt_mono _ _) (Nat.lt_succ_diag_r _))) c Hc').
      2: simpl in |- *; apply csf_wd_unfolded; simpl in |- *; algebra.
     apply Feq_imp_eq with (Compact Hab).
      unfold Hab in |- *; apply Derivative_I_n_unique with (S n) F.

@@ -868,7 +868,7 @@ Proof.
     rstepr ((start_r x[-]start_l x)[*]nring (S (S (N + 3)))).
     apply mult_resp_less_lft.
      apply nring_less.
-     apply lt_n_S.
+     apply -> Nat.succ_lt_mono.
      apply le_lt_n_Sm.
      apply Nat.le_add_r.
     apply shift_zero_less_minus.

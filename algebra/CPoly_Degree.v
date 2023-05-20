@@ -457,7 +457,7 @@ Proof.
    simpl in |- *. auto with arith.
   induction  p as [| s p Hrecp]; intros.
   simpl in H. elim (ap_irreflexive_unfolded _ _ H).
-  simpl in |- *. simpl in H. apply lt_n_S. auto.
+  simpl in |- *. simpl in H. apply -> Nat.succ_lt_mono. auto.
 Qed.
 
 Lemma poly_degree_lth : forall p : RX, degree_le (lth_of_poly p) p.
