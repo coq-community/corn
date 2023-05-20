@@ -205,7 +205,7 @@ Proof.
      intros; apply HR.
     red in |- *; intros; apply prf1; auto.
    assumption.
-  exfalso; apply (le_not_lt j' m); auto.
+  exfalso; apply (Nat.le_ngt j' m); auto.
  elim (le_lt_dec j 0); intro.
   exfalso; apply Nat.nlt_0_r with j'; red in |- *; apply Nat.le_trans with j; auto.
  generalize Hj H H0; clear H0 H Hj.
@@ -289,7 +289,7 @@ Proof.
     apply b0.
    apply AbsIR_wd; apply cg_minus_wd; apply prf1; auto.
   left; intro.
-  exfalso; apply le_not_lt with i n; auto.
+  exfalso; apply Nat.le_ngt with i n; auto.
  intros.
  apply less_cotransitive_unfolded.
  rstepl ((delta [/]TwoNZ) [/]TwoNZ).

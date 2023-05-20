@@ -371,7 +371,7 @@ Proof.
       rewrite Nat.add_comm. apply Nat.lt_add_lt_sub_l. exact H5.
       intro abs.
       destruct H2, H6. specialize (H6 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs).
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs).
       apply H6, le_n_S, H4. apply H2. apply le_n_S, H4.
       apply (CRle_trans
                _ (CRsum
@@ -391,7 +391,7 @@ Proof.
       apply H2, le_n_S, H4.
       intro abs.
       destruct H2, H6. specialize (H6 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs).
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs).
       apply H6, le_n_S, H4.
       destruct H. apply CRlt_asym. apply (c0 eps _ _ epsPos).
       apply (CRle_lt_trans _ (PartitionMesh (ipt_seq P) (S (ipt_last P)))).
@@ -402,13 +402,13 @@ Proof.
       apply Nat.add_le_mono_r. apply Nat.le_0_l.
       intro abs.
       destruct H2, H2. specialize (H2 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs).
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs).
       apply H2. apply le_n_S, H4.
       rewrite Nat.add_comm. apply Nat.lt_add_lt_sub_l.
       apply le_n_S in H5. rewrite Nat.succ_pred in H5. exact H5.
       intro abs.
       destruct H2, H2. specialize (H2 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs).
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs).
       apply H2. apply le_n_S, H4.
       rewrite sum_scale, CRmult_comm. apply CRmult_le_compat_l.
       apply CRlt_asym, epsPos.
@@ -427,7 +427,7 @@ Proof.
       intro abs.
       destruct H2, H5.
       specialize (H5 n (S n) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs), H5, le_n_S, H4.
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs), H5, le_n_S, H4.
     + rewrite (CRsum_eq _  (fun k : nat => (ipt_seq P (S k) - ipt_seq P k) * eps)).
       rewrite sum_scale, CRmult_comm. apply CRmult_le_compat_l.
       apply CRlt_asym, epsPos.
@@ -451,7 +451,7 @@ Proof.
       intro abs.
       destruct H2, H5.
       specialize (H5 i (S i) (Nat.le_refl _)).
-      apply Nat.sub_0_le in abs. apply (le_not_lt _ _ abs), H5, le_n_S, H4.
+      apply Nat.sub_0_le in abs. apply (proj1 (Nat.le_ngt _ _) abs), H5, le_n_S, H4.
     + unfold IntegralFiniteSum.
       rewrite partition_sum_by_packets. reflexivity. exact H2.
 Qed.

@@ -352,7 +352,7 @@ Proof.
  intros.
  unfold RSR_auxP in |- *.
  elim (le_lt_dec n i); intro; simpl in |- *.
-  exfalso; apply le_not_lt with n i; auto.
+  exfalso; apply Nat.le_ngt with n i; auto.
  elim (le_lt_dec i 0); intro; simpl in |- *.
   exfalso; apply Nat.lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
  set (x := ProjT1 (RSR_h_f' _ (lt_pred' _ _ b1 b0))) in *.
@@ -402,7 +402,7 @@ Proof.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with n.
     repeat rewrite <- le_plus_minus; auto.
-   elim (le_not_lt n i); auto; apply Nat.lt_trans with j; auto.
+   lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec n j); intro; simpl in |- *.
   apply Nat.lt_le_trans with (S (pred m + pred n)).
@@ -543,7 +543,7 @@ Proof.
  intros.
  unfold RSR_auxR in |- *.
  elim (le_lt_dec m i); intro; simpl in |- *.
-  exfalso; apply le_not_lt with m i; auto.
+  exfalso; apply Nat.le_ngt with m i; auto.
  elim (le_lt_dec i 0); intro; simpl in |- *.
   exfalso; apply Nat.lt_irrefl with 0; apply Nat.lt_le_trans with i; auto.
  set (x := ProjT1 (RSR_h_g' _ (lt_pred' _ _ b1 b0))) in *.
@@ -593,7 +593,7 @@ Proof.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with m.
     repeat rewrite <- le_plus_minus; auto.
-   elim (le_not_lt m i); auto; apply Nat.lt_trans with j; auto.
+   lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec m j); intro; simpl in |- *.
   set (H0 := RSR_nm0) in *; set (H1 := RSR_mn0) in *; apply Nat.lt_le_trans with (S (pred m + pred n)).

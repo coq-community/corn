@@ -243,7 +243,7 @@ Proof.
    cut (f j < f n); [ intro | apply Nat.le_lt_trans with i; auto ].
    apply not_ge.
    intro; red in H1.
-   apply (le_not_lt (f j) (f n)); auto with arith.
+   apply (Nat.le_ngt (f j) (f n)); auto with arith.
    apply Hfmon.
    elim (le_lt_eq_dec _ _ H1); intro; auto.
    rewrite b0 in H0; elim (Nat.lt_irrefl (f j)); auto.

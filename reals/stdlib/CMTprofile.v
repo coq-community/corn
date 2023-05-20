@@ -40,6 +40,7 @@ Require Import CMTIntegrableFunctions.
 Require Import CMTIntegrableSets.
 Require Import CMTFullSets.
 Require Import CMTReals.
+Require Import Lia.
 
 Local Open Scope ConstructiveReals.
 
@@ -1023,7 +1024,7 @@ Proof.
     + exfalso. apply le_S_n in l0.
       apply (Nat.le_trans _ _ _ H) in l0. clear H.
       apply (Nat.mul_le_mono_pos_l _ _ 2) in l0.
-      apply (Nat.le_trans _ _ _ l) in l0. apply (le_not_lt _ _ l0 (Nat.le_refl _)).
+      apply (Nat.le_trans _ _ _ l) in l0. apply (proj1 (Nat.le_ngt _ _) l0 (Nat.le_refl _)).
       apply le_n_S, Nat.le_0_l.
     + apply StepApproxIntegralIncr.
       apply BinarySubdivInside. apply CRlt_asym, ltab.
@@ -1098,7 +1099,7 @@ Proof.
       apply le_S_n, l0. apply CRlt_asym, (snd beta).
     + exfalso. apply le_S_n in l0. apply le_S_n in l.
       apply (Nat.le_trans _ _ (2^S n)) in H.
-      apply (Nat.le_trans _ _ _ H) in l0. apply (le_not_lt _ _ l0).
+      apply (Nat.le_trans _ _ _ H) in l0. apply (proj1 (Nat.le_ngt _ _) l0).
       apply le_S, Nat.le_refl. apply Nat.mul_le_mono_nonneg_l.
       apply Nat.le_0_l. exact l.
     + clear l l0.
@@ -1339,7 +1340,7 @@ Proof.
     unfold StepApproxDiscretize in c0.
     destruct (2^n)%nat eqn:des. apply Nat.le_0_l. rewrite <- des.
     destruct (le_lt_dec (S (S n0)) (S n0)). exfalso.
-    exact (le_not_lt _ _ l0 (Nat.le_refl _)).
+    lia.
     destruct (le_lt_dec (S (S n0)) (S i)).
     + apply le_S_n in l1. pose proof (Nat.le_antisymm _ _ l l1).
       subst i. rewrite <- des. apply Nat.le_refl.
@@ -1365,7 +1366,7 @@ Proof.
     apply (CRlt_trans _ _ _ H) in c0. unfold StepApproxDiscretize in c0.
     destruct j. apply Nat.le_0_l.
     destruct (le_lt_dec (S (2 ^ n)) (S j)).
-    exfalso. apply le_S_n in l1. exact (le_not_lt _ _ l1 l0).
+    exfalso. apply le_S_n in l1. lia.
     destruct (le_lt_dec (S (2 ^ n)) (S i)).
     apply le_S_n in l1. apply le_S_n in l2. exact (Nat.le_trans _ _ _ l1 l2).
     destruct (le_lt_dec (S j) i). exact l3. exfalso.

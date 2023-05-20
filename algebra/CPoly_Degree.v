@@ -495,7 +495,7 @@ Proof.
   cut (i <> i0). intro.
   Step_final (nth_coeff i0 p[*][0]).
  intro; rewrite <- H2 in H1.
- apply (le_not_lt i n); auto.
+ apply (Nat.le_ngt i n); auto.
 Qed.
 
 Hint Resolve poly_as_sum'': algebra.

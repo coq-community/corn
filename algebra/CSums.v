@@ -87,7 +87,7 @@ Proof.
  intros n f Hf i Hi.
  unfold part_tot_nat_fun in |- *.
  elim le_lt_dec; intro.
-  exfalso; apply (le_not_lt n i); auto.
+  exfalso; apply (Nat.le_ngt n i); auto.
  simpl in |- *; apply Hf; auto.
 Qed.
 
@@ -98,7 +98,7 @@ Proof.
  unfold part_tot_nat_fun in |- *.
  elim le_lt_dec; intro.
   simpl in |- *; algebra.
- exfalso; apply (le_not_lt n i); auto.
+ exfalso; apply (Nat.le_ngt n i); auto.
 Qed.
 
 (** [Sum0] defines the sum for [i=0..(n-1)] *)
@@ -365,8 +365,8 @@ Proof.
  apply Sum_wd'.
   assumption.
  intros i H1 H2.
- elim le_lt_dec; intro H3; [ simpl in |- * | exfalso; apply (le_not_lt i n); auto ].
- elim le_lt_dec; intro H4; [ simpl in |- * | exfalso; apply (le_not_lt m i); auto ].
+ elim le_lt_dec; intro H3; [ simpl in |- * | exfalso; apply (Nat.le_ngt i n); auto ].
+ elim le_lt_dec; intro H4; [ simpl in |- * | exfalso; apply (Nat.le_ngt m i); auto ].
  algebra.
 Qed.
 

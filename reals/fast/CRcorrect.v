@@ -823,7 +823,7 @@ Proof.
  clear Hc.
  unfold y.
  destruct (lt_le_dec m a) as [Z|Z].
-  elim (le_not_lt _ _ Z).
+  elim (proj1 (Nat.le_ngt _ _) Z).
   unfold m.
   apply Nat.lt_le_trans with (S (Nat.max a n)); auto with *.
  change (AbsSmall (proj1_sig e) (/ Qmax (proj1_sig z) (x b)-1 * / x m))%Q.
