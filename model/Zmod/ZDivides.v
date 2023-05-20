@@ -499,8 +499,8 @@ Proof.
  intros a b.
  generalize (Z_mod_lt (Z.abs a) (Z.abs b)).
  case a.
-   case b; unfold Z.abs, Z.opp, Zmod, Z.div_eucl in |- *; auto with zarith.
-  case b; unfold Z.abs, Z.opp, Zmod, Z.div_eucl in |- *.
+   case b; unfold Z.abs, Z.opp, Z.modulo, Z.div_eucl in |- *; auto with zarith.
+  case b; unfold Z.abs, Z.opp, Z.modulo, Z.div_eucl in |- *.
     auto with zarith.
    intros p q.
    elim (Zdiv_eucl_POS q (Zpos p)); intros Q R.
@@ -515,7 +515,7 @@ Proof.
    auto with zarith.
   intro r'; intros H0 H1 H2.
   elim H0; auto with zarith.
- case b; unfold Z.abs, Z.opp, Zmod, Z.div_eucl in |- *.
+ case b; unfold Z.abs, Z.opp, Z.modulo, Z.div_eucl in |- *.
    auto with zarith.
   intros p q.
   elim (Zdiv_eucl_POS q (Zpos p)); intros Q R.
@@ -529,7 +529,7 @@ Lemma Zdiv_Zopp :
  forall a b : Z, (a mod b)%Z = 0%Z -> (a / - b)%Z = (- (a / b))%Z.
 Proof.
  intros a b.
- unfold Zmod, Z.div, Z.div_eucl in |- *.
+ unfold Z.modulo, Z.div, Z.div_eucl in |- *.
  case a.
    auto.
   intro A.
@@ -540,7 +540,7 @@ Proof.
    intro Hr; rewrite Hr; auto.
   intro B.
   generalize (Z_mod_lt (Zpos A) (Zpos B)).
-  unfold Zmod, Z.div_eucl in |- *.
+  unfold Z.modulo, Z.div_eucl in |- *.
   elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
   case r.
     intros _ HR; fold (- q)%Z in |- *; fold (- - q)%Z in |- *; rewrite Z.opp_involutive; auto.
@@ -557,7 +557,7 @@ Proof.
    auto.
   intro B.
   generalize (Z_mod_lt (Zpos A) (Zpos B)).
-  unfold Zmod, Z.div_eucl in |- *.
+  unfold Z.modulo, Z.div_eucl in |- *.
   elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
   case r.
     intros _ HR; fold (- q)%Z in |- *; fold (- - q)%Z in |- *; rewrite Z.opp_involutive; auto.
@@ -571,7 +571,7 @@ Proof.
   elim Hlt; auto with zarith; intro Hfalse; elim Hfalse; auto with zarith.
  intro B.
  generalize (Z_mod_lt (Zpos A) (Zpos B)).
- unfold Zmod, Z.div_eucl in |- *.
+ unfold Z.modulo, Z.div_eucl in |- *.
  elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
  case r.
    intros _ HR; fold (- q)%Z in |- *; auto.

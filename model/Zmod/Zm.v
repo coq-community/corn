@@ -571,11 +571,11 @@ Section zp_nonzero.
 Variable x: Zp.
 Hypothesis Hx: x[#][0].
 
-Lemma Zp_nonz_mod: 0<(Zmod x m)<m.
+Lemma Zp_nonz_mod: 0<(Z.modulo x m)<m.
 Proof.
  generalize (Z_mod_lt x m); intro H; elim H; clear H; intros.
   split.
-   elim (Zlt_asymmetric (Zmod x m) 0).
+   elim (Zlt_asymmetric (Z.modulo x m) 0).
     intro Hfalse; elim Hx; elim Hfalse; clear Hfalse; intro Hfalse.
      elim H; apply Z.lt_gt; auto.
     simpl; rewrite <-Hfalse; auto with zarith.
@@ -592,8 +592,8 @@ Proof.
  unfold Zrelprime.
  rewrite <-Zgcd_mod_lft; auto.
   generalize Hxmod0.
-  set (d:=(Zmod x m)).
-  cut (d=(Zmod x m)).
+  set (d:=(Z.modulo x m)).
+  cut (d=(Z.modulo x m)).
    case d.
      intros _ Hfalse; elim (Zlt_irref _ Hfalse).
     intros D HD _.
@@ -662,8 +662,8 @@ Proof.
    unfold Zrelprime.
    rewrite <-Zgcd_mod_rht; auto.
     generalize Hxmod0.
-    set (d:=(Zmod x m)).
-    cut (d=(Zmod x m)); auto.
+    set (d:=(Z.modulo x m)).
+    cut (d=(Z.modulo x m)); auto.
     case d.
       intros _ Hfalse; elim (Zlt_irref _ Hfalse).
      intros D HD _.
@@ -687,8 +687,8 @@ Proof.
   unfold Zrelprime.
   rewrite <-Zgcd_mod_rht; auto.
    generalize Hxmod0.
-   set (d:=(Zmod x m)).
-   cut (d=(Zmod x m)); auto.
+   set (d:=(Z.modulo x m)).
+   cut (d=(Z.modulo x m)); auto.
    case d.
      intros _ Hfalse; elim (Zlt_irref _ Hfalse).
     intros D HD _.
