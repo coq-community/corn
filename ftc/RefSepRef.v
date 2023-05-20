@@ -704,7 +704,7 @@ Proof.
   elim (le_lt_dec m j); intro; simpl in |- *.
    rewrite not_le_minus_0.
     rewrite <- plus_n_O; auto with arith.
-   apply lt_not_le; auto.
+   apply Nat.lt_nge; auto.
   apply plus_pred_pred_plus.
   elim (ProjT2 (RSR_h_g' _ (lt_pred' _ _ b1 b2))); intros.
   assumption.

@@ -57,12 +57,12 @@ Proof.
   intros. generalize dependent n. induction k.
   - simpl. split.
     + intro. destruct (Nat.eq_dec (proj1_sig un O) n).
-      assumption. exfalso. apply (lt_not_le n (S n)).
+      assumption. exfalso. apply (Nat.lt_nge n (S n)).
       apply Nat.le_refl. assumption.
     + intro. destruct (Nat.eq_dec (proj1_sig un O) n). apply Nat.le_0_l.
       exfalso. pose proof (SubSeqAboveId un n).
       destruct un. simpl in H. simpl in n0. simpl in H0.
-      apply (lt_not_le (x n) (x (S n))). apply l. apply Nat.le_refl.
+      apply (Nat.lt_nge (x n) (x (S n))). apply l. apply Nat.le_refl.
       rewrite H. assumption.
   - split.
     + intro. simpl. simpl in H.
@@ -87,7 +87,7 @@ Proof.
     + intros. intro absurd. simpl in H.
       destruct (Nat.eq_dec (proj1_sig un (S k)) n).
       inversion H. subst k. pose proof (SubSeqAboveId un (S n)).
-      rewrite e in H1. apply (lt_not_le n (S n)). apply Nat.le_refl.
+      rewrite e in H1. apply (Nat.lt_nge n (S n)). apply Nat.le_refl.
       assumption. apply Nat.le_succ_r in H0. destruct H0.
       specialize (IHk n) as [IHk _].
       specialize (IHk H p H0). contradiction. subst p. contradiction.
@@ -104,7 +104,7 @@ Proof.
   - simpl. destruct (Nat.eq_dec (proj1_sig un O) (proj1_sig un O)). reflexivity.
     exfalso. exact (n (eq_refl _)).
   - simpl. destruct (Nat.eq_dec (proj1_sig un (S n)) (proj1_sig un O)).
-    exfalso. destruct un. simpl in e. apply (lt_not_le (x O) (x (S n))).
+    exfalso. destruct un. simpl in e. apply (Nat.lt_nge (x O) (x (S n))).
     apply l. apply le_n_S. apply Nat.le_0_l. rewrite e. apply Nat.le_refl.
     apply IHn.
 Qed.
@@ -139,7 +139,7 @@ Proof.
     destruct (Nat.eq_dec (SubSeqInv sub k k) (S k)). reflexivity.
     exfalso. apply n. clear n. apply SubSeqInvNotFound. intros.
     intro absurd. destruct p. rewrite absurd in H. exact (Nat.lt_irrefl k H).
-    destruct sub. simpl in absurd, H. apply (lt_not_le (x O) (x (S p))).
+    destruct sub. simpl in absurd, H. apply (Nat.lt_nge (x O) (x (S p))).
     apply l. apply le_n_S. apply Nat.le_0_l. rewrite absurd. apply le_S in H.
     apply le_S_n in H. apply H.
   - unfold FillSubSeqWithZeros.
@@ -172,10 +172,10 @@ Proof.
     destruct (Nat.lt_trichotomy p (S n)).
     apply Nat.le_succ_r in H2. destruct H2.
     specialize (inc p n H2). rewrite absurd in inc.
-    apply (lt_not_le (S (sub n + k)) (sub n)). assumption.
+    apply (Nat.lt_nge (S (sub n + k)) (sub n)). assumption.
     apply le_S. rewrite <- (Nat.add_0_r (sub n)). rewrite <- Nat.add_assoc.
     apply Nat.add_le_mono_l. apply Nat.le_0_l. inversion H2. subst p.
-    apply (lt_not_le (sub n) (S (sub n + k))). apply le_n_S.
+    apply (Nat.lt_nge (sub n) (S (sub n + k))). apply le_n_S.
     rewrite <- (Nat.add_0_r (sub n)). rewrite <- Nat.add_assoc.
     apply Nat.add_le_mono_l. apply Nat.le_0_l. rewrite <- absurd. apply Nat.le_refl.
     destruct H2. subst p. exact (Nat.lt_irrefl (sub (S n)) H1).
