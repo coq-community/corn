@@ -651,7 +651,7 @@ Proof.
    apply Nat.le_add_r.
   apply U_conversion_rate2 with (m := S (N + 3)).
    apply le_n_S.
-   apply le_plus_r.
+   apply Nat.le_add_l.
   assumption.
  apply Archimedes'.  (* Note the use of Archimedean Property of R1 *)
 Qed.
@@ -957,7 +957,7 @@ Proof.
     assumption.
    apply H3.
    apply Nat.le_trans with (m := N1 + N2).
-    apply le_plus_r.
+    apply Nat.le_add_l.
    assumption.
   unfold B in |- *.
   cut (SeqLimit U_as_CauchySeq (Lim U_as_CauchySeq)).
@@ -1058,7 +1058,7 @@ Proof.
     assumption.
    apply a0.
    apply Nat.le_trans with (m := N1 + N2).
-    apply le_plus_r.
+    apply Nat.le_add_l.
    assumption.
   unfold B in |- *.
   cut (SeqLimit U_as_CauchySeq (Lim U_as_CauchySeq)).

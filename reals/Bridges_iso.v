@@ -1418,10 +1418,10 @@ Proof.
   apply a.
   apply Nat.le_trans with (m := m).
    assumption.
-  apply le_plus_r.
+  apply Nat.le_add_l.
  apply AbsSmall_minus.
  apply a.
- apply le_plus_r.
+ apply Nat.le_add_l.
 Qed.
 
 
@@ -1657,7 +1657,7 @@ Proof.
   apply leEq_wdr with (y := sup (tail_seq g N)).
    change (sup_tail (k + N)[<=]sup_tail N) in |- *.
    apply sup_tail_decrease.
-   apply le_plus_r.
+   apply Nat.le_add_l.
   apply eq_symmetric_unfolded.
   assumption.
  apply less_leEq.
@@ -1723,7 +1723,7 @@ Proof.
    apply leEq_transitive with (y := nring (R:=OF) k).
     apply less_leEq; assumption.
    apply nring_leEq.
-   apply le_plus_r.
+   apply Nat.le_add_l.
   apply Greater_imp_ap.
   apply pos_div_two.
   assumption.
