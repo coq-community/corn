@@ -182,7 +182,7 @@ Proof.
    apply mult_resp_leEq_rht.
     apply less_leEq; apply less_plusOne.
    apply shift_leEq_div.
-    apply nring_pos; clear Hi; apply neq_O_lt; auto.
+    apply nring_pos; clear Hi; apply Nat.neq_0_lt_0; auto.
    apply shift_leEq_minus.
    astepl ([0][+]a).
    astepl a; assumption.
@@ -707,7 +707,7 @@ Proof.
    intros.
    apply mult_lt_compat_r.
     assumption.
-   apply neq_O_lt; auto.
+   apply Nat.neq_0_lt_0; auto.
   intros.
   cut (i * k <= m).
    intro.
@@ -767,7 +767,7 @@ Proof.
   apply ap_irreflexive_unfolded.
  astepl (nring m[*]nring (R:=IR) n).
  apply mult_resp_ap_zero; apply Greater_imp_ap; astepl (nring (R:=IR) 0);
-   apply nring_less; apply neq_O_lt; auto.
+   apply nring_less; apply Nat.neq_0_lt_0; auto.
 Qed.
 
 End Even_Partitions.
@@ -856,7 +856,7 @@ Lemma _Separated_imp_length_zero : forall n (P : Partition Hab n),
 Proof.
  intros n P H H0.
  cut (~ 0 <> n); [ auto with zarith | intro ].
- cut (0 < n); [ intro | apply neq_O_lt; auto ].
+ cut (0 < n); [ intro | apply Nat.neq_0_lt_0; auto ].
  cut (a [#] b).
   exact (eq_imp_not_ap _ _ _ H0).
  astepl (P _ (Nat.le_0_l _)).
@@ -871,7 +871,7 @@ Lemma partition_less_imp_gt_zero : forall n (P : Partition Hab n), a [<] b -> 0 
 Proof.
  intros n P H.
  cut (0 <> n); intro.
-  apply neq_O_lt; auto.
+  apply Nat.neq_0_lt_0; auto.
  exfalso.
  cut (a [=] b).
   intro; apply less_irreflexive_unfolded with (x := a).

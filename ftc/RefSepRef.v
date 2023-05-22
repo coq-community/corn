@@ -416,7 +416,7 @@ Proof.
   cut (S (pred (m + n)) = S (pred m + n)); auto.
   rewrite <- plus_Sn_m.
   rewrite <- (Nat.lt_succ_pred 0 m); auto with arith.
-  apply neq_O_lt.
+  apply Nat.neq_0_lt_0.
   intro.
   apply Nat.lt_irrefl with 0.
   apply Nat.lt_trans with i; auto.
@@ -610,7 +610,7 @@ Proof.
    apply Nat.lt_succ_pred with 0.
    apply Nat.lt_le_trans with m; auto with arith.
    apply Nat.lt_trans with i; auto.
-  apply neq_O_lt.
+  apply Nat.neq_0_lt_0.
   intro.
   apply Nat.lt_irrefl with 0.
   apply Nat.lt_trans with i; auto.

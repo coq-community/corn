@@ -853,7 +853,8 @@ Proof.
       apply recip_resp_pos.
       apply pos_nring_S.
      apply -> Nat.succ_lt_mono.
-     apply neq_O_lt.
+     apply Nat.neq_0_lt_0.
+     apply Nat.neq_sym.
      apply (nring_ap_zero_imp R1).
      apply Greater_imp_ap.
      apply less_transitive_unfolded with (y := [1][/] x[-][1][//]H0).

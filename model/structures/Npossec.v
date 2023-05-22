@@ -92,7 +92,7 @@ Proof.
     lia.
    lia.
   unfold gt in |- *.
-  apply neq_O_lt.
+  apply Nat.neq_0_lt_0.
   cut ((x*S y0) <> 0).
    auto.
   apply Hrecy0.
