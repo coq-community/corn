@@ -401,7 +401,7 @@ Proof.
    elim (le_lt_dec n j); intro; simpl in |- *.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with n.
-    repeat rewrite <- le_plus_minus; auto.
+    repeat (rewrite Nat.add_comm; rewrite Nat.sub_add); auto.
    lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec n j); intro; simpl in |- *.
@@ -592,7 +592,7 @@ Proof.
    elim (le_lt_dec m j); intro; simpl in |- *.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with m.
-    repeat rewrite <- le_plus_minus; auto.
+    repeat (rewrite Nat.add_comm; rewrite Nat.sub_add); auto.
    lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec m j); intro; simpl in |- *.
