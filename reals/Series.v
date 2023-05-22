@@ -886,7 +886,7 @@ Proof.
  intro; inversion_clear H2.
   apply leEq_transitive with (c[*]AbsIR (x n)).
    apply H; auto with arith.
-  rewrite <- minus_Sn_m.
+  rewrite Nat.sub_succ_l.
    astepr (AbsIR (x N) [*] (c[*]c[^] (n - N))).
    rstepr (c[*] (AbsIR (x N) [*]c[^] (n - N))).
    apply mult_resp_leEq_lft.

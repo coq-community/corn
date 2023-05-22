@@ -83,7 +83,7 @@ Proof.
  apply Zmult_gt_0_lt_reg_r with (Zpos d).
  reflexivity.
  replace ((n * Zpos p / Zpos d * 1 + 1) * Zpos d)%Z
-   with (Zpos d* (n*Zpos p/ Zpos d) + (Zmod (n*Zpos p) (Zpos d)) - (Zmod (n*Zpos p) (Zpos d)) + Zpos d)%Z
+   with (Zpos d* (n*Zpos p/ Zpos d) + (Z.modulo (n*Zpos p) (Zpos d)) - (Z.modulo (n*Zpos p) (Zpos d)) + Zpos d)%Z
    by ring.
  rewrite <- (Z_div_mod_eq_full (n*Zpos p) (Zpos d)).
  apply Z.le_lt_trans with (n*1*Zpos p)%Z.
@@ -91,7 +91,7 @@ Proof.
   apply Zmult_lt_0_le_compat_r; auto with *.
  apply Zlt_0_minus_lt.
  replace (n * Zpos p - (n * Zpos p) mod (Zpos d) + Zpos d - n * 1 * Zpos p)%Z
-   with (Zpos d - (Zmod (n*Zpos p) (Zpos d)))%Z by ring.
+   with (Zpos d - (Z.modulo (n*Zpos p) (Zpos d)))%Z by ring.
  rewrite <- Zlt_plus_swap.
  ring_simplify.
  assert (X:(Zpos d >0)%Z) by auto with *.

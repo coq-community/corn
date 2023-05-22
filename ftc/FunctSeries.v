@@ -760,7 +760,7 @@ Proof.
    apply mult_resp_leEq_lft.
     apply Hrecn; auto with arith.
    assumption.
-  rewrite <- minus_Sn_m.
+  rewrite Nat.sub_succ_l.
    simpl in |- *; rational.
   auto with arith.
  rewrite b0; intros.

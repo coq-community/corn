@@ -165,7 +165,7 @@ Proof.
       apply a_nonneg.
      apply H12.
       replace (n - j) with (S (n - S j)); [auto with arith|].
-      rewrite minus_Sn_m; auto with arith.
+      rewrite <- Nat.sub_succ_l; auto with arith.
      auto.
     rewrite <- H22.
     astepl (a (n - S j) [*] (a_0[-]eps[/] a (n - S j) [//]H16)).
@@ -193,7 +193,7 @@ Proof.
  elim (le_lt_eq_dec _ _ H15); intro H18.
   apply H12.
    replace (n - j) with (S (n - S j)); [auto with arith|].
-   rewrite minus_Sn_m; auto with arith.
+   rewrite <- Nat.sub_succ_l; auto with arith.
   auto.
  rewrite <- H18.
  apply less_leEq; auto.

@@ -66,7 +66,7 @@ Proof.
  intros n k Hlt.
  induction  n as [| n Hrecn].
   inversion Hlt.
- rewrite <- minus_Sn_m.
+ rewrite <- Nat.sub_succ_l.
   simpl in |- *.
   reflexivity.
  unfold lt in Hlt.

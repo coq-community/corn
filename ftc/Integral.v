@@ -962,7 +962,7 @@ Proof.
   apply prf1; auto.
  eapply leEq_wdr.
   apply b2.
- apply prf1; rewrite minus_Sn_m; auto with arith.
+ apply prf1; rewrite <- Nat.sub_succ_l; auto with arith.
 Qed.
 
 Lemma partition_join_Pts_wd : forall i j,
