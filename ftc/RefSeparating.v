@@ -221,7 +221,7 @@ Proof.
  exists m'.
  cut (m <> 0); intro.
   split.
-   cut (S m' = m); [ intro | unfold m' in |- *; apply Nat.lt_succ_pred with 0; apply neq_O_lt;
+   cut (S m' = m); [ intro | unfold m' in |- *; apply Nat.lt_succ_pred with 0; apply Nat.neq_0_lt_0;
      auto ].
    rewrite H0; clear H0 m'.
    cut (n <= sep__part_h m).
@@ -231,7 +231,7 @@ Proof.
    assumption.
   intros; apply Hm'.
   unfold m' in H0; rewrite <- (Nat.lt_succ_pred 0 m); auto with arith.
-  apply neq_O_lt; auto.
+  apply Nat.neq_0_lt_0; auto.
  apply SPap_n.
  rewrite H in Hm.
  simpl in Hm.

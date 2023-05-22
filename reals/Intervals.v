@@ -893,7 +893,7 @@ Proof.
   apply mult_resp_nonneg.
    apply nring_nonneg.
   apply shift_leEq_div.
-   apply nring_pos; apply neq_O_lt; auto.
+   apply nring_pos; apply Nat.neq_0_lt_0; auto.
   apply shift_leEq_minus.
   rstepl a; assumption.
  apply shift_plus_leEq'.
@@ -906,7 +906,7 @@ Proof.
   astepl (nring (R:=IR) i).
   apply nring_leEq; assumption.
  apply shift_leEq_div.
-  apply nring_pos; apply neq_O_lt; auto.
+  apply nring_pos; apply Nat.neq_0_lt_0; auto.
  apply shift_leEq_minus.
  rstepl a; assumption.
 Qed.
