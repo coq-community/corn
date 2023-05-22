@@ -54,7 +54,8 @@ Proof.
  induction  n as [| n Hrecn].
   exists 0.
   rewrite <- (plus_n_O m).
-  apply le_n_O_eq.
+  symmetry in |- *.
+  apply Nat.le_0_r.
   assumption.
  case (le_lt_eq_dec m (S n)).
    assumption.
@@ -372,9 +373,9 @@ Proof.
  induction  n as [| n Hrecn].
   (* n=O *)
   simpl in |- *.
-  rewrite <- (le_n_O_eq m H1).
+  rewrite <- (proj1 (Nat.le_0_r m) H1).
   apply H0.
-  constructor.
+  apply H1.
  (* n=(S n0) *)
  simpl in |- *.
  case (le_lt_eq_dec m (S n)).
@@ -425,9 +426,9 @@ Proof.
  induction  n as [| n Hrecn].
   (* n=O *)
   simpl in |- *.
-  rewrite <- (le_n_O_eq m H1).
+  rewrite <- (proj1 (Nat.le_0_r m) H1).
   apply H0.
-  constructor.
+  apply H1.
  (* n=(S n0) *)
  simpl in |- *.
  case (le_lt_eq_dec m (S n)).
@@ -643,7 +644,7 @@ Proof.
     intros.
     left.
     intros.
-    rewrite <- (le_n_O_eq m H1).
+    rewrite (proj1 (Nat.le_0_r m) H1).
     assumption.
    intro.
    right.
