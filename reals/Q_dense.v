@@ -464,8 +464,7 @@ Proof.
    intro.
    rewrite H0.
    apply leEq_reflexive.
-  symmetry  in |- *.
-  apply le_n_O_eq.
+  apply Nat.le_0_r.
   assumption.
  (* n=(S n0) *)
  cut ({m = S n} + {m <= n}).
@@ -520,8 +519,7 @@ Proof.
    intro.
    rewrite H0.
    apply leEq_reflexive.
-  symmetry  in |- *.
-  apply le_n_O_eq.
+  apply Nat.le_0_r.
   assumption.
  (* n=(S n0) *)
  cut ({m = S n} + {m <= n}).

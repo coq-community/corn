@@ -316,8 +316,8 @@ Lemma poly_01_zero : forall n i j, j <= n -> j <> i -> (poly_01 i n) ! (a_ j) [=
 Proof.
  intros.
  induction  n0 as [| n0 Hrecn0]; intros.
-  rewrite <- (le_n_O_eq j H).
-  rewrite <- (le_n_O_eq j H) in H0.
+  rewrite (proj1 (Nat.le_0_r j) H).
+  rewrite (proj1 (Nat.le_0_r j) H) in H0.
   simpl in |- *.
   elim (eq_nat_dec i 0); intro y.
    rewrite y in H0.

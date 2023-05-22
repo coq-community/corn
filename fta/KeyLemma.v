@@ -479,7 +479,7 @@ Proof.
    split. auto.
    intros j H9 k_j r i H10 H11.
   unfold k_j, r in |- *.
-  rewrite <- (le_n_O_eq _ H9).
+  rewrite (proj1 (Nat.le_0_r _) H9).
   replace (p3m 0) with OneR.
    2: auto.
   astepr (a k_0[*] (t[^]k_0[*][1][^]k_0)).
