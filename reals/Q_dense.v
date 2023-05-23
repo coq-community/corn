@@ -714,7 +714,7 @@ Proof.
    apply less_transitive_unfolded with (nring (R:=Q_as_COrdField) N).
     assumption.
    apply nring_less.
-   apply le_lt_n_Sm.
+   apply Nat.lt_succ_r.
    constructor.
    apply Nat.le_add_r.
   apply G_conversion_rate2 with (m := S (N + 3)).
@@ -867,7 +867,7 @@ Proof.
     apply mult_resp_less_lft.
      apply nring_less.
      apply -> Nat.succ_lt_mono.
-     apply le_lt_n_Sm.
+     apply Nat.lt_succ_r.
      apply Nat.le_add_r.
     apply shift_zero_less_minus.
     apply l_less_r.
@@ -878,7 +878,7 @@ Proof.
     apply less_transitive_unfolded with (y := nring (R:=R1) N).
      assumption.
     apply nring_less.
-    apply le_lt_n_Sm.
+    apply Nat.lt_succ_r.
     constructor.
    apply mult_cancel_lft with (z := nring (R:=R1) (S N)).
     apply nringS_ap_zero.
