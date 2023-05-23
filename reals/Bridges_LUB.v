@@ -644,7 +644,7 @@ Proof.
    apply less_transitive_unfolded with (y := nring (R:=R1) N).
     assumption.
    apply nring_less.
-   apply le_lt_n_Sm.
+   apply Nat.lt_succ_r.
    constructor.
    apply Nat.le_add_r.
   apply U_conversion_rate2 with (m := S (N + 3)).

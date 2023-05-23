@@ -255,7 +255,7 @@ Proof.
    rewrite <- POS_anti_convert.
    rewrite Zpos_eq_Z_of_nat_o_nat_of_P.
    apply inj_lt.
-   apply le_lt_n_Sm.
+   apply Nat.lt_succ_r.
    apply Nat.le_trans with (Nat.max n (nat_of_P ed));auto with *.
   change (1*P_of_succ_nat m <= en * P_of_succ_nat m)%Z.
   apply Zmult_lt_0_le_compat_r;auto with *.
