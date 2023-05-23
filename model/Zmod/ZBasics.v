@@ -99,7 +99,8 @@ Proof.
  intros k n Hle.
  induction  k as [| k Hreck].
   rewrite <- minus_n_O.
-  apply minus_n_n.
+  symmetry in |- *.
+  apply Nat.sub_diag.
  set (K := k) in |- * at 2.
  rewrite Hreck.
   unfold K in |- *; clear K.

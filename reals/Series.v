@@ -896,7 +896,7 @@ Proof.
    assumption.
   auto with arith.
  rewrite H3.
- rewrite <- minus_n_n.
+ rewrite Nat.sub_diag.
  apply eq_imp_leEq.
  simpl in |- *; algebra.
 Qed.

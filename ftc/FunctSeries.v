@@ -764,7 +764,7 @@ Proof.
    simpl in |- *; rational.
   auto with arith.
  rewrite b0; intros.
- rewrite <- minus_n_n.
+ rewrite Nat.sub_diag.
  apply eq_imp_leEq.
  simpl in |- *; eapply eq_transitive_unfolded.
   2: apply eq_symmetric_unfolded; apply mult_one.

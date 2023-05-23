@@ -381,7 +381,7 @@ Proof.
   cut (0 = m); [ intro; rewrite <- H0; auto | apply RSR_HR' ].
   apply partition_length_zero with Hab; rewrite <- H; apply P.
  elim (le_lt_dec n n); intro; simpl in |- *.
-  rewrite <- minus_n_n; auto.
+  rewrite Nat.sub_diag; auto.
  exfalso; apply Nat.lt_irrefl with n; auto.
 Qed.
 
@@ -572,7 +572,7 @@ Proof.
   cut (0 = n); [ intro; rewrite <- H0; auto | apply RSR_HP' ].
   apply partition_length_zero with Hab; rewrite <- H; apply R.
  elim (le_lt_dec m m); intro; simpl in |- *.
-  rewrite <- minus_n_n; auto.
+  rewrite Nat.sub_diag; auto.
  elim (Nat.lt_irrefl _ b1).
 Qed.
 
