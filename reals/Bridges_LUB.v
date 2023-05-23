@@ -559,7 +559,7 @@ Proof.
     apply Nat.lt_trans with (m := 3).
      constructor.
      constructor.
-    apply lt_S_n.
+    apply Nat.succ_lt_mono.
     assumption.
    simpl in |- *.
    algebra.
@@ -798,7 +798,7 @@ Proof.
      apply mult_resp_pos.
       change (nring (R:=OF) 0[<]nring n) in |- *.
       apply nring_less.
-      apply lt_S_n.
+      apply Nat.succ_lt_mono.
       assumption.
      apply pos_square.
      apply Greater_imp_ap.
@@ -814,7 +814,7 @@ Proof.
    simpl in |- *.
    apply eq_reflexive_unfolded.
   apply Hrecn.
-  apply lt_S_n.
+  apply Nat.succ_lt_mono.
   assumption.
  intro H1.
  rewrite <- H1.

@@ -345,7 +345,7 @@ Proof.
   - intros. intro abs. 
     destruct i. inversion ltni. simpl in H1.
     revert abs.
-    refine (IHn i (lt_S_n n i ltni) r step x y z d e
+    refine (IHn i (proj2 (Nat.succ_lt_mono n i) ltni) r step x y z d e
                 ltde loc _ H0 H1).
     replace (i-n)%nat with (S i - S n)%nat by reflexivity.
     exact H.
@@ -378,7 +378,7 @@ Proof.
   - intros. intro abs.
     destruct m. inversion ltjm.
     simpl in H1.
-    apply (IHj n m ltin (lt_S_n j m ltjm) b r stepX stepY
+    apply (IHj n m ltin (proj2 (Nat.succ_lt_mono j m) ltjm) b r stepX stepY
                     d e ltde loc H H0 H1 abs).
 Qed.
 
