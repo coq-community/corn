@@ -280,7 +280,7 @@ match v in Vector.t _ i return i <= n -> cpoly_cring R with
 |Vector.cons a i' v' =>
   match n as n return (S i' <= n) -> cpoly_cring R with
   | O => fun p => False_rect _ (Nat.nle_succ_0 _ p)
-  | S n' => fun p => _C_ a[*]Bernstein (le_S_n _ _ p)[+]evalBernsteinBasisH v' (le_Sn_le _ _ p)
+  | S n' => fun p => _C_ a[*]Bernstein (le_S_n _ _ p)[+]evalBernsteinBasisH v' (Nat.lt_le_incl _ _ p)
   end
 end.
 
@@ -367,7 +367,7 @@ Proof.
   intros H H'.
   replace (proj1 (Nat.lt_succ_r j n) H) with (proj1 (Nat.lt_succ_r j n) H') by apply le_irrelevent.
   reflexivity.
- rstepl (evalBernsteinBasisH (Vector.const c i) (le_Sn_le i (S n) l)[+]
+ rstepl (evalBernsteinBasisH (Vector.const c i) (Nat.lt_le_incl i (S n) l)[+]
    _C_ c[*](Bernstein (le_S_n i n l)[+] Sum (S i) n (part_tot_nat_fun (cpoly_cring R) (S n)
      (fun (i0 : nat) (H : i0 < S n) => Bernstein (proj1 (Nat.lt_succ_r i0 n) H))))).
  replace (Bernstein (le_S_n _ _ l)) with (part_tot_nat_fun (cpoly_cring R) (S n)
@@ -400,7 +400,7 @@ match v in Vector.t _ i return i <= n -> Vector.t R (S i) with
 | Vector.nil => fun _ => Vector.cons [0] _ Vector.nil
 | Vector.cons a i' v' => match n as n return S i' <= n -> Vector.t R (S (S i')) with
   | O => fun p => False_rect _ (Nat.nle_succ_0 _ p)
-  | S n' => fun p => Vector.cons (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (le_Sn_le _ _ p))
+  | S n' => fun p => Vector.cons (eta(Qred (i#P_of_succ_nat n'))[*]a) _ (BernsteinBasisTimesXH v' (Nat.lt_le_incl _ _ p))
   end
 end.
 
