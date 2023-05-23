@@ -359,8 +359,7 @@ Section definition.
     apply Qmult_le_compat_r; [| auto].
     apply Qdiv_le_1. split. Qauto_nonneg. rewrite <- (positive_nat_Z n).
     apply Qlt_le_weak. apply Q.nat_lt_Qlt.
-    apply Nat.div_lt_upper_bound.
-    apply Pos2Nat_nonneg.
+    apply Nat.Div0.div_lt_upper_bound.
     rewrite <- (Pos2Nat.inj_mul t n).
     rewrite (Pos.mul_comm t n).
     apply ile. apply Qpos_nonneg. }
