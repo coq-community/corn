@@ -503,10 +503,10 @@ Proof.
   case b; unfold Z.abs, Z.opp, Z.modulo, Z.div_eucl in |- *.
     auto with zarith.
    intros p q.
-   elim (Zdiv_eucl_POS q (Zpos p)); intros Q R.
+   elim (Coq.ZArith.BinIntDef.Z.pos_div_eucl q (Zpos p)); intros Q R.
    intros Hlt Hp HR; rewrite HR; auto with zarith.
   intros p q.
-  elim (Zdiv_eucl_POS q (Zpos p)); intros Q R.
+  elim (Coq.ZArith.BinIntDef.Z.pos_div_eucl q (Zpos p)); intros Q R.
   case R.
     auto with zarith.
    intro r'; intros H0 H1 H2.
@@ -518,10 +518,10 @@ Proof.
  case b; unfold Z.abs, Z.opp, Z.modulo, Z.div_eucl in |- *.
    auto with zarith.
   intros p q.
-  elim (Zdiv_eucl_POS q (Zpos p)); intros Q R.
+  elim (Coq.ZArith.BinIntDef.Z.pos_div_eucl q (Zpos p)); intros Q R.
   case R; intros r' H0; intros; try (cut (Zpos r' = Zpos p); elim H0); auto with zarith.
  intros p q.
- elim (Zdiv_eucl_POS q (Zpos p)); intros Q R.
+ elim (Coq.ZArith.BinIntDef.Z.pos_div_eucl q (Zpos p)); intros Q R.
  case R; intros; try discriminate; try tauto.
 Qed.
 
@@ -536,12 +536,12 @@ Proof.
   case b; unfold Z.opp in |- *.
     auto.
    intro B.
-   elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
+   elim (Coq.ZArith.BinIntDef.Z.pos_div_eucl A (Zpos B)); intros q r.
    intro Hr; rewrite Hr; auto.
   intro B.
   generalize (Z_mod_lt (Zpos A) (Zpos B)).
   unfold Z.modulo, Z.div_eucl in |- *.
-  elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
+  elim (Coq.ZArith.BinIntDef.Z.pos_div_eucl A (Zpos B)); intros q r.
   case r.
     intros _ HR; fold (- q)%Z in |- *; fold (- - q)%Z in |- *; rewrite Z.opp_involutive; auto.
    intros R Hlt HR.
@@ -558,7 +558,7 @@ Proof.
   intro B.
   generalize (Z_mod_lt (Zpos A) (Zpos B)).
   unfold Z.modulo, Z.div_eucl in |- *.
-  elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
+  elim (Coq.ZArith.BinIntDef.Z.pos_div_eucl A (Zpos B)); intros q r.
   case r.
     intros _ HR; fold (- q)%Z in |- *; fold (- - q)%Z in |- *; rewrite Z.opp_involutive; auto.
    intros R Hlt HR.
@@ -572,7 +572,7 @@ Proof.
  intro B.
  generalize (Z_mod_lt (Zpos A) (Zpos B)).
  unfold Z.modulo, Z.div_eucl in |- *.
- elim (Zdiv_eucl_POS A (Zpos B)); intros q r.
+ elim (Coq.ZArith.BinIntDef.Z.pos_div_eucl A (Zpos B)); intros q r.
  case r.
    intros _ HR; fold (- q)%Z in |- *; auto.
   intros; discriminate.
