@@ -749,8 +749,7 @@ Proof.
   - (* If subsets a and c are different, the product on x's is zero. *)
     assert (c < length (FreeSubsets (length hn)))%nat as cin.
     { subst c.
-      apply Nat.div_lt_upper_bound. intro abs.
-      rewrite abs in lenPos. exact (Nat.lt_irrefl 0 lenPos). exact H0. }
+      apply Nat.Div0.div_lt_upper_bound. exact H0. }
     apply (ProdIntegrableSubsetsDisjoint
              (map prodint_f hn) (nth c (FreeSubsets (length hn)) nil)
              (nth a (FreeSubsets (length hn)) nil) x).
@@ -758,8 +757,7 @@ Proof.
     rewrite (FreeSubsetsLength (length hn)).
     rewrite (FreeSubsetsLength (length hn)). reflexivity.
     apply nth_In. subst a.
-    apply Nat.div_lt_upper_bound. intro abs.
-    rewrite abs in lenPos. exact (Nat.lt_irrefl 0 lenPos).
+    apply Nat.Div0.div_lt_upper_bound.
     exact (Nat.lt_trans _ _ _ H H0).
     apply nth_In. exact cin.
     rewrite (FreeSubsetsLength (length hn)).
@@ -767,8 +765,7 @@ Proof.
     apply FreeSubsetsDifferent.
     intro abs. apply n. symmetry. exact abs. exact cin.
     subst a.
-    apply Nat.div_lt_upper_bound. intro abs.
-    rewrite abs in lenPos. exact (Nat.lt_irrefl 0 lenPos).
+    apply Nat.Div0.div_lt_upper_bound.
     exact (Nat.lt_trans _ _ _ H H0).
 Qed.
 
@@ -1124,8 +1121,7 @@ Proof.
                  (length hn) (nth (nl / length (FreeSubsets (length hn))) (FreeSubsets (length hn)) nil)) in des2.
       exact (proj1 (Nat.lt_nge _ _) H0 des2).
       apply nth_In.
-      apply Nat.div_lt_upper_bound in H1. exact H1.
-      intro abs. rewrite abs in flen. inversion flen. exact H1.
+      apply Nat.Div0.div_lt_upper_bound in H1. exact H1. exact H1.
       exfalso. apply nth_error_None in des. rewrite map_length in des.
       exact (proj1 (Nat.lt_nge _ _) H0 des).
     + assert (Forall (fun h => ~h x) (map prodint_f hn)).
@@ -1342,8 +1338,7 @@ Proof.
       apply ProdIntegrableSubsetRight_match. apply inuniong.
     + clear p0. simpl in p.
       assert (k / length (FreeSubsets (length hn)) < length (FreeSubsets (length hn)))%nat.
-      { apply Nat.div_lt_upper_bound in H3. exact H3.
-        intro abs. rewrite abs in lenPos. inversion lenPos. }
+      { apply Nat.Div0.div_lt_upper_bound in H3. exact H3. }
       apply (ProdIntegrableSubsetsDisjoint
                (map prodint_f hn)
                (nth (k / length (FreeSubsets (length hn))) (FreeSubsets (length hn)) nil)
