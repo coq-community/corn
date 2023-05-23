@@ -638,7 +638,7 @@ Proof.
    apply Nat.lt_trans with (m := 3).
     constructor.
     constructor.
-   apply lt_S_n.
+   apply Nat.succ_lt_mono.
    assumption.
   simpl in |- *.
   rational.

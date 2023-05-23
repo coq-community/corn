@@ -107,7 +107,7 @@ Proof.
    apply H; apply -> Nat.succ_lt_mono; apply H3.
   split; [ rewrite -> coeff_Sm_lin; destruct H0; apply H0 | unfold degree_le; intros ].
   destruct m0; [ inversion H3 | simpl; destruct H0 ].
-  apply H4; apply lt_S_n; apply H3.
+  apply H4; apply Nat.succ_lt_mono; apply H3.
  unfold degree_lt_pair.
  split; intros.
   unfold degree_le; intros.
