@@ -448,7 +448,7 @@ Proof.
   rewrite y. simpl in |- *.
   rstepl (Two:IR). rstepr (Three:IR).
   apply less_leEq. apply two_less_three.
-  elim (le_lt_eq_dec _ _ (lt_le_S _ _ y)); intros H0.
+  elim (le_lt_eq_dec _ _ (proj1 (Nat.le_succ_l _ _) y)); intros H0.
   apply mult_cancel_leEq with (nring i:IR).
    astepl (nring 0:IR). apply nring_less. auto.
    apply leEq_wdl with (nring (S i) [*]Two[*] (nring i[*]Two[^]i:IR)).
@@ -461,7 +461,7 @@ Proof.
     rstepl (nring i[*]Two[+] (Two:IR)).
     rstepr (nring i[*]Two[+] (nring i:IR)).
     apply plus_resp_leEq_lft.
-    elim (le_lt_eq_dec _ _ (lt_le_S _ _ H0)); intros H1.
+    elim (le_lt_eq_dec _ _ (proj1 (Nat.le_succ_l _ _) H0)); intros H1.
      apply less_leEq. apply nring_less. auto.
      rewrite <- H1. apply leEq_reflexive.
     apply less_leEq. apply mult_resp_pos.

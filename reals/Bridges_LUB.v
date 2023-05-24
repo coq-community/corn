@@ -786,7 +786,7 @@ Proof.
   apply Nat.lt_trans with (m := 1).
    apply Nat.lt_0_succ.
   assumption.
- case (le_lt_eq_dec 2 (S n) (lt_le_S 1 (S n) H0)).
+ case (le_lt_eq_dec 2 (S n) (proj1 (Nat.le_succ_l 1 (S n)) H0)).
   intro.
   cut ([1][+]nring n[*]x[<](x[+][1])[^]n).
    intro.
