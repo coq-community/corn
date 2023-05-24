@@ -660,7 +660,7 @@ Proof.
   eapply eq_transitive_unfolded.
    apply H.
   simpl in |- *; rational.
- apply (lt_O_neq n); auto.
+ apply (Nat.neq_0_lt_0 n); auto.
 Qed.
 
 (**
