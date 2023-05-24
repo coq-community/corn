@@ -702,9 +702,9 @@ Proof.
   elim (le_lt_dec j 0); intro; simpl in |- *.
    apply Nat.le_0_l.
   elim (le_lt_dec m j); intro; simpl in |- *.
-   rewrite not_le_minus_0.
+    rewrite (proj2 (Nat.sub_0_le j m)).
     rewrite <- plus_n_O; auto with arith.
-   apply Nat.lt_nge; auto.
+    assumption.
   apply plus_pred_pred_plus.
   elim (ProjT2 (RSR_h_g' _ (lt_pred' _ _ b1 b2))); intros.
   assumption.
