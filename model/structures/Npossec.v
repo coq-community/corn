@@ -82,7 +82,8 @@ Proof.
  cut (0 <> (x*S y0+x) -> (x*S y0+x) <> 0).
   intro H3.
   apply H3.
-  apply lt_O_neq.
+  apply Nat.neq_sym.
+  apply Nat.neq_0_lt_0.
   cut ((x*S y0+x) > 0).
    unfold gt in |- *.
    intuition.
