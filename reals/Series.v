@@ -874,7 +874,7 @@ Proof.
   exists N.
   exists 0.
   intro.
-  rewrite Nat.add_comm; rewrite Minus.minus_plus.
+  rewrite Nat.add_comm; rewrite Nat.add_sub.
   algebra.
  simple induction n.
   intro.
