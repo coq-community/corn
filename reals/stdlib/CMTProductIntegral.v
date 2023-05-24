@@ -593,8 +593,7 @@ Proof.
       2: rewrite Nat.mul_1_l; reflexivity.
       intro abs. rewrite Nat.add_sub, abs, Nat.mul_0_r in H0. inversion H0.
       replace (i + length k)%nat with (i + 1*length k)%nat.
-      rewrite Nat.mod_add. reflexivity.
-      intro abs. rewrite Nat.add_sub, abs, Nat.mul_0_r in H0. inversion H0.
+      rewrite Nat.Div0.mod_add. reflexivity.
       rewrite Nat.mul_1_l. reflexivity.
     + clear IHl. simpl (list_prod (a :: l) k). rewrite app_nth1.
       2: rewrite map_length; exact l0.
@@ -1255,7 +1254,7 @@ Proof.
     pose proof (nth_list_prod
                   (FreeSubsets (length hn)) (FreeSubsets (length hn)) nil nil
                   (kg + kf * (length (FreeSubsets (length hn)))) H2).
-    rewrite Nat.div_add, Nat.mod_add, Nat.div_small, Nat.mod_small in H3.
+    rewrite Nat.div_add, Nat.Div0.mod_add, Nat.div_small, Nat.mod_small in H3.
     2: apply H0. 2: apply H0.
     symmetry. rewrite <- CRmult_1_r.
     apply CRmult_morph. rewrite <- CRmult_1_r.
@@ -1288,7 +1287,6 @@ Proof.
       rewrite (map_nth (fun xy => ProdSubsetIntersect hn (fst xy) (snd xy))), H3.
       simpl. destruct H0. rewrite H4.
       apply ProdIntegrableSubsetRight_match. apply inuniong. exact H1.
-    + intros abs. destruct H. rewrite abs in H. inversion H.
     + intros abs. destruct H. rewrite abs in H. inversion H.
   - (* Other points evaluate to zero *)
     intros. simpl.

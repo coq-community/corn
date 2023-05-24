@@ -805,14 +805,16 @@ Proof.
   apply AbsSmall_plus.
    apply HM.
    apply (fun p n m : nat => plus_le_reg_l n m p) with k.
-   rewrite <- le_plus_minus.
+   rewrite (Nat.add_comm k (m- k)).
+   rewrite Nat.sub_add.
     apply Nat.le_trans with (Nat.max N M + k); auto with arith.
     rewrite Nat.add_comm; auto with arith.
    apply Nat.le_trans with (S (Nat.max N M + k)); auto with arith.
   apply AbsSmall_minus.
   apply HM.
   apply (fun p n m : nat => plus_le_reg_l n m p) with k.
-  rewrite <- le_plus_minus.
+  rewrite (Nat.add_comm k (S (Nat.max N M + k) - k)).
+  rewrite Nat.sub_add.
    apply Nat.le_trans with (Nat.max N M + k); auto.
    rewrite Nat.add_comm; auto with arith.
   apply Nat.le_trans with (S (Nat.max N M + k)); auto with arith.
@@ -894,7 +896,7 @@ Proof.
    assumption.
   auto with arith.
  rewrite H3.
- rewrite <- minus_n_n.
+ rewrite Nat.sub_diag.
  apply eq_imp_leEq.
  simpl in |- *; algebra.
 Qed.

@@ -117,7 +117,8 @@ Proof.
  rewrite -> nexp_ring_hom, nexp_ring_hom.
  rewrite <- CRings.mult_assoc, <- CRings.mult_assoc.
  apply mult_wdr.
- rewrite (le_plus_minus _ _ Hn) at 1.
+ rewrite <- (Nat.sub_add _ _ Hn) at 1.
+ rewrite Nat.add_comm.
  clear H0 Hn.
  rewrite <- nexp_plus.
  rewrite -> CRings.mult_assoc.

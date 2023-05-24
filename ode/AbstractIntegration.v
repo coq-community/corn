@@ -460,7 +460,7 @@ Section integral_approximation.
        rewrite <- Qplus_assoc, <- Qmult_plus_distr_l, <- Zplus_Qplus, <- Nat2Z.inj_add.
        apply Qplus_le_r. change (S n * proj1_sig iw' == proj1_sig w) in A. rewrite <- A.
        apply Qmult_le_compat_r. rewrite <- Zle_Qle. apply inj_le. rewrite Nat.add_comm.
-       now apply lt_le_S.
+       now apply Nat.le_succ_l.
        apply (proj2_sig iw').
        apply Qplus_le_l with (z := x), Qplus_le_l with (z := - proj1_sig w).
        setoid_replace (a - x + x + - proj1_sig w) with (a - proj1_sig w) by ring.

@@ -369,8 +369,7 @@ Proof.
    rewrite H0.
    simpl in |- *.
    apply leEq_reflexive.
-  symmetry  in |- *.
-  apply le_n_O_eq.
+  apply Nat.le_0_r.
   assumption.
  (* n=(S n0) *)
  cut ({m = S n} + {m <= n}).
@@ -426,8 +425,7 @@ Proof.
    rewrite H0.
    simpl in |- *.
    apply leEq_reflexive.
-  symmetry  in |- *.
-  apply le_n_O_eq.
+  apply Nat.le_0_r.
   assumption.
  (* n=(S n0) *)
  cut ({m = S n} + {m <= n}).
@@ -561,7 +559,7 @@ Proof.
     apply Nat.lt_trans with (m := 3).
      constructor.
      constructor.
-    apply lt_S_n.
+    apply Nat.succ_lt_mono.
     assumption.
    simpl in |- *.
    algebra.
@@ -646,7 +644,7 @@ Proof.
    apply less_transitive_unfolded with (y := nring (R:=R1) N).
     assumption.
    apply nring_less.
-   apply le_lt_n_Sm.
+   apply Nat.lt_succ_r.
    constructor.
    apply Nat.le_add_r.
   apply U_conversion_rate2 with (m := S (N + 3)).
@@ -788,7 +786,7 @@ Proof.
   apply Nat.lt_trans with (m := 1).
    apply Nat.lt_0_succ.
   assumption.
- case (le_lt_eq_dec 2 (S n) (lt_le_S 1 (S n) H0)).
+ case (le_lt_eq_dec 2 (S n) (proj1 (Nat.le_succ_l 1 (S n)) H0)).
   intro.
   cut ([1][+]nring n[*]x[<](x[+][1])[^]n).
    intro.
@@ -800,7 +798,7 @@ Proof.
      apply mult_resp_pos.
       change (nring (R:=OF) 0[<]nring n) in |- *.
       apply nring_less.
-      apply lt_S_n.
+      apply Nat.succ_lt_mono.
       assumption.
      apply pos_square.
      apply Greater_imp_ap.
@@ -816,7 +814,7 @@ Proof.
    simpl in |- *.
    apply eq_reflexive_unfolded.
   apply Hrecn.
-  apply lt_S_n.
+  apply Nat.succ_lt_mono.
   assumption.
  intro H1.
  rewrite <- H1.
@@ -853,7 +851,8 @@ Proof.
       apply recip_resp_pos.
       apply pos_nring_S.
      apply -> Nat.succ_lt_mono.
-     apply neq_O_lt.
+     apply Nat.neq_0_lt_0.
+     apply Nat.neq_sym.
      apply (nring_ap_zero_imp R1).
      apply Greater_imp_ap.
      apply less_transitive_unfolded with (y := [1][/] x[-][1][//]H0).

@@ -285,7 +285,8 @@ Proof.
   apply Greater_imp_ap.
   astepr (nring (R:=R_COrdField') n).
    apply nring_pos.
-   apply neq_O_lt.
+   apply Nat.neq_0_lt_0.
+   apply Nat.neq_sym.
    apply nring_ap_zero_imp with F.
    assumption.
   apply ing_nring.

@@ -381,7 +381,7 @@ Proof.
   cut (0 = m); [ intro; rewrite <- H0; auto | apply RSR_HR' ].
   apply partition_length_zero with Hab; rewrite <- H; apply P.
  elim (le_lt_dec n n); intro; simpl in |- *.
-  rewrite <- minus_n_n; auto.
+  rewrite Nat.sub_diag; auto.
  exfalso; apply Nat.lt_irrefl with n; auto.
 Qed.
 
@@ -401,7 +401,7 @@ Proof.
    elim (le_lt_dec n j); intro; simpl in |- *.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with n.
-    repeat rewrite <- le_plus_minus; auto.
+    repeat (rewrite Nat.add_comm; rewrite Nat.sub_add); auto.
    lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec n j); intro; simpl in |- *.
@@ -416,7 +416,7 @@ Proof.
   cut (S (pred (m + n)) = S (pred m + n)); auto.
   rewrite <- plus_Sn_m.
   rewrite <- (Nat.lt_succ_pred 0 m); auto with arith.
-  apply neq_O_lt.
+  apply Nat.neq_0_lt_0.
   intro.
   apply Nat.lt_irrefl with 0.
   apply Nat.lt_trans with i; auto.
@@ -572,7 +572,7 @@ Proof.
   cut (0 = n); [ intro; rewrite <- H0; auto | apply RSR_HP' ].
   apply partition_length_zero with Hab; rewrite <- H; apply R.
  elim (le_lt_dec m m); intro; simpl in |- *.
-  rewrite <- minus_n_n; auto.
+  rewrite Nat.sub_diag; auto.
  elim (Nat.lt_irrefl _ b1).
 Qed.
 
@@ -592,7 +592,7 @@ Proof.
    elim (le_lt_dec m j); intro; simpl in |- *.
     apply plus_lt_compat_l.
     apply plus_lt_reg_l with m.
-    repeat rewrite <- le_plus_minus; auto.
+    repeat (rewrite Nat.add_comm; rewrite Nat.sub_add); auto.
    lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
  elim (le_lt_dec m j); intro; simpl in |- *.
@@ -610,7 +610,7 @@ Proof.
    apply Nat.lt_succ_pred with 0.
    apply Nat.lt_le_trans with m; auto with arith.
    apply Nat.lt_trans with i; auto.
-  apply neq_O_lt.
+  apply Nat.neq_0_lt_0.
   intro.
   apply Nat.lt_irrefl with 0.
   apply Nat.lt_trans with i; auto.

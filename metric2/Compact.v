@@ -607,7 +607,8 @@ Proof.
   - intros s k d1 d2 pt Hpt e1 e2 khalf H.
  set (A:=Z.to_nat (CompactTotallyBoundedIndex e1 d1 d2)) in *.
  set (B:=Z.to_nat (CompactTotallyBoundedIndex e2 d1 d2)) in *.
- rewrite (le_plus_minus _ _ H).
+ rewrite <- (Nat.sub_add _ _ H).
+ rewrite Nat.add_comm.
  assert (proj1_sig k < 1) as Y.
  { apply (Qle_lt_trans _ _ _ khalf). reflexivity. }
   assert (Y0:= (CompactTotallyBoundedStreamCauchyLemma

@@ -317,14 +317,14 @@ Proof.
             Qmax (MVP_apply Q_as_CRing c v0) rec) n1 b) in *.
     replace RHS with (R*@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
       Bernstein (MultivariatePolynomial Q_as_CRing n)
-        (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i n1 (S m) l0 (le_Sn_le _ _ l))))) (Vector.cons _ a _ v0)).
+        (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i n1 (S m) l0 (Nat.lt_le_incl _ _ l))))) (Vector.cons _ a _ v0)).
      apply IHb.
     apply: mult_wdr.
     apply MVP_apply_wd; try reflexivity.
     apply Sumx_wd.
     intros i H.
     replace (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) l))
-      with (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i n1 (S m) H (le_Sn_le n1 (S m) l))) by apply le_irrelevent.
+      with (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i n1 (S m) H (Nat.lt_le_incl n1 (S m) l))) by apply le_irrelevent.
     reflexivity.
    clear - Ha0 Ha1.
    induction n1.
@@ -336,12 +336,12 @@ Proof.
    apply: plus_resp_nonneg.
     stepr (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
       Bernstein (MultivariatePolynomial Q_as_CRing n)
-        (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 l0) (le_Sn_le _ _ l))))) (Vector.cons _ a _ v0)).
+        (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 l0) (Nat.lt_le_incl _ _ l))))) (Vector.cons _ a _ v0)).
      apply IHn1.
     apply MVP_apply_wd; try reflexivity.
     apply Sumx_wd.
     intros i H.
-    replace (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) (le_Sn_le (S n1) (S m) l)))
+    replace (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) (Nat.lt_le_incl (S n1) (S m) l)))
       with (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S (S n1)) (S m) (Nat.lt_lt_succ_r i (S n1) (Nat.lt_lt_succ_r i n1 H)) l))
         by apply le_irrelevent.
     reflexivity.
@@ -445,14 +445,14 @@ Proof.
            Qmin (MVP_apply Q_as_CRing c v0) rec) n1 b) in *.
    replace LHS with (R*@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
      Bernstein (MultivariatePolynomial Q_as_CRing n)
-       (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i n1 (S m) l0 (le_Sn_le _ _ l))))) (Vector.cons _ a _ v0)).
+       (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i n1 (S m) l0 (Nat.lt_le_incl _ _ l))))) (Vector.cons _ a _ v0)).
     apply IHb.
    apply: mult_wdr.
    apply MVP_apply_wd; try reflexivity.
    apply Sumx_wd.
    intros i H.
    replace (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) l))
-     with (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i n1 (S m) H (le_Sn_le n1 (S m) l))) by apply le_irrelevent.
+     with (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i n1 (S m) H (Nat.lt_le_incl n1 (S m) l))) by apply le_irrelevent.
    reflexivity.
   clear - Ha0 Ha1.
   induction n1.
@@ -464,12 +464,12 @@ Proof.
   apply: plus_resp_nonneg.
    stepr (@MVP_apply Q_as_CRing (S n) (Sumx (fun (i : nat) (l0 : (i < n1)%nat) =>
      Bernstein (MultivariatePolynomial Q_as_CRing n)
-       (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 l0) (le_Sn_le _ _ l))))) (Vector.cons _ a _ v0)).
+       (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 l0) (Nat.lt_le_incl _ _ l))))) (Vector.cons _ a _ v0)).
     apply IHn1.
    apply MVP_apply_wd; try reflexivity.
    apply Sumx_wd.
    intros i H.
-   replace (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) (le_Sn_le (S n1) (S m) l)))
+   replace (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S n1) (S m) (Nat.lt_lt_succ_r i n1 H) (Nat.lt_le_incl (S n1) (S m) l)))
      with (proj1 (Nat.lt_succ_r i m) (Nat.lt_le_trans i (S (S n1)) (S m) (Nat.lt_lt_succ_r i (S n1) (Nat.lt_lt_succ_r i n1 H)) l))
        by apply le_irrelevent.
    reflexivity.
