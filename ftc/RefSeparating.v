@@ -70,7 +70,7 @@ Qed.
 Lemma SPap_n : n <> 0.
 Proof.
  intro.
- apply (lt_O_neq n).
+ apply (Nat.neq_0_lt_0 n).
   exact RS'_pos_n.
  auto.
 Qed.
@@ -408,7 +408,8 @@ Proof.
   reflexivity.
  exfalso.
  generalize b0.
- apply lt_O_neq; apply RS'_pos_m.
+ apply Nat.neq_sym.
+ apply Nat.neq_0_lt_0; apply RS'_pos_m.
 Qed.
 
 Lemma sep__part_fun_i :
