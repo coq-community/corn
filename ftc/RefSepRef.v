@@ -400,7 +400,7 @@ Proof.
     elim (Nat.lt_irrefl 0); apply Nat.lt_le_trans with j; try apply Nat.le_lt_trans with i; auto with arith.
    elim (le_lt_dec n j); intro; simpl in |- *.
     apply plus_lt_compat_l.
-    apply plus_lt_reg_l with n.
+    apply Nat.add_lt_mono_l with n.
     repeat (rewrite Nat.add_comm; rewrite Nat.sub_add); auto.
    lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
@@ -591,7 +591,7 @@ Proof.
     elim (Nat.lt_irrefl 0); apply Nat.le_lt_trans with i; try apply Nat.lt_le_trans with j; auto with arith.
    elim (le_lt_dec m j); intro; simpl in |- *.
     apply plus_lt_compat_l.
-    apply plus_lt_reg_l with m.
+    apply Nat.add_lt_mono_l with m.
     repeat (rewrite Nat.add_comm; rewrite Nat.sub_add); auto.
    lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
