@@ -1295,7 +1295,7 @@ Proof.
       unfold lt in l. simpl in xnlim.
       pose proof (xnlim (j - S i)%nat) as H0.
       replace (S (i + (j - S i)))%nat with j in H0. exact H0.
-      symmetry. exact (le_plus_minus_r (S i) j l). }
+      symmetry. rewrite Nat.add_comm. rewrite <- Nat.add_succ_r. exact (Nat.sub_add (S i) j l). }
     destruct (series_cv_abs
                 (fun n0 : nat => CRabs _ (partialApply (IntFn intRepres (S (i + n0))) x (xnlim n0)))
                 cau) as [x0 s].
