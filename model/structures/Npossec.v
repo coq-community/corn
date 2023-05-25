@@ -89,7 +89,7 @@ Proof.
    intuition.
   apply gt_trans with (x*S y0).
    apply gt_le_trans with (x*S y0+0).
-    apply plus_gt_compat_l.
+    apply Nat.add_lt_mono_l.
     lia.
    lia.
   unfold gt in |- *.
