@@ -87,15 +87,7 @@ Proof.
   cut ((x*S y0+x) > 0).
    unfold gt in |- *.
    intuition.
-  apply gt_trans with (x*S y0).
-   apply gt_le_trans with (x*S y0+0).
-    apply Nat.add_lt_mono_l.
-    lia.
-   lia.
-  unfold gt in |- *.
-  apply Nat.neq_0_lt_0.
-  cut ((x*S y0) <> 0).
-   auto.
-  apply Hrecy0.
- auto.
+  apply Nat.lt_trans with (x*S y0).
+   apply Nat.lt_le_trans with (x*S y0+0).
+    lia. lia. lia. lia.
 Qed.
