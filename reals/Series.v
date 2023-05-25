@@ -804,7 +804,7 @@ Proof.
     (seq_part_sum x M[-]seq_part_sum x (S (Nat.max N M + k) - k))).
   apply AbsSmall_plus.
    apply HM.
-   apply (fun p n m : nat => plus_le_reg_l n m p) with k.
+   apply (fun p n m : nat => Nat.add_le_mono_l n m p) with k.
    rewrite (Nat.add_comm k (m- k)).
    rewrite Nat.sub_add.
     apply Nat.le_trans with (Nat.max N M + k); auto with arith.
@@ -812,7 +812,7 @@ Proof.
    apply Nat.le_trans with (S (Nat.max N M + k)); auto with arith.
   apply AbsSmall_minus.
   apply HM.
-  apply (fun p n m : nat => plus_le_reg_l n m p) with k.
+  apply (fun p n m : nat => Nat.add_le_mono_l n m p) with k.
   rewrite (Nat.add_comm k (S (Nat.max N M + k) - k)).
   rewrite Nat.sub_add.
    apply Nat.le_trans with (Nat.max N M + k); auto.
