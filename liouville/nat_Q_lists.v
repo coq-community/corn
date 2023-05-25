@@ -180,14 +180,14 @@ Proof.
   rewrite H0.
   simpl.
   rewrite <- (Nat.add_0_r (Z.abs_nat a)) at 1.
-  apply plus_le_compat_l.
+  apply Nat.add_le_mono_l.
   apply Nat.le_0_l.
  simpl.
  destruct (ZL4 p).
  rewrite H0.
  simpl.
  rewrite <- (Nat.add_0_r (Z.abs_nat a)) at 1.
- apply plus_le_compat_l.
+ apply Nat.add_le_mono_l.
  apply Nat.le_0_l.
 Qed.
 
