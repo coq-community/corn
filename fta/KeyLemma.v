@@ -321,7 +321,7 @@ Proof.
  elim (le_gt_dec i j).
   auto.
  intro y.
- elim (le_not_gt _ _ H y).
+ elim (proj1 (Nat.le_ngt _ _) H y).
 Qed.
 
 Lemma chfun_2 : forall k j a i, j < i -> a = chfun k a j i.
@@ -330,7 +330,7 @@ Proof.
  unfold chfun in |- *.
  elim (le_gt_dec i j).
   intro y.
-  elim (le_not_gt _ _ y H).
+  elim (proj1 (Nat.le_ngt _ _) y H).
  auto.
 Qed.
 
