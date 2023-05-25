@@ -479,7 +479,7 @@ Proof.
   intros.
   simpl in b0; rewrite <- b0; auto.
  elim (le_lt_eq_dec _ _ H); intro.
-  cut (pred i < pred n); [ intro | apply lt_pred; rewrite Nat.lt_succ_pred with 0 i; auto ].
+  cut (pred i < pred n); [ intro | apply Nat.lt_succ_lt_pred; rewrite Nat.lt_succ_pred with 0 i; auto ].
   cut (RSR_auxP i <= pred (m + n)).
    intro; exists H1.
    elim le_lt_eq_dec; intro; simpl in |- *.
