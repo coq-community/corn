@@ -306,8 +306,9 @@ Proof.
       rewrite <- (MVP_mult_apply Q_as_CRing).
       apply: MVP_apply_wd; try reflexivity.
       replace (proj1 (Nat.lt_succ_r n1 m) (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))
-        with (Le.le_S_n n1 m l) by apply le_irrelevent.
-      apply c_mult_apply.
+        with (proj2 (Nat.succ_le_mono n1 m) l) by apply le_irrelevent.
+      replace (le_S_n n1 m l) with (proj2 (Nat.succ_le_mono n1 m) l) by apply le_irrelevent.
+      apply c_mult_apply. 
      apply MVP_BernsteinNonNeg; auto.
     eapply Qle_trans;[|apply Qmax_ub_r].
     set (R:=Vector.t_rec (MultivariatePolynomial Q_as_CRing n)
@@ -434,7 +435,8 @@ Proof.
      rewrite <- (MVP_mult_apply Q_as_CRing).
      apply: MVP_apply_wd; try reflexivity.
      replace (proj1 (Nat.lt_succ_r n1 m) (Nat.lt_le_trans n1 (S n1) (S m) (Nat.lt_succ_diag_r n1) l))
-       with (Le.le_S_n n1 m l) by apply le_irrelevent.
+       with (proj2 (Nat.succ_le_mono n1 m) l) by apply le_irrelevent.
+     replace (le_S_n n1 m l) with (proj2 (Nat.succ_le_mono n1 m) l) by apply le_irrelevent.
      apply c_mult_apply.
     apply MVP_BernsteinNonNeg; auto.
    eapply Qle_trans;[apply Qmin_lb_r|].

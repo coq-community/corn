@@ -43,7 +43,7 @@ Extract Inlined Constant minus => "fun n m -> max 0 (n - m)".
 Extract Inlined Constant mult => "(*)".
 Extract Inlined Constant max => max.
 Extract Inlined Constant min => min.
-Extract Inlined Constant EqNat.beq_nat => "(==)".
+Extract Inlined Constant Nat.eqb => "(==)".
 Extract Inlined Constant EqNat.eq_nat_decide => "(==)".
 Extract Inlined Constant Peano_dec.eq_nat_dec => "(==)".
 

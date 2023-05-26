@@ -291,7 +291,7 @@ Proof.
    apply less_wdl with (P (pred j) Hi'[-]P _ a0); intros.
     2: apply cg_minus_wd; apply prf1; auto.
    apply H0.
-   apply lt_pred_n_n.
+   apply Nat.lt_pred_l. apply Nat.neq_0_lt_0.
    apply Nat.le_lt_trans with (sep__part_h i).
     apply Nat.le_0_l.
    apply Partition_Points_mon with (P := P) (Hi := a0) (Hj := Hj).

@@ -99,7 +99,7 @@ Qed.
 Lemma lt_Zlt_to_nat (n : nat) (z : Z) : Z.of_nat n < z <-> (n < Z.to_nat z)%nat.
 Proof.
 assert (A : forall (m n : nat), not (m <= n)%nat <-> (n < m)%nat).
-+ intros; split; [apply not_le | apply gt_not_le].
++ intros; split; [apply not_le | apply Nat.lt_nge].
 + assert (A1 := le_Zle_to_nat n z). apply iff_not in A1.
   now rewrite A, Z.nle_gt in A1.
 Qed.

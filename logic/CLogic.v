@@ -751,7 +751,7 @@ Lemma lt_5 : forall i n : nat, i < n -> pred i < n.
 Proof.
  intros; apply Nat.le_lt_trans with (pred n).
   apply Nat.pred_le_mono; auto with arith.
- apply lt_pred_n_n; apply Nat.le_lt_trans with i; auto with arith.
+ apply Nat.lt_pred_l; apply Nat.neq_0_lt_0. apply Nat.le_lt_trans with i; auto with arith.
 Qed.
 
 Lemma lt_8 : forall m n : nat, m < pred n -> m < n.
@@ -762,7 +762,7 @@ Qed.
 Lemma pred_lt : forall m n : nat, m < pred n -> S m < n.
 Proof.
  intros; apply Nat.le_lt_trans with (pred n); auto with arith.
- apply lt_pred_n_n; apply Nat.le_lt_trans with m.
+ apply Nat.lt_pred_l; apply Nat.neq_0_lt_0. apply Nat.le_lt_trans with m.
   auto with arith.
  apply Nat.lt_le_trans with (pred n); auto with arith.
 Qed.

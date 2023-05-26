@@ -399,8 +399,8 @@ Proof.
  elim (le_lt_dec n i); elim (le_lt_dec j 0); intros; simpl in |- *.
     elim (Nat.lt_irrefl 0); apply Nat.lt_le_trans with j; try apply Nat.le_lt_trans with i; auto with arith.
    elim (le_lt_dec n j); intro; simpl in |- *.
-    apply plus_lt_compat_l.
-    apply plus_lt_reg_l with n.
+    apply Nat.add_lt_mono_l.
+    apply Nat.add_lt_mono_l with n.
     repeat (rewrite Nat.add_comm; rewrite Nat.sub_add); auto.
    lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
@@ -479,7 +479,7 @@ Proof.
   intros.
   simpl in b0; rewrite <- b0; auto.
  elim (le_lt_eq_dec _ _ H); intro.
-  cut (pred i < pred n); [ intro | apply lt_pred; rewrite Nat.lt_succ_pred with 0 i; auto ].
+  cut (pred i < pred n); [ intro | apply Nat.lt_succ_lt_pred; rewrite Nat.lt_succ_pred with 0 i; auto ].
   cut (RSR_auxP i <= pred (m + n)).
    intro; exists H1.
    elim le_lt_eq_dec; intro; simpl in |- *.
@@ -590,8 +590,8 @@ Proof.
  elim (le_lt_dec m i); elim (le_lt_dec j 0); intros; simpl in |- *.
     elim (Nat.lt_irrefl 0); apply Nat.le_lt_trans with i; try apply Nat.lt_le_trans with j; auto with arith.
    elim (le_lt_dec m j); intro; simpl in |- *.
-    apply plus_lt_compat_l.
-    apply plus_lt_reg_l with m.
+    apply Nat.add_lt_mono_l.
+    apply Nat.add_lt_mono_l with m.
     repeat (rewrite Nat.add_comm; rewrite Nat.sub_add); auto.
    lia; auto; apply Nat.lt_trans with j; auto.
   elim (Nat.lt_irrefl 0); apply Nat.lt_trans with i; auto; apply Nat.lt_le_trans with j; auto.
@@ -702,9 +702,9 @@ Proof.
   elim (le_lt_dec j 0); intro; simpl in |- *.
    apply Nat.le_0_l.
   elim (le_lt_dec m j); intro; simpl in |- *.
-   rewrite not_le_minus_0.
+    rewrite (proj2 (Nat.sub_0_le j m)).
     rewrite <- plus_n_O; auto with arith.
-   apply Nat.lt_nge; auto.
+    assumption.
   apply plus_pred_pred_plus.
   elim (ProjT2 (RSR_h_g' _ (lt_pred' _ _ b1 b2))); intros.
   assumption.

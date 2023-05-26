@@ -337,7 +337,7 @@ Qed.
 End Assoc_properties.
 
 #[global]
-Hint Resolve assoc_2 minus_plus zero_minus cg_cancel_mixed plus_resp_eq:
+Hint Resolve assoc_2 Nat.add_sub zero_minus cg_cancel_mixed plus_resp_eq:
   algebra.
 
 

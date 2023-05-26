@@ -636,7 +636,7 @@ Proof.
     lia. lia. lia.
     apply H4; auto.
  intro. induction  k as [| k Hreck]; intros.
- apply H4. rewrite <- minus_n_O in H5; auto.
+ apply H4. rewrite Nat.sub_0_r in H5; auto.
   elim (le_lt_eq_dec (N - k) i); try intro y. auto. rewrite y in Hreck.
    apply mult_cancel_lft with (nth_coeff m p). auto. astepr ([0]:F).
    apply eq_transitive_unfolded with

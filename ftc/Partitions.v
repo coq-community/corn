@@ -705,9 +705,9 @@ Proof.
   exists (fun i : nat => i * k); repeat split.
     symmetry  in |- *; assumption.
    intros.
-   apply mult_lt_compat_r.
-    assumption.
+   apply Nat.mul_lt_mono_pos_r.
    apply Nat.neq_0_lt_0; auto.
+   assumption.
   intros.
   cut (i * k <= m).
    intro.

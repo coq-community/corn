@@ -98,7 +98,7 @@ Lemma minus_n_minus_n_k : forall k n : nat, k <= n -> k = n - (n - k).
 Proof.
  intros k n Hle.
  induction  k as [| k Hreck].
-  rewrite <- minus_n_O.
+  rewrite Nat.sub_0_r.
   symmetry in |- *.
   apply Nat.sub_diag.
  set (K := k) in |- * at 2.
