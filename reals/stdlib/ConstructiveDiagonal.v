@@ -285,7 +285,7 @@ Proof.
   assert (I = K).
   - destruct (Nat.lt_trichotomy I K).
     + exfalso. unfold lt in H0. assert ((S I) * S (S I) / 2 <= K * S K / 2)%nat.
-      apply Nat.Div0.div_le_mono.
+      apply Nat.div_le_mono. intro absurd. inversion absurd.
       apply Nat.mul_le_mono_nonneg. apply Nat.le_0_l. assumption. apply Nat.le_0_l.
       apply le_n_S. assumption. rewrite diagPlaneAbsNext in H1.
       apply (Nat.add_le_mono_l (I * S I / 2 + S I) (K * S K / 2) l) in H1.
@@ -298,7 +298,7 @@ Proof.
       assumption. apply Nat.le_refl.
     + destruct H0. assumption. exfalso.
       unfold lt in H0. assert ((S K) * S (S K) / 2 <= I * S I / 2)%nat.
-      apply Nat.Div0.div_le_mono.
+      apply Nat.div_le_mono. intro absurd. inversion absurd.
       apply Nat.mul_le_mono_nonneg. apply Nat.le_0_l. assumption. apply Nat.le_0_l.
       apply le_n_S. assumption. rewrite diagPlaneAbsNext in H1.
       apply (Nat.add_le_mono_l (K * S K / 2 + S K) (I * S I / 2) j) in H1.
@@ -433,7 +433,7 @@ Proof.
   rewrite des in H0. unfold diagPlane in H0. unfold diagPlane.
   subst p. rewrite Nat.add_0_l. ring. unfold diagPlane. rewrite Nat.add_0_l.
   rewrite Nat.add_0_l. remember (i + j)%nat. apply Nat.add_le_mono. assumption.
-  apply Nat.Div0.div_le_mono. auto. apply Nat.mul_le_mono_nonneg.
+  apply Nat.div_le_mono. auto. apply Nat.mul_le_mono_nonneg.
   apply Nat.le_0_l. assumption. apply Nat.le_0_l. apply le_n_S. assumption.
 Qed.
 
@@ -558,7 +558,7 @@ Proof.
   remember (S n + p)%nat as n0. assert (n <= n0)%nat.
   subst n0. simpl. apply le_S. rewrite <- (Nat.add_0_r n). rewrite <- Nat.add_assoc.
   apply Nat.add_le_mono_l. apply Nat.le_0_l.
-  apply Nat.add_le_mono. assumption. apply Nat.Div0.div_le_mono. auto.
+  apply Nat.add_le_mono. assumption. apply Nat.div_le_mono. auto.
   apply Nat.mul_le_mono. assumption. apply le_n_S. assumption.
   rewrite CRabs_minus_sym. apply H. apply Nat.le_refl.
   unfold CRminus. rewrite CRplus_assoc. apply CRplus_morph. reflexivity.

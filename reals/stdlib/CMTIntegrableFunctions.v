@@ -434,13 +434,13 @@ Proof.
     apply (CRle_trans _ _ _ (CRabs_triang _ _)).
     setoid_replace (1 # n)%Q with ((1 # (2*n)) + (1 # (2*n)))%Q.
     apply le_S_n in H1. rewrite CR_of_Q_plus. apply CRplus_le_compat.
-    apply H. rewrite <- (Nat.div_mul N 2). apply Nat.Div0.div_le_mono.
+    apply H. rewrite <- (Nat.div_mul N 2). apply Nat.div_le_mono.
     auto. apply (Nat.le_trans (N*2) (N*2 + (S N0)*2)). apply Nat.le_add_r.
     apply (Nat.le_trans _ i). assumption.
     apply le_S. apply Nat.le_refl. auto.
     apply H0. assert (N0 = pred (S N0)). reflexivity.
     rewrite H2. apply Nat.pred_le_mono. rewrite <- (Nat.div_mul (S N0) 2).
-    apply Nat.Div0.div_le_mono. auto.
+    apply Nat.div_le_mono. auto.
     apply (Nat.le_trans _ (N*2 + (S N0)*2)).
     rewrite Nat.add_comm. apply Nat.le_add_r.
     apply (Nat.le_trans (N*2 + (S N0)*2) i). assumption. apply le_S. apply Nat.le_refl. auto.
@@ -453,11 +453,11 @@ Proof.
     apply (CRle_trans _ _ _ (CRabs_triang _ _)).
     setoid_replace (1 # n)%Q with ((1 # (2*n)) + (1 # (2*n)))%Q.
     apply le_S_n in H1. rewrite CR_of_Q_plus. apply CRplus_le_compat.
-    apply H. rewrite <- (Nat.div_mul N 2). apply Nat.Div0.div_le_mono.
+    apply H. rewrite <- (Nat.div_mul N 2). apply Nat.div_le_mono.
     auto. apply (Nat.le_trans (N*2) (N*2 + (S N0)*2)). apply Nat.le_add_r.
     apply (Nat.le_trans _ i). assumption. apply le_S. apply Nat.le_refl. auto.
     apply H0. rewrite <- (Nat.div_mul N0 2).
-    apply Nat.Div0.div_le_mono. auto.
+    apply Nat.div_le_mono. auto.
     apply (Nat.le_trans (N0*2) (N*2 + (S N0)*2)). rewrite Nat.add_comm.
     apply (Nat.le_trans (N0 * 2) (S N0 * 2)).
     apply Nat.mul_le_mono_r. apply le_S. apply Nat.le_refl.
