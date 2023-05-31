@@ -71,9 +71,7 @@ Tactic Notation "apply" ":" constr(x) := pose proof x as HHH; first [
   refine (HHH _ _ _ _ _ _ _ _ _ _ _ _ _) |
   refine (HHH _ _ _ _ _ _ _ _ _ _ _ _ _ _)]; clear HHH.
 
-Global Set Automatic Coercions Import.
 
-Global Set Automatic Introduction.
 
 #[global]
 Instance: @DefaultRelation nat eq | 2 := {}.

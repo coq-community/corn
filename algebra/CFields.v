@@ -41,7 +41,6 @@
 (** printing [/]?[//] %\ensuremath{/?\ddagger}% #/?&Dagger;# *)
 
 Require Export CoRN.algebra.CRings.
-Set Automatic Introduction.
 
 Transparent sym_eq.
 Transparent f_equal.

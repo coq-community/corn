@@ -5,7 +5,6 @@ Require Import
 
 Require CoRN.stdlib_omissions.Z.
 
-Set Automatic Introduction.
 
 Notation "x <= y < z" := (x <= y /\ y < z) : Q_scope.
 Notation "x < y <= z" := (x < y /\ y <= z) : Q_scope.

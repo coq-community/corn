@@ -30,7 +30,6 @@ Require Import CoRN.algebra.COrdFields.
 Set Warnings "-unsupported-attributes".
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Local Open Scope Q_scope.
 

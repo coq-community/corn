@@ -34,7 +34,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 Require Export CoRN.reals.CReals1.
-Set Automatic Introduction.
 
 (* Consider Reals are enumerated by function f *)
 

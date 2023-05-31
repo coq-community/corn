@@ -10,7 +10,6 @@ Require Import
  Coq.Classes.Morphisms
  Coq.Classes.SetoidClass.
 
-Set Automatic Introduction.
 
 Class Apartness `{SetoidClass.Setoid} (ap: Crelation A): Type :=
   { ap_irreflexive: irreflexive ap

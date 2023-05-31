@@ -29,7 +29,6 @@ Require Import CoRN.stdlib_omissions.Q.
 
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Local Open Scope Q_scope.
 

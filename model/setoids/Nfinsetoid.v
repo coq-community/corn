@@ -35,7 +35,6 @@
  *)
 
 Require Import CoRN.algebra.CSetoids.
-Set Automatic Introduction.
 
 (**
 ** Setoids of the first [n] natural numbers

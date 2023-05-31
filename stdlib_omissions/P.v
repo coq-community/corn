@@ -1,7 +1,6 @@
 
 Require Import Coq.Setoids.Setoid Coq.PArith.BinPos Coq.PArith.Pnat ZArith_base.
 
-Set Automatic Introduction.
 
 Section P_of_nat.
 

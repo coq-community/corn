@@ -36,7 +36,6 @@
 
 Require Export CoRN.algebra.CSetoidInc.
 Require Export CoRN.reals.RealLists.
-Set Automatic Introduction.
 
 Section Intervals.
 

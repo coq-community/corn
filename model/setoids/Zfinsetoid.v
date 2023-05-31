@@ -35,7 +35,6 @@
  *)
 Require Export Coq.ZArith.ZArith.
 Require Import CoRN.algebra.CSetoids.
-Set Automatic Introduction.
 
 (**
 ** Setoids of the integers between 0 and [z]

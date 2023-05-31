@@ -3,7 +3,6 @@
 Require Import CoRN.model.totalorder.QposMinMax 
         Coq.Program.Program CoRN.model.structures.QposInf Coq.QArith.Qminmax.
 
-Set Automatic Introduction.
 
 (* The data type and simple relations/constants: *)
 
