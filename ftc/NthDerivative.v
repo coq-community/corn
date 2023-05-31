@@ -35,7 +35,6 @@
  *)
 
 Require Export CoRN.ftc.Differentiability.
-Set Automatic Introduction.
 
 Section Nth_Derivative.
 

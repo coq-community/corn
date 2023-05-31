@@ -10,7 +10,6 @@ Require MathClasses.implementations.ne_list.
 Import CRing_Homomorphisms.coercions.
 Import ne_list.notations ne_list.coercions.
 
-Set Automatic Introduction.
 
 Coercion Vector.to_list: Vector.t >-> list.
 

@@ -35,7 +35,6 @@
  *)
 
 Require Export CoRN.metrics.IR_CPMSpace.
-Set Automatic Introduction.
 
 Section prodpsmetrics.
 (**

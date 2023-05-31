@@ -29,7 +29,6 @@ Require Import Coq.QArith.Qround.
 Require Import Coq.Arith.Div2.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Local Open Scope uc_scope.
 

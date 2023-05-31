@@ -34,7 +34,6 @@ Require Import MathClasses.interfaces.canonical_names.
 Set Warnings "-unsupported-attributes".
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Opaque CR Qmin Qmax.
 

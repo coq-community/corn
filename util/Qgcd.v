@@ -3,7 +3,6 @@ Require Import
         Coq.QArith.QArith CoRN.model.Zmod.ZGcd
         CoRN.model.totalorder.QposMinMax
         CoRN.stdlib_omissions.Q.
-Set Automatic Introduction.
 
 Open Scope Q_scope.
 

@@ -35,7 +35,6 @@
  *)
 Require Export CoRN.algebra.COrdAbs.
 From Coq Require Import Lia.
-Set Automatic Introduction.
 
 (* Begin_SpecReals *)
 

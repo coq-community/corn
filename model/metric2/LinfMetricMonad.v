@@ -39,7 +39,6 @@ Require Import CoRN.algebra.COrdFields2.
 Require Import CoRN.tactics.CornTac.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Local Open Scope sfstscope.
 Local Open Scope setoid_scope.

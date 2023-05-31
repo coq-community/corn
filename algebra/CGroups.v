@@ -42,7 +42,6 @@
 
 Require Import CoRN.tactics.CornTac.
 Require Export CoRN.algebra.CMonoids.
-Set Automatic Introduction.
 
 (* Begin_SpecReals *)
 

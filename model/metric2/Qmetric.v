@@ -29,7 +29,6 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import MathClasses.implementations.stdlib_rationals.
 
 Set Implicit Arguments.
-Set Automatic Introduction.
 
 Local Open Scope Q_scope.
 

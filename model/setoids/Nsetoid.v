@@ -37,7 +37,6 @@
 Require Export CoRN.model.structures.Nsec.
 Require Import CoRN.algebra.CSetoidFun.
 
-Set Automatic Introduction.
 
 (**
 ** Example of a setoid: [nat]

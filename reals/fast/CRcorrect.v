@@ -34,7 +34,6 @@ Require Export CoRN.reals.fast.CRFieldOps.
 (* Backwards compatibility for Hint Rewrite locality attributes *)
 Set Warnings "-unsupported-attributes".
 
-Set Automatic Introduction.
 
 Local Open Scope nat_scope.
 

@@ -8,8 +8,6 @@ Require Import
   CoRN.stdlib_omissions.Z
   CoRN.stdlib_omissions.Q.
 
-Set Automatic Introduction.
-Set Automatic Introduction.
 
 Open Scope Q_scope.
 

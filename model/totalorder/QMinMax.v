@@ -21,7 +21,6 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Import Coq.QArith.QArith_base.
 Require Import CoRN.order.TotalOrder.
-Set Automatic Introduction.
 
 (**
 ** Example of a Total Order: <Q, Qle, Qmin, Qmax>

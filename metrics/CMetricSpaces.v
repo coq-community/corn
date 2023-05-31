@@ -36,7 +36,6 @@
 
 Require Export CoRN.metrics.Prod_Sub.
 Require Export CoRN.metrics.Equiv.
-Set Automatic Introduction.
 
 Section Definition_MS.
 (**

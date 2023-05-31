@@ -39,7 +39,6 @@ Require Export CoRN.algebra.CFields.
 Require Export CoRN.tactics.Rational.
 Require Import Lia.
 Import CRing_Homomorphisms.coercions.
-Set Automatic Introduction.
 
 (**
 * Degrees of Polynomials

@@ -40,7 +40,6 @@
 
 Require Export CoRN.reals.CSumsReals.
 Require Export CoRN.ftc.PartFunEquality.
-Set Automatic Introduction.
 
 (**
 * Sums of Functions

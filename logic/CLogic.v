@@ -52,7 +52,6 @@ Require Export Coq.Arith.Div2.
 Require Export Coq.Arith.Wf_nat.
 From Coq Require Import Lia.
 
-Set Automatic Introduction.
 
 (**
 * Extending the Coq Logic

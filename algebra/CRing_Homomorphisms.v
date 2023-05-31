@@ -47,7 +47,6 @@
 (** printing phi %\ensuremath{\phi}%  *)
 
 Require Export CoRN.algebra.CRings.
-Set Automatic Introduction.
 
 (* Backwards compatibility for Hint Rewrite locality attributes *)
 Set Warnings "-unsupported-attributes".
