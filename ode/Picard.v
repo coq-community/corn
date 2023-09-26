@@ -689,7 +689,7 @@ pose proof (CRdistance_CRle 1 1 y) as [_ H1].
 specialize (H1 H). destruct H1 as [H1 H2].
 change (1 - 1 ≤ y) in H1. change (y ≤ 1 + 1) in H2. change (abs y ≤ 2).
 rewrite plus_negate_r in H1. apply CRabs_AbsSmall. split; [| assumption].
-change (-2 ≤ y). transitivity (0 : CR); [| easy]. rewrite <- negate_0.
+change (-2 ≤ y). transitivity (0%mc : CR); [| easy]. rewrite <- negate_0.
 apply flip_le_negate. apply (CRle_trans H1 H2).
 Qed.
 

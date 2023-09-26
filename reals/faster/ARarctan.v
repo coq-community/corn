@@ -145,7 +145,7 @@ Proof.
    rewrite rational_arctan_small_correct.
    rewrite rational_arctan_correct. 
    apply CRIR.IRasCR_wd, InvTrigonom.ArcTan_wd, Q_in_CReals.inj_Q_wd.
-   mc_setoid_replace ('a / '1 : Q) with ('a).
+   mc_setoid_replace (('a / '1)%mc : Q) with ('a).
     reflexivity.
    rewrite rings.preserves_1.
    rewrite dec_fields.dec_recip_1.

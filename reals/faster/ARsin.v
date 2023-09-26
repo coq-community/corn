@@ -217,7 +217,7 @@ Qed.
 
 (** Sine's range can then be extended to [[0,3^n]] by [n] applications
 of the identity [sin(x) = 3*sin(x/3) - 4*(sin(x/3))^3]. *) 
-Definition AQsin_poly_fun (x : AQ) : AQ := x * (3 - 4 * x ^ (2:N)).
+Definition AQsin_poly_fun (x : AQ) : AQ := x * (3 - 4 * x ^ (2%mc:N)).
 
 Lemma AQsin_poly_fun_correct (q : AQ) :
   'AQsin_poly_fun q = sin_poly_fun ('q).
@@ -362,7 +362,7 @@ Definition AQsin (a:AQ) : msp_car AR
 Lemma AQsin_correct : forall a, 'AQsin a = rational_sin ('a).
 Proof.
   intro a.
-  mc_setoid_replace ('a : Q) with ('a / '1 : Q).
+  mc_setoid_replace ('a : Q) with (('a / '1)%mc : Q).
    now apply AQsin_bounded_correct.
   rewrite rings.preserves_1, dec_fields.dec_recip_1. 
   rewrite Qmult_1_r. reflexivity.
