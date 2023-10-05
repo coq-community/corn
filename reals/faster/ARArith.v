@@ -438,7 +438,7 @@ Next Obligation.
    rewrite <-(rings.mult_1_l (proj1_sig δ)) at 2.
    now apply (order_preserving (.* (proj1_sig δ))).
   apply rings.flip_nonneg_minus.
-  transitivity ('approximate x ((1#2) * 'ε)%Qpos - 'ε : Q).
+  transitivity (('approximate x ((1#2) * 'ε)%Qpos - 'ε)%mc : Q).
    apply (order_preserving (cast AQ Q)) in Pε.
    now apply rings.flip_nonneg_minus.
   apply rings.flip_le_minus_l.

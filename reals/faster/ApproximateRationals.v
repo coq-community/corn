@@ -150,7 +150,7 @@ Section approximate_rationals_more.
   Proof.
     split; try apply _.
      intros E.
-     destruct (rings.is_ne_0 (1:Q)).
+     destruct (rings.is_ne_0 (1%mc:Q)).
      rewrite <-(rings.preserves_1 (f:=cast AQ Q)).
      rewrite <-(rings.preserves_0 (f:=cast AQ Q)).
      now rewrite E.

@@ -23,7 +23,7 @@ Local Open Scope uc_scope.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
-Definition AQcos_poly_fun (x : AQ) : AQ := 1 - 2 * x ^ (2:N).
+Definition AQcos_poly_fun (x : AQ) : AQ := 1 - 2 * x ^ (2%mc:N).
 
 Lemma AQcos_poly_fun_correct (x : AQ) :
   'AQcos_poly_fun x = cos_poly_fun ('x).

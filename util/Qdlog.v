@@ -109,12 +109,12 @@ Proof.
   apply (antisymmetry (≤)).
    apply nat_int.le_iff_lt_plus_1.
    rewrite commutativity.
-   apply int_pow_exp_lt_back with (2 : Q); [ apply semirings.lt_1_2 |].
+   apply int_pow_exp_lt_back with (2%mc : Q); [ apply semirings.lt_1_2 |].
    apply orders.le_lt_trans with x; [ intuition |].
    now apply Qdlog2_spec.
   apply nat_int.le_iff_lt_plus_1.
   rewrite commutativity.
-  apply int_pow_exp_lt_back with (2 : Q); [ apply semirings.lt_1_2 |].
+  apply int_pow_exp_lt_back with (2%mc : Q); [ apply semirings.lt_1_2 |].
   apply orders.le_lt_trans with x; [|intuition].
   now apply Qdlog2_spec.
 Qed.
@@ -147,7 +147,7 @@ Lemma Qdlog2_preserving (x y : Q) :
 Proof.
   intros E1 E2.
   apply nat_int.le_iff_lt_plus_1. rewrite commutativity.
-  apply int_pow_exp_lt_back with (2:Q); [ apply semirings.lt_1_2 |].
+  apply int_pow_exp_lt_back with (2%mc:Q); [ apply semirings.lt_1_2 |].
   apply orders.le_lt_trans with x; [now apply Qdlog2_spec | ].
   apply orders.le_lt_trans with y; [assumption |].
   apply Qdlog2_spec. 
@@ -269,7 +269,7 @@ Lemma Qdlog4_spec (x : Q) :
   0 < x → 4 ^ Qdlog4 x ≤ x ∧ x < 4 ^ (1 + Qdlog4 x).
 Proof.
   intros E1. unfold Qdlog4.
-  change (4:Q) with ((2:Q) ^ (2:Z))%mc.
+  change (4%mc:Q) with ((2%mc:Q) ^ (2:Z))%mc.
   rewrite <-2!int_pow_exp_mult.
   split.
    etransitivity.
