@@ -80,10 +80,12 @@ license:
 
 supported_coq_versions:
   text: Coq 8.14 or greater
-  opam: '{(>= "8.14" & < "8.17~") | (= "dev")}'
+  opam: '{(>= "8.14" & < "8.19~") | (= "dev")}'
 
 tested_coq_opam_versions:
 - version: dev
+- version: "8.18"
+- version: "8.17"
 - version: "8.16"
 - version: "8.15"
 - version: "8.14"
