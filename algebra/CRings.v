@@ -1099,34 +1099,32 @@ Proof.
 Qed.
 Hint Resolve zero_nexp: algebra.
 
-Lemma inv_nexp_even : forall (x : R) n, even n -> [--]x[^]n [=] x[^]n.
+Lemma inv_nexp_even : forall (x : R) n, Nat.Even n -> [--]x[^]n [=] x[^]n.
 Proof.
  intros x n H.
- elim (even_2n n); try assumption.
- intros m H0.
- rewrite H0. unfold Nat.double in |- *.
- astepl ( [--]x[^]m[*] [--]x[^]m).
- astepl (( [--]x[*] [--]x) [^]m).
- astepl ((x[*]x) [^]m).
- Step_final (x[^]m[*]x[^]m).
+ rewrite (Nat.Even_double _ H).
+ unfold Nat.double in |- *.
+ astepl ( [--]x[^](Nat.div2 n)[*] [--]x[^](Nat.div2 n)).
+ astepl (( [--]x[*] [--]x) [^](Nat.div2 n)).
+ astepl ((x[*]x) [^](Nat.div2 n)).
+ Step_final (x[^](Nat.div2 n)[*]x[^](Nat.div2 n)).
 Qed.
 Hint Resolve inv_nexp_even: algebra.
 
 Lemma inv_nexp_two : forall x : R, [--]x[^]2 [=] x[^]2.
 Proof.
  intro x.
- apply inv_nexp_even.
- auto with arith.
+ now apply inv_nexp_even; exists 1.
 Qed.
 Hint Resolve inv_nexp_two: algebra.
 
-Lemma inv_nexp_odd : forall (x : R) n, odd n -> [--]x[^]n [=] [--] (x[^]n).
+Lemma inv_nexp_odd : forall (x : R) n, Nat.Odd n -> [--]x[^]n [=] [--] (x[^]n).
 Proof.
- intros x n H.
- inversion H; clear H1 H n.
- astepl ( [--]x[*] [--]x[^]n0).
- astepl ( [--]x[*]x[^]n0).
- Step_final ( [--] (x[*]x[^]n0)).
+ intros x [| n] H; [apply Nat.odd_spec in H; discriminate H |].
+ apply Nat.Odd_succ in H.
+ astepl ( [--]x[*] [--]x[^]n).
+ astepl ( [--]x[*]x[^]n).
+ Step_final ( [--] (x[*]x[^]n)).
 Qed.
 Hint Resolve inv_nexp_odd: algebra.
 
@@ -1146,14 +1144,14 @@ Proof.
 Qed.
 Hint Resolve nexp_two: algebra.
 
-Lemma inv_one_even_nexp : forall n : nat, even n -> [--][1][^]n [=] ([1]:R).
+Lemma inv_one_even_nexp : forall n : nat, Nat.Even n -> [--][1][^]n [=] ([1]:R).
 Proof.
  intros n H.
  Step_final (([1]:R) [^]n).
 Qed.
 Hint Resolve inv_one_even_nexp: algebra.
 
-Lemma inv_one_odd_nexp : forall n : nat, odd n -> [--][1][^]n [=] [--] ([1]:R).
+Lemma inv_one_odd_nexp : forall n : nat, Nat.Odd n -> [--][1][^]n [=] [--] ([1]:R).
 Proof.
  intros n H.
  Step_final ( [--] (([1]:R) [^]n)).

@@ -366,23 +366,15 @@ Proof.
  apply bin_op_wd_unfolded.
    + destruct (even_or_odd_plus n') as [m [Hm|Hm]]; simpl.
      rational.
-     elim (not_even_and_odd n').
-     apply (even_mult_l 2 n).
-     repeat constructor.
-     rewrite Hm.
-     constructor.
-     replace (m + m)%nat with (2*m)%nat by lia.
-     apply (even_mult_l 2 m).
-     repeat constructor.
+     elim (Nat.Even_Odd_False n');
+     [ now apply (Nat.Even_mul_l 2 n); exists 1%nat |
+       now exists m; rewrite Hm, Nat.add_1_r; simpl; rewrite Nat.add_0_r].
    + destruct (even_or_odd_plus (S n')) as [m [Hm|Hm]]; simpl.
-  elim (not_even_and_odd (S n')).
+  elim (Nat.Even_Odd_False (S n')).
    rewrite Hm.
    replace (m + m)%nat with (2*m)%nat by lia.
-   apply (even_mult_l 2 m).
-   repeat constructor.
-  constructor.
-  apply (even_mult_l 2 n).
-  repeat constructor.
+   now apply (Nat.Even_mul_l 2 m); exists 1%nat.
+   subst n'; exists n; ring.
  inversion Hm.
  unfold n' in H1.
  replace m with n by lia.

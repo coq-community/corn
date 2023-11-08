@@ -47,9 +47,6 @@
 
 From Coq Require Export ZArith.
 From Coq Require Import Lia.
-Require Export Coq.Arith.Even.
-Require Export Coq.Arith.Max.
-Require Export Coq.Arith.Min.
 Require Export CoRN.stdlib_omissions.List.
 Require Import Coq.Logic.Eqdep_dec.
 Require Import Coq.Setoids.Setoid.

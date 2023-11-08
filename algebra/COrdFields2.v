@@ -1008,33 +1008,24 @@ Proof.
  auto.
 Qed.
 
-Lemma even_power_pos : forall n, even n -> forall x : R, x [#] [0] -> [0] [<] x[^]n.
+Lemma even_power_pos : forall n, Nat.Even n -> forall x : R, x [#] [0] -> [0] [<] x[^]n.
 Proof.
- intros.
- elim (even_2n n H). intros m y.
- replace n with (2 * m).
-  astepr ((x[^]2)[^]m).
-  apply nexp_resp_pos.
-  apply pos_square. auto.
-  rewrite y. unfold Nat.double in |- *. lia.
+ intros n Hn x Hx; apply Nat.Even_double in Hn as ->; unfold Nat.double.
+ astepr ((x[^]2)[^](Nat.div2 n)).
+ - apply nexp_resp_pos, pos_square; exact Hx.
+ - astepr ((x[^]2)[^](Nat.div2 n)); [reflexivity |].
+   now rewrite nexp_mult, <-Nat.double_twice.
 Qed.
 
-
-Lemma odd_power_cancel_pos : forall n, odd n -> forall x : R, [0] [<] x[^]n -> [0] [<] x.
+Lemma odd_power_cancel_pos : forall n, Nat.Odd n -> forall x : R, [0] [<] x[^]n -> [0] [<] x.
 Proof.
- intros n H x H0.
- induction  n as [| n Hrecn].
-  generalize (to_Codd _ H); intro H1.
-  inversion H1.
- apply mult_cancel_pos_rht with (x[^]n).
-  astepr (x[^]S n). auto.
-  apply less_leEq; apply even_power_pos.
-  inversion H. auto.
-  apply un_op_strext_unfolded with (nexp_op (R:=R) (S n)).
- cut (0 < S n). intro.
-  astepr ZeroR.
-  apply Greater_imp_ap. auto.
-  auto with arith.
+ intros n [m Hm]%to_Codd x. simpl. intros H.
+ apply mult_pos_imp in H as [[H1 H2] | [H1 H2]].
+ - exact H2.
+ - exfalso. apply less_imp_ap in H2.
+   apply (even_power_pos m) in H2; [| now apply Ceven_to].
+   apply less_antisymmetric_unfolded with (1 := H1).
+   exact H2.
 Qed.
 
 Lemma plus_resp_pos : forall x y : R, [0] [<] x -> [0] [<] y -> [0] [<] x[+]y.

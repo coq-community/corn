@@ -369,10 +369,9 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
                 (inj_Q IR (Str_nth n (artanhSequence a))).
   rational.
  unfold ArTanH_series_coef.
- case_eq (even_odd_dec (S (Nat.double n))); intros H.
-  elim (not_even_and_odd _ H).
-  constructor.
-  apply even_plus_n_n.
+ case_eq (Nat.Even_Odd_dec (S (Nat.double n))); intros H.
+  elim (Nat.Even_Odd_False _ H).
+  now rewrite <-Nat.add_1_r, Nat.double_twice; exists n.
  intros _.
  eapply eq_transitive;
   [|apply inj_Q_wd; simpl;symmetry;apply Str_nth_artanhSequence].
@@ -416,11 +415,11 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
   apply nexp_wd.
  rational.
 unfold ArTanH_series_coef.
-case_eq (even_odd_dec (Nat.double n)).
+case_eq (Nat.Even_Odd_dec (Nat.double n)).
  intros _ _.
  rational.
 intros o.
-elim (fun x=> not_even_and_odd _ x o).
+elim (fun x=> Nat.Even_Odd_False _ x o).
 apply even_plus_n_n.
 Qed.
 

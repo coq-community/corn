@@ -1,5 +1,5 @@
 
-Require Import Coq.ZArith.ZArith Coq.Numbers.Natural.Peano.NPeano CoRN.stdlib_omissions.P.
+Require Import Coq.ZArith.ZArith CoRN.stdlib_omissions.P.
 Require Import Lia.
 
 (*Require Import NSigNAxioms.  was added in the trunk branch*)

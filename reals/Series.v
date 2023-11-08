@@ -1004,9 +1004,8 @@ Proof.
    eapply eq_transitive_unfolded.
     apply nexp_plus.
    apply inv_one_odd_nexp.
-   cut (n + S (n + (m + m)) = S (n + n + (m + m))); [ intro | rewrite <- plus_n_Sm; auto with arith ].
-   rewrite H0.
-   auto with arith.
+   replace (n + S (n + (m + m))) with (2 * (n + m) + 1) by ring; 
+    now exists (n + m).
   astepl ([1][*]x (S (S (n + (m + m))))).
   rstepr ( [--][1][^]n[*][--][1][^]S (S (n + (m + m))) [*]x (S (S (n + (m + m))))).
   apply mult_wdl.
@@ -1014,9 +1013,8 @@ Proof.
   eapply eq_transitive_unfolded.
    apply nexp_plus.
   apply inv_one_even_nexp.
-  cut (n + S (S (n + (m + m))) = S (S (n + n + (m + m)))); [ intro | lia ].
-  rewrite H0.
-  auto with arith.
+  replace (n + S (S (n + (m + m)))) with (2 * (S (n + m))) by ring;
+   now exists (S (n + m)).
  unfold Sum in |- *; simpl in |- *.
  unfold Sum1 in |- *; simpl in |- *.
  rational.
@@ -1041,9 +1039,8 @@ Proof.
    apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
     apply nexp_plus.
    apply inv_one_odd_nexp.
-   cut (n + S (n + (m + m)) = S (n + n + (m + m))); [ intro | rewrite <- plus_n_Sm; auto with arith ].
-   rewrite H0.
-   auto with arith.
+   replace (n + S (n + (m + m))) with (2 * (n + m) + 1) by ring;
+   now exists (n + m).
   apply pos_x.
  eapply eq_transitive_unfolded.
   apply eq_symmetric_unfolded; apply ring_dist_unfolded.
@@ -1081,9 +1078,7 @@ Proof.
    eapply eq_transitive_unfolded.
     apply nexp_plus.
    apply inv_one_odd_nexp.
-   cut (n + S n = S (n + n)); [ intro | auto with arith ].
-   rewrite H1.
-   auto with arith.
+   replace (n + S n) with (2 * n + 1) by ring; now exists n.
   unfold Sum, Sum1 in |- *; simpl in |- *; rational.
  cut (n + S (S m + S m) = S (S (n + S (m + m))));
    [ intro | simpl in |- *; repeat rewrite <- plus_n_Sm; auto with arith ].
@@ -1106,19 +1101,15 @@ Proof.
    astepl ([1][*]x (S (n + S (m + m)))); apply mult_wdl.
    apply eq_symmetric_unfolded.
    eapply eq_transitive_unfolded; [ apply nexp_plus | apply inv_one_even_nexp ].
-   cut (n + S (n + S (m + m)) = S (S (n + n + (m + m))));
-     [ intro | simpl in |- *; repeat rewrite <- plus_n_Sm; auto with arith ].
-   rewrite H0.
-   auto with arith.
+   replace (n + S (n + S (m + m))) with (2 * (n + m + 1)) by ring;
+    now exists (n + m + 1).
   eapply eq_transitive_unfolded.
    2: apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
   rstepl ( [--][1][*]x (S (S (n + S (m + m))))); apply mult_wdl.
   apply eq_symmetric_unfolded.
   eapply eq_transitive_unfolded; [ apply nexp_plus | apply inv_one_odd_nexp ].
-  cut (n + S (S (n + S (m + m))) = S (S n + S n + (m + m))); [ intro
-    | simpl in |- *; repeat rewrite <- plus_n_Sm; simpl in |- *; auto with arith ].
-  rewrite H0.
-  auto with arith.
+  replace (n + S (S (n + S (m + m)))) with (2 * (n + m + 1) + 1) by ring;
+   now exists (n + m + 1).
  apply mult_wdr.
  unfold Sum, Sum1 in |- *; simpl in |- *; rational.
 Qed.
@@ -1158,10 +1149,8 @@ Proof.
      apply less_leEq; apply pos_one.
     apply eq_symmetric_unfolded; eapply eq_transitive_unfolded.
      apply nexp_plus.
-    cut (n + S (n + S (m + m)) = n + n + (S m + S m)); [ intro
-      | simpl in |- *; repeat rewrite <- plus_n_Sm; simpl in |- *; auto with arith ].
-    rewrite H0; apply inv_one_even_nexp.
-    auto with arith.
+    replace (n + S (n + S (m + m))) with (2 * (n + m + 1)) by ring.
+    apply inv_one_even_nexp; now exists (n + m + 1).
    apply pos_x.
   apply plus_resp_leEq.
   apply alternate_lemma3.
@@ -1224,7 +1213,7 @@ Proof.
      astepr ZeroR; apply leEq_reflexive.
     simpl in |- *; unfold ABSIR in |- *; apply eq_reflexive_unfolded.
    apply eq_symmetric_unfolded; assumption.
-  elim (even_odd_dec N); intro.
+  destruct (Nat.Even_Odd_dec N) as [HE | HO].
    apply AbsIR_wd.
    eapply eq_transitive_unfolded.
     apply seq_part_sum_n; auto; apply Nat.lt_le_trans with N; auto.
@@ -1254,16 +1243,8 @@ Proof.
    2: apply eq_symmetric_unfolded; apply mult_assoc_unfolded.
   apply mult_wdl.
   astepl (OneR[*][--][1][^]i).
-  apply mult_wdl.
-  apply eq_symmetric_unfolded.
-  rstepl ( [--]OneR[^]1[*][--][1][^]N).
-  eapply eq_transitive_unfolded.
-   apply nexp_plus.
-  apply inv_one_even_nexp.
-  simpl in |- *.
-  auto with arith.
- exists (S N').
-  auto with arith.
+  now apply mult_wdl; rewrite inv_one_odd_nexp, cg_inv_inv by assumption.
+ exists (S N'); [exact (Nat.lt_0_succ _) |].
  intros.
  astepr (x m[-][0]); apply HN'; auto with arith.
 Qed.

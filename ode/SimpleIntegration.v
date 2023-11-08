@@ -10,7 +10,7 @@ Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.reals.CRreal.
 Require Import
-  CoRN.stdlib_omissions.List Coq.Numbers.Natural.Peano.NPeano Coq.Unicode.Utf8
+  CoRN.stdlib_omissions.List Coq.Unicode.Utf8
   Coq.QArith.QArith Coq.QArith.Qabs
   CoRN.model.totalorder.QposMinMax CoRN.util.Qsums
   CoRN.model.metric2.Qmetric CoRN.model.setoids.Qsetoid (* Needs imported for Q_is_Setoid to be a canonical structure *)

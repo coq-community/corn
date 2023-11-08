@@ -446,7 +446,7 @@ Proof.
  elim Hk; simpl in |- *; intro.
   eapply leEq_wdl; [ apply less_leEq; apply pos_one | apply eq_symmetric_unfolded; apply AbsIRz_isz ].
  apply eq_imp_leEq.
- elim (even_odd_dec k); intro.
+ elim (Nat.Even_Odd_dec k); intro.
   apply eq_transitive_unfolded with (AbsIR [1]).
    apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
   apply AbsIR_eq_x; apply less_leEq; apply pos_one.
@@ -464,7 +464,7 @@ Proof.
  elim even_or_odd_plus; intros k Hk; simpl in |- *.
  elim Hk; simpl in |- *; intro.
   apply eq_imp_leEq.
-  elim (even_odd_dec k); intro.
+  elim (Nat.Even_Odd_dec k); intro.
    apply eq_transitive_unfolded with (AbsIR [1]).
     apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
    apply AbsIR_eq_x; apply less_leEq; apply pos_one.

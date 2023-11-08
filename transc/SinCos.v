@@ -184,7 +184,7 @@ Proof.
  apply mult_wdr.
  rewrite b.
  eapply eq_transitive_unfolded.
-  2: apply inv_nexp_odd; apply odd_S; apply even_plus_n_n.
+  2: apply inv_nexp_odd; apply Nat.Odd_succ; apply even_plus_n_n.
  apply nexp_wd; rational.
 Qed.
 
