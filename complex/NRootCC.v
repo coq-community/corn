@@ -127,18 +127,15 @@ Proof.
  apply sqrt_sqr.
 Qed.
 
-Lemma nroot_I_nexp_aux : forall n, odd n -> {m : nat | n * n = 4 * m + 1}.
+Lemma nroot_I_nexp_aux : forall n, Nat.Odd n -> {m : nat | n * n = 4 * m + 1}.
 Proof.
- intros n on.
- elim (odd_S2n n); try assumption.
- intros n' H.
- rewrite H.
- exists (n' * n' + n').
- unfold Nat.double in |- *.
- ring.
+ intros n H; destruct (even_or_odd_plus n) as [m [Hm | ->]].
+ - exfalso; apply (Nat.Even_Odd_False n); [| exact H].
+   exists m; rewrite Hm; ring.
+ - exists (m * m + m); ring.
 Qed.
 
-Definition nroot_I (n : nat) (n_ : odd n) : CC := II[^]n.
+Definition nroot_I (n : nat) (n_ : Nat.Odd n) : CC := II[^]n.
 
 Lemma nroot_I_nexp : forall n n_, nroot_I n n_[^]n [=] II.
 Proof.
@@ -181,7 +178,7 @@ Proof.
 Qed.
 Hint Resolve nroot_I_nexp: algebra.
 
-Definition nroot_minus_I (n : nat) (n_ : odd n) : CC := [--] (nroot_I n n_).
+Definition nroot_minus_I (n : nat) (n_ : Nat.Odd n) : CC := [--] (nroot_I n n_).
 
 Lemma nroot_minus_I_nexp : forall n n_, nroot_minus_I n n_[^]n [=] [--]II.
 Proof.
@@ -964,7 +961,7 @@ Section NRootCC_4_ap_real.
 Variables a b : IR.
 Hypothesis b_ : b [#] [0].
 Variable n : nat.
-Hypothesis n_ : odd n.
+Hypothesis n_ : Nat.Odd n.
 
 (* begin hide *)
 Let c := a[+I*]b.
@@ -1042,8 +1039,7 @@ Proof.
   apply to_Codd.
   assumption.
  apply nrootCC_3'_degree.
- rewrite (odd_double n). auto with arith.
-  assumption.
+ destruct n_ as [k ->]; rewrite Nat.add_1_r; exact (Nat.lt_0_succ _).
 Qed.
 
 End NRootCC_4_solutions.
@@ -1258,7 +1254,7 @@ and [(odd n)]; define [c' := (a[+I*]b) [*]II := a'[+I*]b'].
 Variables a b : IR.
 Hypothesis a_ : a [#] [0].
 Variable n : nat.
-Hypothesis n_ : odd n.
+Hypothesis n_ : Nat.Odd n.
 
 (* begin hide *)
 Let c' := (a[+I*]b) [*]II.
@@ -1303,7 +1299,7 @@ Qed.
 
 End NRootCC_4_ap_imag.
 
-Lemma nrootCC_4 : forall c, c [#] [0] -> forall n, odd n -> {z : CC | z[^]n [=] c}.
+Lemma nrootCC_4 : forall c, c [#] [0] -> forall n, Nat.Odd n -> {z : CC | z[^]n [=] c}.
 Proof.
  intros.
  pattern c in |- *.

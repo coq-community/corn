@@ -1,5 +1,5 @@
 Require Import
-  CoRN.stdlib_omissions.List Coq.Numbers.Natural.Peano.NPeano
+  CoRN.stdlib_omissions.List
   Coq.QArith.QArith Coq.QArith.Qabs
   CoRN.model.totalorder.QposMinMax 
   CoRN.model.metric2.Qmetric

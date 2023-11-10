@@ -719,7 +719,7 @@ Proof.
    apply Nat.le_add_r.
   apply G_conversion_rate2 with (m := S (N + 3)).
    apply le_n_S.
-   apply le_plus_r.
+   rewrite Nat.add_comm; apply Nat.le_add_r.
   assumption.
  apply Q_is_archemaedian.  (* Note the use of Q_is_archemaedian *)
 Qed.
@@ -908,7 +908,7 @@ Proof.
   apply G_conversion_rate_resp_x.
   apply Nat.le_trans with (m := S (N + 3)).
    apply le_n_S.
-   apply le_plus_r.
+   rewrite Nat.add_comm; apply Nat.le_add_r.
   assumption.
  apply Archimedes'.
 Qed.

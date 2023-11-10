@@ -577,7 +577,7 @@ Proof.
  Intros.
  Left.
  Intros.
- Rewrite <- (le_n_O_eq m H2).
+ Rewrite <- (Nat.le_0_r m H2).
  Assumption.
  Intro.
  Right.
@@ -593,7 +593,7 @@ Proof.
  Apply H.
  Apply Nat.le_trans with m:=N.
  Assumption.
- Apply le_n_Sn.
+ Apply Nat.le_succ_diag_r.
  Intro.
  Case (H (S N)).
  Apply le_n.
@@ -626,7 +626,7 @@ Proof.
  Split.
  Apply Nat.le_trans with m:=N.
  Assumption.
- Apply le_n_Sn.
+ Apply Nat.le_succ_diag_r.
  Assumption.
 Qed.
 *)
@@ -1419,10 +1419,10 @@ Proof.
   apply a.
   apply Nat.le_trans with (m := m).
    assumption.
-  apply le_plus_r.
+  rewrite Nat.add_comm; apply Nat.le_add_r.
  apply AbsSmall_minus.
  apply a.
- apply le_plus_r.
+ rewrite Nat.add_comm; apply Nat.le_add_r.
 Qed.
 
 
@@ -1658,7 +1658,7 @@ Proof.
   apply leEq_wdr with (y := sup (tail_seq g N)).
    change (sup_tail (k + N)[<=]sup_tail N) in |- *.
    apply sup_tail_decrease.
-   apply le_plus_r.
+   rewrite Nat.add_comm; apply Nat.le_add_r.
   apply eq_symmetric_unfolded.
   assumption.
  apply less_leEq.
@@ -1724,7 +1724,7 @@ Proof.
    apply leEq_transitive with (y := nring (R:=OF) k).
     apply less_leEq; assumption.
    apply nring_leEq.
-   apply le_plus_r.
+   rewrite Nat.add_comm; apply Nat.le_add_r.
   apply Greater_imp_ap.
   apply pos_div_two.
   assumption.

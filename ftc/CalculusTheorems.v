@@ -682,11 +682,11 @@ Qed.
 real power preserves the less or equal than relation!
 *)
 
-Lemma nexp_resp_leEq_odd : forall n, odd n -> forall x y : IR, x [<=] y -> x[^]n [<=] y[^]n.
+Lemma nexp_resp_leEq_odd : forall n, Nat.Odd n -> forall x y : IR, x [<=] y -> x[^]n [<=] y[^]n.
 Proof.
- intro; case n.
-  intros; exfalso; inversion H.
- clear n; intros.
+ intros [| n] H x y H';
+  [destruct H as [m H]; rewrite Nat.add_1_r in H; discriminate H |].
+ apply Nat.Odd_succ in H.
  astepl (Part (FId{^}S n) x I).
  astepr (Part (FId{^}S n) y I).
  apply Derivative_imp_resp_leEq with realline I (nring (R:=IR) (S n) {**}FId{^}n).

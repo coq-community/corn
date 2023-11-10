@@ -200,10 +200,10 @@ Proof.
  apply nexp_resp_nonneg; assumption.
 Qed.
 
-Lemma nexp_resp_leEq_neg_even : forall n, even n ->
+Lemma nexp_resp_leEq_neg_even : forall n, Nat.Even n ->
  forall x y : R, y [<=] [0] -> x [<=] y -> y[^]n [<=] x[^]n.
 Proof.
- do 2 intro; pattern n in |- *; apply even_ind.
+ do 2 intro; pattern n in |- *; apply even_ind; [| | assumption].
    intros; simpl in |- *; apply leEq_reflexive.
   clear H n; intros.
   astepr (x[^]n[*]x[*]x); astepl (y[^]n[*]y[*]y).
@@ -215,30 +215,29 @@ Proof.
     astepr (y[^]2); apply sqr_nonneg.
    auto.
   astepl (y[^]2); astepr (x[^]2).
+  assert (E : Nat.Even 2) by (now exists 1).
   eapply leEq_wdr.
-   2: apply inv_nexp_even; auto with arith.
+   2: apply inv_nexp_even; assumption.
   eapply leEq_wdl.
-   2: apply inv_nexp_even; auto with arith.
+   2: apply inv_nexp_even; assumption.
   apply nexp_resp_leEq.
-   astepl ([--] ([0]:R)); apply inv_resp_leEq; auto.
-  apply inv_resp_leEq; auto.
- auto.
+   astepl ([--] ([0]:R)); apply inv_resp_leEq; assumption.
+  apply inv_resp_leEq; assumption.
 Qed.
 
-Lemma nexp_resp_leEq_neg_odd : forall n, odd n ->
+Lemma nexp_resp_leEq_neg_odd : forall n, Nat.Odd n ->
  forall x y : R, y [<=] [0] -> x [<=] y -> x[^]n [<=] y[^]n.
 Proof.
- intro; case n.
-  intros; exfalso; inversion H.
- clear n; intros.
+ intro; case n; [intros [x H]; rewrite Nat.add_1_r in H; discriminate H |].
+ clear n; intros n H%Nat.Odd_succ x y Hy Hxy.
  astepl (x[^]n[*]x); astepr (y[^]n[*]y).
  rstepl ([--] (x[^]n[*][--]x)); rstepr ([--] (y[^]n[*][--]y)).
  apply inv_resp_leEq; apply mult_resp_leEq_both.
     eapply leEq_wdr.
-     2: apply inv_nexp_even; inversion H; auto.
+     2: { apply inv_nexp_even; inversion H; assumption. }
     apply nexp_resp_nonneg; astepl ([--] ([0]:R)); apply inv_resp_leEq; auto.
    astepl ([--] ([0]:R)); apply inv_resp_leEq; auto.
-  apply nexp_resp_leEq_neg_even; auto; inversion H; auto.
+  apply nexp_resp_leEq_neg_even; auto; inversion H.
  apply inv_resp_leEq; auto.
 Qed.
 
@@ -258,7 +257,7 @@ Qed.
 
 Hint Resolve nexp_distr_recip: algebra.
 
-Lemma nexp_even_nonneg : forall n, even n -> forall x : R, [0] [<=] x[^]n.
+Lemma nexp_even_nonneg : forall n, Nat.Even n -> forall x : R, [0] [<=] x[^]n.
 Proof.
  do 2 intro.
  pattern n in |- *; apply even_ind; intros.

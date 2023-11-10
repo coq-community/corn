@@ -26,7 +26,6 @@ Require Export CoRN.metric2.Complete.
 Require Import CoRN.logic.Classic.
 Require Import Coq.QArith.Qpower.
 Require Import Coq.QArith.Qround.
-Require Import Coq.Arith.Div2.
 
 Set Implicit Arguments.
 

@@ -446,12 +446,14 @@ Proof.
  elim Hk; simpl in |- *; intro.
   eapply leEq_wdl; [ apply less_leEq; apply pos_one | apply eq_symmetric_unfolded; apply AbsIRz_isz ].
  apply eq_imp_leEq.
- elim (even_odd_dec k); intro.
+ destruct (even_or_odd_plus k) as [j [H | H]].
   apply eq_transitive_unfolded with (AbsIR [1]).
    apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
+   exists j; rewrite H; ring. 
   apply AbsIR_eq_x; apply less_leEq; apply pos_one.
  apply eq_transitive_unfolded with (AbsIR [--][1]).
   apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_odd_nexp; auto.
+  exists j; rewrite H; ring.
  astepr ([--][--]OneR); apply AbsIR_eq_inv_x; apply less_leEq.
  astepr ([--]ZeroR); apply inv_resp_less; apply pos_one.
 Qed.
@@ -464,12 +466,14 @@ Proof.
  elim even_or_odd_plus; intros k Hk; simpl in |- *.
  elim Hk; simpl in |- *; intro.
   apply eq_imp_leEq.
-  elim (even_odd_dec k); intro.
+  destruct (even_or_odd_plus k) as [j [Hj | Hj]].
    apply eq_transitive_unfolded with (AbsIR [1]).
     apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_even_nexp; auto.
+    exists j; rewrite Hj; ring.
    apply AbsIR_eq_x; apply less_leEq; apply pos_one.
   apply eq_transitive_unfolded with (AbsIR [--][1]).
    apply AbsIR_wd; astepl ([--]OneR[^]k); apply inv_one_odd_nexp; auto.
+   exists j; rewrite Hj; ring.
   astepr ([--][--]OneR); apply AbsIR_eq_inv_x; apply less_leEq.
   astepr ([--]ZeroR); apply inv_resp_less; apply pos_one.
  eapply leEq_wdl; [ apply less_leEq; apply pos_one | apply eq_symmetric_unfolded; apply AbsIRz_isz ].

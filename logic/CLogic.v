@@ -48,7 +48,6 @@ Require Export Coq.Arith.Compare_dec.
 Require Export CoRN.logic.CornBasics.
 Require Export Coq.ZArith.ZArith.
 Require Export Coq.setoid_ring.ZArithRing.
-Require Export Coq.Arith.Div2.
 Require Export Coq.Arith.Wf_nat.
 From Coq Require Import Lia.
 
@@ -468,78 +467,74 @@ Proof.
  auto.
 Qed.
 
+
+(** For compatibility with Coq.8.14 and Coq.8.15: this can be removed and
+    changed with Nat.Even_Odd_dec when the minimal version is bumped to 8.16 *)
+Lemma Even_Odd_dec (n : nat) : {Nat.Even n} + {Nat.Odd n}.
+Proof.
+  destruct (Nat.even n) eqn:E.
+  - left; apply Nat.even_spec; exact E.
+  - right; apply Bool.negb_true_iff in E; rewrite Nat.negb_even in E.
+    apply Nat.odd_spec; exact E.
+Qed.
+
 Inductive Codd : nat -> CProp :=
     Codd_S : forall n : nat, Ceven n -> Codd (S n)
 with Ceven : nat -> CProp :=
   | Ceven_O : Ceven 0
   | Ceven_S : forall n : nat, Codd n -> Ceven (S n).
 
-Lemma Codd_even_to : forall n : nat, (Codd n -> odd n) /\ (Ceven n -> even n).
+Lemma Codd_even_to : forall n : nat, (Codd n -> Nat.Odd n) /\ (Ceven n -> Nat.Even n).
 Proof.
  simple induction n.
   split.
    intro H.
    inversion H.
   intro.
-  apply even_O.
+  now exists 0.
  intros n0 H.
  elim H; intros H0 H1.
  split.
   intro H2.
   inversion H2.
-  apply odd_S.
+  apply Nat.Odd_succ.
   apply H1.
   assumption.
  intro H2.
  inversion H2.
- apply even_S.
+ apply Nat.Even_succ.
  apply H0.
  assumption.
 Qed.
 
-Lemma Codd_to : forall n : nat, Codd n -> odd n.
+Lemma Codd_to : forall n : nat, Codd n -> Nat.Odd n.
 Proof.
  intros n H.
  elim (Codd_even_to n); auto.
 Qed.
 
-Lemma Ceven_to : forall n : nat, Ceven n -> even n.
+Lemma Ceven_to : forall n : nat, Ceven n -> Nat.Even n.
 Proof.
  intros n H.
  elim (Codd_even_to n); auto.
 Qed.
 
-Lemma to_Codd_even : forall n : nat, (odd n -> Codd n) and (even n -> Ceven n).
+Lemma to_Codd_even : forall n : nat, (Nat.Odd n -> Codd n) and (Nat.Even n -> Ceven n).
 Proof.
- simple induction n.
-  split.
-   intro H.
-   exfalso.
-   inversion H.
-  intro H.
-  apply Ceven_O.
- intros n0 H.
- elim H; intros H0 H1.
- split.
-  intro H2.
-  apply Codd_S.
-  apply H1.
-  inversion H2.
-  assumption.
- intro H2.
- apply Ceven_S.
- apply H0.
- inversion H2.
- assumption.
+ induction n as [| n IH]; split.
+ - intros H%Nat.odd_spec; discriminate H.
+ - intros _; exact Ceven_O.
+ - now intros H%Nat.Odd_succ; apply IH in H; apply Codd_S.
+ - now intros H%Nat.Even_succ; apply IH in H; apply Ceven_S.
 Qed.
 
-Lemma to_Codd : forall n : nat, odd n -> Codd n.
+Lemma to_Codd : forall n : nat, Nat.Odd n -> Codd n.
 Proof.
  intros.
  elim (to_Codd_even n); auto.
 Qed.
 
-Lemma to_Ceven : forall n : nat, even n -> Ceven n.
+Lemma to_Ceven : forall n : nat, Nat.Even n -> Ceven n.
 Proof.
  intros.
  elim (to_Codd_even n); auto.
@@ -691,21 +686,19 @@ We begin by proving that this case distinction is decidable.
 Next, we prove the usual results about sums of even and odd numbers:
 *)
 
-Lemma even_plus_n_n : forall n : nat, even (n + n).
+Lemma even_plus_n_n : forall n : nat, Nat.Even (n + n).
 Proof.
- intro n; induction  n as [| n Hrecn].
-  auto with arith.
- replace (S n + S n) with (S (S (n + n))).
-  apply even_S; apply odd_S; apply Hrecn.
- rewrite plus_n_Sm; simpl in |- *; auto.
+ intros n; replace (n + n) with (Nat.double n) by reflexivity.
+ now rewrite Nat.double_twice; exists n.
 Qed.
 
 Lemma even_or_odd_plus : forall k : nat, {j : nat &  {k = j + j} + {k = S (j + j)}}.
 Proof.
- intro k.
- elim (even_odd_dec k); intro H.
-  elim (even_2n k H); intros j Hj; exists j; auto.
- elim (odd_S2n k H); intros j Hj; exists j; auto.
+ induction k as [| k IH].
+ - exists 0; left; reflexivity.
+ - destruct IH as [j [H | H]].
+   + now exists j; right; rewrite H.
+   + now exists (S j); left; rewrite H, Nat.add_succ_r.
 Qed.
 
 (** Finally, we prove that an arbitrary natural number can be written in some canonical way.
@@ -715,11 +708,14 @@ Lemma even_or_odd_plus_gt : forall i j : nat,
  i <= j -> {k : nat &  {j = i + (k + k)} + {j = i + S (k + k)}}.
 Proof.
  intros i j H.
- elim (even_or_odd_plus (j - i)).
- intros k Hk.
- elim Hk; intro H0.
-  exists k; left; rewrite <- H0; auto with arith.
- exists k; right; rewrite <- H0; auto with arith.
+ destruct (even_or_odd_plus (j - i)) as [k [Hk | Hk]]; exists k.
+ destruct (Nat.eq_dec k 0) as [-> | I].
+ - left; rewrite Nat.add_0_r; rewrite Nat.add_0_r in Hk.
+   now apply Nat.sub_0_le in Hk; apply Nat.le_antisymm.
+ - left; apply Nat.add_sub_eq_nz in Hk; [| now intros [C _]%Nat.eq_add_0].
+   exact (eq_sym Hk).
+ - right; apply Nat.add_sub_eq_nz in Hk; [| now intros C].
+   exact (eq_sym Hk).
 Qed.
 
 End Odd_and_Even.
@@ -1007,36 +1003,33 @@ results for [CProp]-valued predicates:
 Lemma even_induction :
   forall P : nat -> CProp,
   P 0 ->
-  (forall n, even n -> P n -> P (S (S n))) ->
-  forall n, even n -> P n.
+  (forall n, Nat.Even n -> P n -> P (S (S n))) ->
+  forall n, Nat.Even n -> P n.
 Proof.
- intros P H H0 n.
- pattern n in |- *; apply lt_wf_rect.
- clear n.
- intros n H1 H2.
- induction  n as [| n Hrecn].
-  auto.
- induction  n as [| n Hrecn0].
-  exfalso; inversion H2; inversion H4.
- apply H0.
-  inversion H2; inversion H4; auto.
- apply H1.
-  auto with arith.
- inversion H2; inversion H4; auto.
+ intros P H0 H n; induction n as [n IH] using Wf_nat.lt_wf_rect.
+ destruct n as [| n].
+ - intros _; exact H0.
+ - destruct n as [| n].
+   + intros C%Nat.even_spec; discriminate C.
+   + intros Hn; apply ->Nat.Even_succ_succ in Hn.
+     apply H; [exact Hn |].
+     apply IH; [| exact Hn].
+     apply Nat.lt_trans with (1 := Nat.lt_succ_diag_r n).
+     exact (Nat.lt_succ_diag_r _).
 Qed.
 
 Lemma odd_induction :
   forall P : nat -> CProp,
   P 1 ->
-  (forall n, odd n -> P n -> P (S (S n))) ->
-  forall n, odd n -> P n.
+  (forall n, Nat.Odd n -> P n -> P (S (S n))) ->
+  forall n, Nat.Odd n -> P n.
 Proof.
- intros P H H0 n; case n.
-  intro H1; exfalso; inversion H1.
- clear n; intros n H1.
- pattern n in |- *; apply even_induction; auto.
-  intros n0 H2 H3; auto with arith.
- inversion H1; auto.
+ intros P H1 H [| n] Hn.
+ - apply Nat.odd_spec in Hn; discriminate Hn.
+ - apply (even_induction (fun n => P (S n))).
+   + exact H1.
+   + now intros k Hk; apply H, Nat.Odd_succ.
+   + now apply Nat.Odd_succ.
 Qed.
 
 Lemma four_induction :
@@ -1064,33 +1057,23 @@ Proof.
  pattern m in |- *; apply lt_wf_rect; auto with arith.
 Qed.
 
-Lemma odd_double_ind : forall P : nat -> CProp, (forall n, odd n -> P n) ->
+Lemma odd_double_ind : forall P : nat -> CProp, (forall n, Nat.Odd n -> P n) ->
  (forall n, 0 < n -> P n -> P (Nat.double n)) -> forall n, 0 < n -> P n.
 Proof.
- cut (forall n : nat, 0 < Nat.double n -> 0 < n). intro.
-  intro. intro H0. intro H1. intro n.
-  pattern n in |- *.
-  apply lt_wf_rect. intros n0 H2 H3.
-  generalize (even_odd_dec n0). intro H4. elim H4.
-  intro.
-   rewrite (even_double n0).
-    apply H1.
-     apply H.
-     rewrite <- (even_double n0). assumption.
-      assumption.
-    apply H2.
-     apply Nat.lt_div2. assumption.
-     rewrite (even_double n0) in H3.
-     apply H. assumption.
-     assumption.
-   assumption.
-  exact (H0 n0).
- unfold Nat.double in |- *. intros.
- case (zerop n). intro.
-  absurd (0 < n + n).
-   rewrite e. auto with arith.
-   assumption.
- intro. assumption.
+ assert (forall n : nat, 0 < Nat.double n -> 0 < n) as H. {
+  unfold Nat.double; intros [| n]; simpl; [intros []%Nat.lt_irrefl |].
+  intros _; exact (Nat.lt_0_succ _).
+ }
+ intro. intro H0. intro H1. intro n.
+ pattern n in |- *.
+ apply lt_wf_rect. intros n0 H2 H3.
+ pose proof (even_or_odd_plus n0) as [k [Hk | Hk]].
+ - assert (0 < k) as I. {
+    apply H; unfold Nat.double; rewrite <-Hk; exact H3.
+   }
+   rewrite Hk; apply H1; [exact I |].
+   apply H2. lia. exact I.
+ - apply H0. exists k. lia.
 Qed.
 
 (** For subsetoid predicates in the natural numbers we can eliminate
@@ -1211,31 +1194,16 @@ completeness's sake.
 *)
 
 Lemma even_ind : forall P : nat -> Prop,
- P 0 -> (forall n, even n -> P n -> P (S (S n))) -> forall n, even n -> P n.
-Proof.
- intros P H H0 n.
- pattern n in |- *; apply lt_wf_ind.
- clear n.
- intros n H1 H2.
- induction  n as [| n Hrecn].
-  auto.
- induction  n as [| n Hrecn0].
-  exfalso; inversion H2; inversion H4.
- apply H0.
-  inversion H2; inversion H4; auto.
- apply H1.
-  auto with arith.
- inversion H2; inversion H4; auto.
-Qed.
+ P 0 -> (forall n, Nat.Even n -> P n -> P (S (S n))) -> forall n, Nat.Even n -> P n.
+Proof. now intros P; apply even_induction. Qed.
 
+(* NOTE: this statement is not consistent with odd_induction, is it intended? *)
 Lemma odd_ind : forall P : nat -> Prop,
- P 1 -> (forall n, P n -> P (S (S n))) -> forall n, odd n -> P n.
+ P 1 -> (forall n, P n -> P (S (S n))) -> forall n, Nat.Odd n -> P n.
 Proof.
- intros P H H0 n; case n.
-  intro H1; exfalso; inversion H1.
- clear n; intros n H1.
- pattern n in |- *; apply even_ind; auto.
- inversion H1; auto.
+  intros P H1 H n Hn; apply odd_induction; [exact H1 | |].
+  - now intros k _; apply H.
+  - exact Hn.
 Qed.
 
 Lemma nat_complete_double_ind :

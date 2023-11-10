@@ -171,7 +171,7 @@ Qed.
 
 Hint Resolve flip_coefficient: algebra.
 
-Lemma flip_odd : forall (p : RX) n, odd n -> monic n p -> monic n (flip p).
+Lemma flip_odd : forall (p : RX) n, Nat.Odd n -> monic n p -> monic n (flip p).
 Proof.
  unfold monic in |- *. unfold degree_le in |- *.
  intros.
@@ -207,24 +207,24 @@ Variable R : COrdField.
 Let RX := (cpoly R).
 (* end hide *)
 
-Lemma oddpoly_pos : forall (p : RX) n, odd n -> monic n p -> {x : R | [0] [<=] p ! x}.
+Lemma oddpoly_pos : forall (p : RX) n, Nat.Odd n -> monic n p -> {x : R | [0] [<=] p ! x}.
 Proof.
- intros.
+ intros p n H1 H2.
  apply cpoly_pos with n; auto.
- elim H. intros. auto with arith.
+ destruct H1 as [m ->]; rewrite Nat.add_1_r; exact (Nat.lt_0_succ _).
 Qed.
 
 Lemma oddpoly_pos' : forall (p : RX) a n,
- odd n -> monic n p -> {x : R | a [<] x | [0] [<=] p ! x}.
+ Nat.Odd n -> monic n p -> {x : R | a [<] x | [0] [<=] p ! x}.
 Proof.
- intros.
- elim (Ccpoly_pos' _ p a n). intros x H1 H2.
-   exists x; assumption.
-  elim H; auto with arith.
- assumption.
+ intros p a n H1 H2.
+ elim (Ccpoly_pos' _ p a n).
+ - intros x Hx Hp; exists x; assumption.
+ - destruct H1 as [m ->]; rewrite Nat.add_1_r; exact (Nat.lt_0_succ _).
+ - assumption.
 Qed.
 
-Lemma oddpoly_neg : forall (p : RX) n, odd n -> monic n p -> {x : R | p ! x [<=] [0]}.
+Lemma oddpoly_neg : forall (p : RX) n, Nat.Odd n -> monic n p -> {x : R | p ! x [<=] [0]}.
 Proof.
  intros.
  elim (oddpoly_pos _ _ H (flip_odd _ _ _ H H0)). intro x. intros.
@@ -289,7 +289,7 @@ Section OddPoly_Root.
 ** Roots of polynomials of odd degree
 Polynomials of odd degree over the reals always have a root. *)
 
-Lemma oddpoly_root' : forall f n, odd n -> monic n f -> {x : IR | f ! x [=] [0]}.
+Lemma oddpoly_root' : forall f n, Nat.Odd n -> monic n f -> {x : IR | f ! x [=] [0]}.
 Proof.
  intros.
  elim (oddpoly_neg _ f n); auto. intro a. intro H1.
@@ -304,7 +304,7 @@ Proof.
  apply monic_apzero with n; auto.
 Qed.
 
-Lemma oddpoly_root : forall f n, odd n -> degree n f -> {x : IR | f ! x [=] [0]}.
+Lemma oddpoly_root : forall f n, Nat.Odd n -> degree n f -> {x : IR | f ! x [=] [0]}.
 Proof.
  intros f n H H0.
  elim (oddpoly_root' (poly_norm _ f n H0) n); auto.
@@ -318,7 +318,7 @@ Proof.
  unfold odd_cpoly in |- *.
  intros f H.
  elim H. clear H. intro n. intros H H0.
- cut (odd n).
+ cut (Nat.Odd n).
   intro.
   elim (oddpoly_root f n H1 H0). intros. exists x. auto.
   apply Codd_to.
