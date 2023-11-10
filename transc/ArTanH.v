@@ -317,13 +317,12 @@ Qed.
 (** PowerSeries for the Inverse Hyperbolic Tangent Function. *)
 Lemma ArTanH_series_coef_lemma : forall (R:COrdField) n, Nat.Odd n -> (nring (R:=R) n)[#][0].
 Proof.
- intros R [|n] H%Nat.Odd_OddT;
-  [destruct H as [k H]; rewrite Nat.add_1_r in H; discriminate H |].
+ intros R [|n] H%Nat.odd_spec; [discriminate H |].
  apply nringS_ap_zero.
 Qed.
 
 Definition ArTanH_series_coef (n:nat) :=
-match (Nat.Even_Odd_dec n) with
+match (CLogic.Even_Odd_dec n) with
 | left _ => [0]
 | right H => [1][/](nring n)[//](ArTanH_series_coef_lemma IR n H)
 end.
@@ -348,11 +347,11 @@ Proof.
    Log_series_coef n[*]([1][-]x[-][1])[^]n)[=] ArTanH_series_coef n[*]nexp IR n (x[-][0])).
  unfold ArTanH_series_coef.
  destruct n as [|n].
-  destruct (Nat.Even_Odd_dec 0) as [A|A]; 
+  destruct (CLogic.Even_Odd_dec 0) as [A|A]; 
   [simpl; rational |
     exfalso; destruct A as [k B]; rewrite Nat.add_1_r in B; discriminate B ].
  rstepl (Half (R:=IR)[*] (Log_series_coef (S n)[*](x[^]S n[-]([--]x)[^]S n))).
- destruct (Nat.Even_Odd_dec (S n)) as [A|A]; unfold cg_minus.
+ destruct (CLogic.Even_Odd_dec (S n)) as [A|A]; unfold cg_minus.
   csetoid_rewrite (inv_nexp_even _ x _ A).
   rational.
  csetoid_rewrite (inv_nexp_odd _ x _ A).

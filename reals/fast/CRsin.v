@@ -367,13 +367,12 @@ Proof.
    + destruct (even_or_odd_plus n') as [m [Hm|Hm]]; simpl.
      rational.
      elim (Nat.Even_Odd_False n');
-     [ now apply (Nat.Even_mul_l 2 n); exists 1%nat |
+     [ exists n; subst n'; ring |
        now exists m; rewrite Hm, Nat.add_1_r; simpl; rewrite Nat.add_0_r].
    + destruct (even_or_odd_plus (S n')) as [m [Hm|Hm]]; simpl.
   elim (Nat.Even_Odd_False (S n')).
    rewrite Hm.
-   replace (m + m)%nat with (2*m)%nat by lia.
-   now apply (Nat.Even_mul_l 2 m); exists 1%nat.
+   replace (m + m)%nat with (2*m)%nat by lia; now exists m.
    subst n'; exists n; ring.
  inversion Hm.
  unfold n' in H1.

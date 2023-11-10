@@ -369,7 +369,7 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
                 (inj_Q IR (Str_nth n (artanhSequence a))).
   rational.
  unfold ArTanH_series_coef.
- case_eq (Nat.Even_Odd_dec (S (Nat.double n))); intros H.
+ case_eq (CLogic.Even_Odd_dec (S (Nat.double n))); intros H.
   elim (Nat.Even_Odd_False _ H).
   now rewrite <-Nat.add_1_r, Nat.double_twice; exists n.
  intros _.
@@ -415,7 +415,7 @@ csetoid_replace (ArTanH_series_coef (S (Nat.double n))[*]A)
   apply nexp_wd.
  rational.
 unfold ArTanH_series_coef.
-case_eq (Nat.Even_Odd_dec (Nat.double n)).
+case_eq (CLogic.Even_Odd_dec (Nat.double n)).
  intros _ _.
  rational.
 intros o.

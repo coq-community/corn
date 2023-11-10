@@ -1213,7 +1213,7 @@ Proof.
      astepr ZeroR; apply leEq_reflexive.
     simpl in |- *; unfold ABSIR in |- *; apply eq_reflexive_unfolded.
    apply eq_symmetric_unfolded; assumption.
-  destruct (Nat.Even_Odd_dec N) as [HE | HO].
+  destruct (Nat.Even_or_Odd N) as [HE | HO].
    apply AbsIR_wd.
    eapply eq_transitive_unfolded.
     apply seq_part_sum_n; auto; apply Nat.lt_le_trans with N; auto.

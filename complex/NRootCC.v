@@ -129,7 +129,10 @@ Qed.
 
 Lemma nroot_I_nexp_aux : forall n, Nat.Odd n -> {m : nat | n * n = 4 * m + 1}.
 Proof.
- intros n [m ->]%Nat.Odd_OddT; exists (m * m + m); ring.
+ intros n H; destruct (even_or_odd_plus n) as [m [Hm | ->]].
+ - exfalso; apply (Nat.Even_Odd_False n); [| exact H].
+   exists m; rewrite Hm; ring.
+ - exists (m * m + m); ring.
 Qed.
 
 Definition nroot_I (n : nat) (n_ : Nat.Odd n) : CC := II[^]n.
@@ -1036,8 +1039,7 @@ Proof.
   apply to_Codd.
   assumption.
  apply nrootCC_3'_degree.
- rewrite (Nat.Odd_double n). auto with arith.
-  assumption.
+ destruct n_ as [k ->]; rewrite Nat.add_1_r; exact (Nat.lt_0_succ _).
 Qed.
 
 End NRootCC_4_solutions.

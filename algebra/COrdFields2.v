@@ -1010,11 +1010,14 @@ Qed.
 
 Lemma even_power_pos : forall n, Nat.Even n -> forall x : R, x [#] [0] -> [0] [<] x[^]n.
 Proof.
- intros n Hn x Hx; apply Nat.Even_double in Hn as ->; unfold Nat.double.
- astepr ((x[^]2)[^](Nat.div2 n)).
- - apply nexp_resp_pos, pos_square; exact Hx.
- - astepr ((x[^]2)[^](Nat.div2 n)); [reflexivity |].
-   now rewrite nexp_mult, <-Nat.double_twice.
+ intros n Hn x Hx.
+ destruct (even_or_odd_plus n) as [k [Hk | Hk]].
+ - astepr ((x[^]2)[^](k)).
+   apply nexp_resp_pos, pos_square; exact Hx.
+   astepr ((x[^]2)[^](k)); [reflexivity |].
+   now rewrite nexp_mult, Hk; replace (2 * k) with (k + k) by lia.
+ - exfalso; apply (Nat.Even_Odd_False n); [exact Hn |].
+   exists k; lia.
 Qed.
 
 Lemma odd_power_cancel_pos : forall n, Nat.Odd n -> forall x : R, [0] [<] x[^]n -> [0] [<] x.

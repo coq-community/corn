@@ -467,6 +467,17 @@ Proof.
  auto.
 Qed.
 
+
+(** For compatibility with Coq.8.14 and Coq.8.15: this can be removed and
+    changed with Nat.Even_Odd_dec when the minimal version is bumped to 8.16 *)
+Lemma Even_Odd_dec (n : nat) : {Nat.Even n} + {Nat.Odd n}.
+Proof.
+  destruct (Nat.even n) eqn:E.
+  - left; apply Nat.even_spec; exact E.
+  - right; apply Bool.negb_true_iff in E; rewrite Nat.negb_even in E.
+    apply Nat.odd_spec; exact E.
+Qed.
+
 Inductive Codd : nat -> CProp :=
     Codd_S : forall n : nat, Ceven n -> Codd (S n)
 with Ceven : nat -> CProp :=
@@ -683,10 +694,11 @@ Qed.
 
 Lemma even_or_odd_plus : forall k : nat, {j : nat &  {k = j + j} + {k = S (j + j)}}.
 Proof.
- intros k; destruct (Nat.EvenT_OddT_dec k) as [[x H] | [x H]]; exists x;
-  replace (x + x) with (Nat.double x) by reflexivity; rewrite Nat.double_twice.
- - now left.
- - now right; rewrite <-Nat.add_1_r.
+ induction k as [| k IH].
+ - exists 0; left; reflexivity.
+ - destruct IH as [j [H | H]].
+   + now exists j; right; rewrite H.
+   + now exists (S j); left; rewrite H, Nat.add_succ_r.
 Qed.
 
 (** Finally, we prove that an arbitrary natural number can be written in some canonical way.
@@ -1048,30 +1060,20 @@ Qed.
 Lemma odd_double_ind : forall P : nat -> CProp, (forall n, Nat.Odd n -> P n) ->
  (forall n, 0 < n -> P n -> P (Nat.double n)) -> forall n, 0 < n -> P n.
 Proof.
- cut (forall n : nat, 0 < Nat.double n -> 0 < n). intro.
-  intro. intro H0. intro H1. intro n.
-  pattern n in |- *.
-  apply lt_wf_rect. intros n0 H2 H3.
-  generalize (Nat.Even_Odd_dec n0). intro H4. elim H4.
-  intro.
-   rewrite (Nat.Even_double n0).
-    apply H1.
-     apply H.
-     rewrite <- (Nat.Even_double n0). assumption.
-      assumption.
-    apply H2.
-     apply Nat.lt_div2. assumption.
-     rewrite (Nat.Even_double n0) in H3.
-     apply H. assumption.
-     assumption.
-   assumption.
-  exact (H0 n0).
- unfold Nat.double in |- *. intros.
- case (zerop n). intro.
-  absurd (0 < n + n).
-   rewrite e. auto with arith.
-   assumption.
- intro. assumption.
+ assert (forall n : nat, 0 < Nat.double n -> 0 < n) as H. {
+  unfold Nat.double; intros [| n]; simpl; [intros []%Nat.lt_irrefl |].
+  intros _; exact (Nat.lt_0_succ _).
+ }
+ intro. intro H0. intro H1. intro n.
+ pattern n in |- *.
+ apply lt_wf_rect. intros n0 H2 H3.
+ pose proof (even_or_odd_plus n0) as [k [Hk | Hk]].
+ - assert (0 < k) as I. {
+    apply H; unfold Nat.double; rewrite <-Hk; exact H3.
+   }
+   rewrite Hk; apply H1; [exact I |].
+   apply H2. lia. exact I.
+ - apply H0. exists k. lia.
 Qed.
 
 (** For subsetoid predicates in the natural numbers we can eliminate

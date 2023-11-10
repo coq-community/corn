@@ -1101,13 +1101,12 @@ Hint Resolve zero_nexp: algebra.
 
 Lemma inv_nexp_even : forall (x : R) n, Nat.Even n -> [--]x[^]n [=] x[^]n.
 Proof.
- intros x n H.
- rewrite (Nat.Even_double _ H).
- unfold Nat.double in |- *.
- astepl ( [--]x[^](Nat.div2 n)[*] [--]x[^](Nat.div2 n)).
- astepl (( [--]x[*] [--]x) [^](Nat.div2 n)).
- astepl ((x[*]x) [^](Nat.div2 n)).
- Step_final (x[^](Nat.div2 n)[*]x[^](Nat.div2 n)).
+ intros x n [k H].
+ replace (2 * k) with (k + k) in H by lia; rewrite H.
+ astepl ( [--]x[^](k)[*] [--]x[^](k)).
+ astepl (( [--]x[*] [--]x) [^](k)).
+ astepl ((x[*]x) [^](k)).
+ Step_final (x[^](k)[*]x[^](k)).
 Qed.
 Hint Resolve inv_nexp_even: algebra.
 

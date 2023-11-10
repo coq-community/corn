@@ -99,7 +99,7 @@ Proof.
       assumption.
      apply H5.
      apply Nat.le_trans with (m := N1 + N2).
-      apply Nat.le_add_l.
+      rewrite Nat.add_comm; apply Nat.le_add_r.
      assumption.
     apply H1.
     apply div_resp_pos.
@@ -296,7 +296,7 @@ Proof.
        apply shift_minus_less; rstepr (Lim g); auto.
       elim (H6 (N1 + N2)); intros.
        rstepl ([--]((Lim g[-]y) [/]ThreeNZ)); auto.
-      apply Nat.le_add_l.
+      rewrite Nat.add_comm; apply Nat.le_add_r.
      elim (H3 (N1 + N2)); intros.
       apply inv_cancel_leEq.
       rstepr ((Lim g[-]y) [/]ThreeNZ); rstepl (g (N1 + N2)[-]y); auto.
@@ -336,7 +336,7 @@ Proof.
      elim (a (N1 + N2)); intros.
       apply inv_cancel_leEq.
       rstepr ((y[-]Lim g) [/]ThreeNZ); rstepl (g (N1 + N2)[-]Lim g); auto.
-     apply Nat.le_add_l.
+     rewrite Nat.add_comm; apply Nat.le_add_r.
     elim (H3 (N1 + N2)); intros.
      rstepl ([--]((y[-]Lim g) [/]ThreeNZ)); auto.
     apply Nat.le_add_r.
@@ -389,7 +389,7 @@ Proof.
        assumption.
       apply H7.
       apply Nat.le_trans with (m := N1 + N2).
-       apply Nat.le_add_l.
+       rewrite Nat.add_comm; apply Nat.le_add_r.
       assumption.
      apply H4.
      apply pos_div_two.
@@ -444,7 +444,7 @@ Proof.
       apply AbsSmall_minus.
       apply H6.
       apply Nat.le_trans with (m := N1 + N2).
-       apply Nat.le_add_l.
+       rewrite Nat.add_comm; apply Nat.le_add_r.
       assumption.
      apply eq_transitive_unfolded with (y := CS_seq IR g m[-]CS_seq IR h m[+](Lim h[-]Lim g)).
       rational.
@@ -604,7 +604,7 @@ Proof.
     assumption.
    apply H5.
    apply Nat.le_trans with (m := N1 + N2).
-    apply Nat.le_add_l.
+    rewrite Nat.add_comm; apply Nat.le_add_r.
    assumption.
   apply (ax_Lim _ _ (crl_proof IR) h).
   apply pos_div_two.
@@ -772,7 +772,7 @@ Proof.
    apply a.
    apply Nat.le_add_r.
   apply H2.
-  apply Nat.le_add_l.
+  rewrite Nat.add_comm; apply Nat.le_add_r.
  apply Lim_Cauchy.
 Qed.
 
