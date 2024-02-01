@@ -9,8 +9,8 @@ Follow the instructions on https://github.com/coq-community/templates to regener
 [![Code of Conduct][conduct-shield]][conduct-link]
 [![Zulip][zulip-shield]][zulip-link]
 
-[docker-action-shield]: https://github.com/coq-community/corn/workflows/Docker%20CI/badge.svg?branch=master
-[docker-action-link]: https://github.com/coq-community/corn/actions?query=workflow:"Docker%20CI"
+[docker-action-shield]: https://github.com/coq-community/corn/actions/workflows/docker-action.yml/badge.svg?branch=master
+[docker-action-link]: https://github.com/coq-community/corn/actions/workflows/docker-action.yml
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
 [contributing-link]: https://github.com/coq-community/manifesto/blob/master/CONTRIBUTING.md
@@ -87,7 +87,7 @@ CoRN includes the following parts:
   - Bas Spitters ([**@spitters**](https://github.com/spitters))
   - Vincent Semeria ([**@vincentse**](https://github.com/vincentse))
 - License: [GNU General Public License v2](LICENSE)
-- Compatible Coq versions: Coq 8.14 or greater
+- Compatible Coq versions: Coq 8.18 or greater
 - Additional dependencies:
   - [Math-Classes](https://github.com/coq-community/math-classes) 8.8.1 or
 greater, which is a library of abstract interfaces for mathematical

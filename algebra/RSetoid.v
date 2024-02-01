@@ -25,7 +25,9 @@ Set Warnings "-unsupported-attributes".
 Set Implicit Arguments.
 
 Require Export Coq.Setoids.Setoid.
+Require Export (hints) MathClasses.interfaces.orders.
 Require Import MathClasses.interfaces.abstract_algebra.
+Export (hints) MathClasses.interfaces.abstract_algebra.
 
 (**
 * Classic Setoids presented in a bundled way. 

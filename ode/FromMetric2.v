@@ -5,7 +5,7 @@ Require Import CoRN.metric2.Complete CoRN.metric2.Metric CoRN.ode.metric.
 
 Require Import
   CoRN.model.totalorder.QposMinMax
-  MathClasses.interfaces.abstract_algebra MathClasses.implementations.stdlib_rationals
+  MathClasses.interfaces.abstract_algebra MathClasses.interfaces.rationals MathClasses.implementations.stdlib_rationals
   MathClasses.orders.orders MathClasses.orders.semirings MathClasses.orders.rings MathClasses.theory.rings.
 
 Import Qinf.notations Qinf.coercions.
@@ -211,11 +211,13 @@ Lemma nested_balls (x1 x2 : Q) {y1 y2 : Q} {e : Qinf} :
 Proof.
 intros B A1 A2 A3. destruct e as [e |]; [| apply mspc_inf].
 apply mspc_ball_Qabs_flip in B. apply mspc_ball_Qabs_flip.
-assert (x1 ≤ x2) by (transitivity y1; [| transitivity y2]; trivial).
+assert (x1 ≤ x2).
+  now apply (PreOrder_Transitive _ y1); [|apply (PreOrder_Transitive _ y2)].
 rewrite abs.abs_nonneg by now apply rings.flip_nonneg_minus.
 rewrite abs.abs_nonneg in B by now apply rings.flip_nonneg_minus.
 apply rings.flip_le_minus_l. apply rings.flip_le_minus_l in B.
-transitivity x2; [easy |]. transitivity (e + x1); [easy |].
+apply (PreOrder_Transitive _ x2); [easy|].
+apply (PreOrder_Transitive _ (e + x1)); [easy|].
 apply (orders.order_preserving (e +)); easy.
 Qed. (* Too long? *)
 

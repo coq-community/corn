@@ -6,7 +6,7 @@ Require Import
   CoRN.model.totalorder.QposMinMax 
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.util.Qdlog CoRN.reals.faster.ARArith
   MathClasses.theory.int_pow MathClasses.theory.nat_pow
-  MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers MathClasses.implementations.fast_integers MathClasses.implementations.dyadics.
+  MathClasses.interfaces.rationals MathClasses.implementations.stdlib_rationals MathClasses.interfaces.integers MathClasses.implementations.stdlib_binary_integers MathClasses.implementations.fast_integers MathClasses.implementations.dyadics.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 

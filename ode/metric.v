@@ -142,8 +142,8 @@ Class ExtMetricSpaceClass (X : Type) `{MetricSpaceBall X} : Prop := {
   mspc_radius_proper : Proper ((=) ==> (≡) ==> (≡) ==> iff) ball;
   mspc_inf: ∀ x y, ball Qinf.infinite x y;
   mspc_negative: ∀ (e: Q), e < 0 → ∀ x y, ~ ball e x y;
-  mspc_refl:> ∀ e : Q, 0 ≤ e → Reflexive (ball e);
-  mspc_symm:> ∀ e, Symmetric (ball e);
+  mspc_refl:: ∀ e : Q, 0 ≤ e → Reflexive (ball e);
+  mspc_symm:: ∀ e, Symmetric (ball e);
   mspc_triangle: ∀ (e1 e2: Q) (a b c: X),
      ball e1 a b → ball e2 b c → ball (e1 + e2) a c;
   mspc_closed: ∀ (e: Q) (a b: X),
@@ -437,7 +437,7 @@ Definition restrict (f : X -> Y) (x : X) (r : Q) : sig (ball r x) -> Y :=
 IsUniformlyContinuous and IsLocallyUniformlyContinuous *)
 
 Class IsLocallyUniformlyContinuous (f : X -> Y) (lmu : X -> Q -> Q -> Qinf) :=
-  luc_prf :> forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r).
+  luc_prf :: forall (x : X) (r : Q), IsUniformlyContinuous (restrict f x r) (lmu x r).
 
 Global Arguments luc_prf f lmu {_} x r.
 
@@ -580,7 +580,7 @@ particular, integral_lipschitz in AbstractIntegration.v defines [L] as
 [λ a r, abs (f a) + L' a r * r]. *)
 
 Class IsLocallyLipschitz (f : X -> Y) (L : X -> Q -> Q) :=
-  llip_prf :> forall (x : X) (r : Q), PropHolds (0 ≤ r) -> IsLipschitz (restrict f x r) (L x r).
+  llip_prf :: forall (x : X) (r : Q), PropHolds (0 ≤ r) -> IsLipschitz (restrict f x r) (L x r).
 
 Global Arguments llip_prf f L {_} x r _.
 
@@ -625,7 +625,7 @@ Section Contractions.
 Context `{MetricSpaceBall X, MetricSpaceBall Y}.
 
 Class IsContraction (f : X -> Y) (q : Q) := {
-  contr_prf :> IsLipschitz f q;
+  contr_prf :: IsLipschitz f q;
   contr_lt_1 : q < 1
 }.
 
@@ -815,7 +815,7 @@ Qed.
 
 Class Limit := lim : RegularFunction -> X.
 
-Class CompleteMetricSpaceClass `{Limit} := cmspc :> Surjective reg_unit (inv := lim).
+Class CompleteMetricSpaceClass `{Limit} := cmspc :: Surjective reg_unit (inv := lim).
 
 Definition tends_to (f : RegularFunction) (l : X) :=
   forall e : Q, 0 < e -> ball e (f e) l.
