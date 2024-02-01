@@ -14,6 +14,8 @@ Add Ring AQ : (rings.stdlib_ring_theory AQ).
 
 Local Open Scope uc_scope. 
 
+(* To ensure the definitions below don't use sg_setoid instead *)
+Existing Instance strong_setoids.Setoid_instance_0.
 Definition AQ_as_MetricSpace := Emetric (cast AQ Q_as_MetricSpace).
 Definition AQPrelengthSpace := EPrelengthSpace QPrelengthSpace (cast AQ Q_as_MetricSpace).
 Definition AQLocated : locatedMetric AQ_as_MetricSpace.

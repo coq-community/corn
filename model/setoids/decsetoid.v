@@ -20,7 +20,7 @@ Class Apartness `{SetoidClass.Setoid} (ap: Crelation A): Type :=
 
 Class CSetoid_class `(Setoid): Type :=
   { apart: Crelation A
-  ; csetoid_apart:> Apartness apart
+  ; csetoid_apart :: Apartness apart
   }.
 
 Definition is_CSetoid_from_class `{Apartness}: is_CSetoid _ equiv ap0.

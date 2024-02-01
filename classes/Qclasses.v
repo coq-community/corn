@@ -1,5 +1,6 @@
 Require Import 
   CoRN.model.totalorder.QMinMax
+  MathClasses.interfaces.orders
   MathClasses.interfaces.abstract_algebra
   MathClasses.orders.minmax.
 Require Export 

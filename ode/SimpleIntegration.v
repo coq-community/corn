@@ -59,7 +59,7 @@ Section integral_interface.
       (forall x, from <= x <= from+ proj1_sig width -> ball (proj1_sig r) (f x) ('mid)) ->
       ball (proj1_sig (width * r)%Qpos) (∫ f from (from_Qpos width)) (' (proj1_sig width * mid)%Q)
 
-    ; integral_wd:> Proper (Qeq ==> QnonNeg.eq ==> @msp_eq _) (∫ f) }.
+    ; integral_wd:: Proper (Qeq ==> QnonNeg.eq ==> @msp_eq _) (∫ f) }.
 
   (* Todo: Show that the sign function is integrable while not locally uniformly continuous. *)
 

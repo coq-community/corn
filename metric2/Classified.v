@@ -46,12 +46,12 @@ Hint Unfold relation : type_classes.
   Context `{!MetricSpaceBall}.
 
   Class MetricSpaceClass: Prop :=
-    { mspc_ball_proper:> forall (e1 e2 : Qinf) (x y : X),
+    { mspc_ball_proper:: forall (e1 e2 : Qinf) (x y : X),
           equiv e1 e2 -> (mspc_ball e1 x y <-> mspc_ball e2 x y)
     ; mspc_ball_inf: ∀ x y, mspc_ball Qinf.infinite x y
     ; mspc_ball_negative: ∀ (e: Q), (e < 0)%Q → ∀ x y, ~ mspc_ball e x y
-    ; mspc_refl:> ∀ e, (0 <= e)%Qinf → Reflexive (mspc_ball e)
-    ; mspc_sym:> ∀ e, Symmetric (mspc_ball e)
+    ; mspc_refl:: ∀ e, (0 <= e)%Qinf → Reflexive (mspc_ball e)
+    ; mspc_sym:: ∀ e, Symmetric (mspc_ball e)
     ; mspc_triangle: ∀ (e1 e2: Qinf) (a b c: X),
          mspc_ball e1 a b → mspc_ball e2 b c → mspc_ball (e1 + e2) a c
     ; mspc_closed: ∀ (e: Qinf) (a b: X),
@@ -665,7 +665,7 @@ Section local_uniform_continuity.
     := f ∘ @proj1_sig _ _.
 
   Class LocallyUniformlyContinuous_mu (f: X → Y): Type :=
-    luc_mu (b: Ball X Qpos):> UniformlyContinuous_mu (restrict b f).
+    luc_mu (b: Ball X Qpos):: UniformlyContinuous_mu (restrict b f).
 
   Context (f: X → Y) {mu: LocallyUniformlyContinuous_mu f}.
 

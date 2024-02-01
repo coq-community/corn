@@ -25,17 +25,17 @@ Class AppRationals AQ {e plus mult zero one inv} `{Apart AQ} `{Le AQ} `{Lt AQ}
     `{!AppInverse AQtoQ} {ZtoAQ : Cast Z AQ} `{!AppDiv AQ} `{!AppApprox AQ} 
     `{!Abs AQ} `{!Pow AQ N} `{!ShiftL AQ Z} 
     `{∀ x y : AQ, Decision (x = y)} `{∀ x y : AQ, Decision (x ≤ y)} : Prop := {
-  aq_ring :> @Ring AQ e plus mult zero one inv ;
-  aq_trivial_apart :> TrivialApart AQ ;
-  aq_order_embed :> OrderEmbedding AQtoQ ;
-  aq_strict_order_embed :> StrictOrderEmbedding AQtoQ ;
-  aq_ring_morphism :> SemiRing_Morphism AQtoQ ;
-  aq_dense_embedding :> DenseEmbedding AQtoQ ;
+  aq_ring :: @Ring AQ e plus mult zero one inv ;
+  aq_trivial_apart :: TrivialApart AQ ;
+  aq_order_embed :: OrderEmbedding AQtoQ ;
+  aq_strict_order_embed :: StrictOrderEmbedding AQtoQ ;
+  aq_ring_morphism :: SemiRing_Morphism AQtoQ ;
+  aq_dense_embedding :: DenseEmbedding AQtoQ ;
   aq_div : ∀ x y k, ball (2 ^ k) ('app_div x y k) ('x / 'y) ;
   aq_compress : ∀ x k, ball (2 ^ k) ('app_approx x k) ('x) ;
-  aq_shift :> ShiftLSpec AQ Z (≪) ;
-  aq_nat_pow :> NatPowSpec AQ N (^) ;
-  aq_ints_mor :> SemiRing_Morphism ZtoAQ
+  aq_shift :: ShiftLSpec AQ Z (≪) ;
+  aq_nat_pow :: NatPowSpec AQ N (^) ;
+  aq_ints_mor :: SemiRing_Morphism ZtoAQ
 }.
 
 Lemma order_embedding_iff `{OrderEmbedding A B f} x y : 

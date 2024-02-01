@@ -22,7 +22,6 @@ Require CoRN.reals.fast.CRtrans CoRN.reals.faster.ARtrans. (* This is almost all
 
 Import Qinf.coercions QnonNeg.coercions QnnInf.coercions CoRN.stdlib_omissions.Q.
 
-
 Ltac done :=
   trivial; hnf; intros; solve
    [ repeat (first [solve [trivial | apply: sym_equal; trivial]
