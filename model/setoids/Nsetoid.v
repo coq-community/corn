@@ -263,8 +263,7 @@ Proof.
  exact pfun3.
 Defined.
 
-
-Let ex_3_ary: (on 3 5 7 plus3)[=] 3+5+7.
+#[local] Lemma ex_3_ary: (on 3 5 7 plus3)[=] 3+5+7.
 Proof.
  simpl.
  reflexivity.

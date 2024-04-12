@@ -51,8 +51,8 @@ polynomial is irreducible over the prime field Fp, then it is irreducible over
 Z.
 *)
 
-Variable p : positive.
-Hypothesis Hprime : (Prime p).
+Parameter p : positive.
+Axiom Hprime : (Prime p).
 
 Definition fp := (Fp p Hprime).
 
