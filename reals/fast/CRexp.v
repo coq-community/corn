@@ -36,7 +36,6 @@ Require Import CoRN.reals.fast.CRpower.
 Require Import CoRN.transc.Exponential.
 Require Import CoRN.transc.RealPowers.
 Require Import CoRN.reals.fast.Compress.
-Require Import Coq.NArith.Ndigits.
 Require Import CoRN.reals.fast.ModulusDerivative.
 Require Import CoRN.reals.fast.ContinuousCorrect.
 Require Import CoRN.reals.fast.CRsign.
