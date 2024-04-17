@@ -39,7 +39,6 @@ Require Import CoRN.reals.fast.ContinuousCorrect.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.transc.PowerSeries.
 Require Import CoRN.transc.SinCos.
-Require Import Coq.NArith.Ndigits.
 Require Import CoRN.reals.fast.Compress.
 Require Import CoRN.reals.fast.PowerBound.
 Require Import CoRN.tactics.CornTac.

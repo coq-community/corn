@@ -33,7 +33,6 @@ Require Import CoRN.model.metric2.Qmetric.
 Require Import Coq.QArith.Qpower.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.reals.fast.Compress.
-Require Import Coq.NArith.Ndigits.
 Require Import CoRN.reals.fast.PowerBound.
 Require Import CoRN.transc.RealPowers.
 Require Import CoRN.reals.fast.ContinuousCorrect.
