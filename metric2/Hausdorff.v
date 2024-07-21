@@ -23,7 +23,7 @@ Require Import CoRN.logic.Classic.
 Require Export CoRN.metric2.Metric.
 Require Import CoRN.metric2.Classification.
 Require Import Coq.Lists.List.
-Require Import Coq.ZArith.ZArith.
+From Coq Require Import ZArith.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.model.totalorder.QposMinMax.
 

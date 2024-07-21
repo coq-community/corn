@@ -25,7 +25,7 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Export CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.model.metric2.Qmetric.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qabs.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.logic.Stability.
 

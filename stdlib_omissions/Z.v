@@ -1,6 +1,7 @@
 
-Require Import Coq.ZArith.ZArith CoRN.stdlib_omissions.P.
-Require Import Lia.
+From Coq Require Import ZArith.
+Require Import CoRN.stdlib_omissions.P.
+From Coq Require Import Lia.
 
 (*Require Import NSigNAxioms.  was added in the trunk branch*)
 

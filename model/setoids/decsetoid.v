@@ -4,11 +4,8 @@
 
 Set Implicit Arguments.
 
-Require Import
- CoRN.algebra.CSetoids
- Coq.Classes.SetoidDec
- Coq.Classes.Morphisms
- Coq.Classes.SetoidClass.
+Require Import CoRN.algebra.CSetoids.
+From Coq Require Import SetoidDec Morphisms SetoidClass.
 
 
 Class Apartness `{SetoidClass.Setoid} (ap: Crelation A): Type :=

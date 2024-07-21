@@ -28,7 +28,7 @@ Require Import CoRN.reals.fast.CRstreams.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
 Require Import CoRN.reals.iso_CReals.
-Require Import Coq.QArith.Qpower.
+From Coq Require Import Qpower.
 Require Import CoRN.algebra.COrdFields2.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.transc.PowerSeries.
@@ -40,8 +40,8 @@ Require Import CoRN.reals.fast.ModulusDerivative.
 Require Import CoRN.reals.fast.ContinuousCorrect.
 Require Import CoRN.reals.fast.CRsign.
 Require Import CoRN.reals.Q_in_CReals.
-Require Import Coq.QArith.Qabs.
-Require Import Coq.QArith.Qround.
+From Coq Require Import Qabs.
+From Coq Require Import Qround.
 Require Import CoRN.tactics.CornTac.
 Require Import MathClasses.theory.int_pow.
 Require Import MathClasses.interfaces.abstract_algebra.

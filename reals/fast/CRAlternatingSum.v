@@ -19,9 +19,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Coq.setoid_ring.ArithRing.
-Require Import Coq.Bool.Bool.
-Require Import Coq.QArith.Qpower Coq.QArith.Qabs.
+From Coq Require Import ArithRing.
+From Coq Require Import Bool.
+From Coq Require Import Qpower Qabs.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.

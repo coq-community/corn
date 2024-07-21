@@ -25,8 +25,8 @@ Require Export CoRN.reals.fast.RasterQ.
 Require Import CoRN.reals.fast.Interval.
 Require Import CoRN.logic.Classic.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import Coq.QArith.Qabs.
-Require Import Coq.QArith.Qround.
+From Coq Require Import Qabs.
+From Coq Require Import Qround.
 
 Local Open Scope Q_scope.
 

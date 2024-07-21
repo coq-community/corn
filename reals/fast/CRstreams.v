@@ -24,11 +24,12 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.model.metric2.Qmetric. 
 Require Import CoRN.metric2.Limit.
-Require Import Coq.QArith.Qabs. 
-Require Import Coq.Arith.Arith.
-Require Import Coq.QArith.Qpower.
-Require Import CoRN.reals.fast.LazyNat. 
-Require Import Coq.setoid_ring.Ring MathClasses.interfaces.abstract_algebra MathClasses.theory.streams.
+From Coq Require Import Qabs.
+From Coq Require Import Arith.
+From Coq Require Import Qpower.
+Require Import CoRN.reals.fast.LazyNat.
+From Coq Require Import Ring.
+Require Import MathClasses.interfaces.abstract_algebra MathClasses.theory.streams.
 Require Export MathClasses.theory.series.
 Require Import MathClasses.interfaces.abstract_algebra MathClasses.theory.streams.
 

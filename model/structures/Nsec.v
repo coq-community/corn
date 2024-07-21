@@ -36,8 +36,8 @@
 
 (** printing {#N} $\ensuremath{\mathrel\#_{\mathbb N}}$ *)
 
-Require Export Coq.Arith.Peano_dec.
-Require Export Coq.Relations.Relations.
+From Coq Require Export Peano_dec.
+From Coq Require Export Relations.
 Require Import CoRN.logic.CLogic.
 From Coq Require Import Lia.
 

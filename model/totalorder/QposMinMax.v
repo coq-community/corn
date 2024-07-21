@@ -19,9 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Import Coq.Logic.Eqdep_dec.
-Require Import Coq.QArith.QArith Coq.QArith.Qabs.
-Require Import Coq.QArith.Qpower Coq.QArith.Qround.
+From Coq Require Import Eqdep_dec.
+From Coq Require Import QArith Qabs Qpower Qround.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.order.TotalOrder.
 

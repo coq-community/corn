@@ -36,7 +36,7 @@
 
 (** printing [^^] %\ensuremath{\hat{\ }}% #^# *)
 
-Require Export Coq.Arith.Arith.
+From Coq Require Export Arith.
 Require Export CoRN.algebra.COrdCauchy.
 From Coq Require Import Lia.
 

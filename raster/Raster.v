@@ -1,7 +1,7 @@
 Require Coq.Vectors.Vector.
 Export Vector.VectorNotations.
 Require Export CoRN.stdlib_omissions.List.
-Require Import Coq.Arith.Arith Coq.PArith.BinPos.
+From Coq Require Import Arith BinPos.
 
 Set Implicit Arguments.
 

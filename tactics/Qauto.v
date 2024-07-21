@@ -21,8 +21,8 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 Require Export CoRN.model.ordfields.Qordfield.
 Require Import CoRN.algebra.COrdFields2.
-Require Import Coq.QArith.Qpower.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qpower.
+From Coq Require Import Qabs.
 
 (*Require Import CoRN.tactics.CornTac. 
 was removed in the trunk branch

@@ -1,4 +1,5 @@
-Require Import Coq.Program.Program Coq.Unicode.Utf8 CoRN.stdlib_omissions.Pair.
+From Coq Require Import Program Utf8.
+Require Import CoRN.stdlib_omissions.Pair.
 Generalizable All Variables.
 
 (** In the following type class, r is an "output parameter" in the sense

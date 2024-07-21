@@ -1,8 +1,10 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-  Coq.QArith.QArith CoRN.util.Qdlog Coq.ZArith.ZArith CoRN.reals.fast.Compress
+From Coq Require Import QArith.
+Require Import CoRN.util.Qdlog.
+From Coq Require Import ZArith.
+Require Import CoRN.reals.fast.Compress
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.reals.faster.ARArith
   CoRN.model.totalorder.QposMinMax.
 

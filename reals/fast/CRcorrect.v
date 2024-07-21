@@ -28,7 +28,7 @@ Require Import CoRN.tactics.CornTac.
 From Coq Require Import Lia.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.model.totalorder.QMinMax.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qabs.
 Require Export CoRN.reals.fast.CRFieldOps.
 
 (* Backwards compatibility for Hint Rewrite locality attributes *)

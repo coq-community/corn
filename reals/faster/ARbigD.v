@@ -1,8 +1,8 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-  Coq.Program.Program Coq.QArith.QArith Coq.ZArith.ZArith Bignums.BigZ.BigZ 
+From Coq Require Import Program QArith ZArith.
+Require Import Bignums.BigZ.BigZ 
   CoRN.model.totalorder.QposMinMax 
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.util.Qdlog CoRN.reals.faster.ARArith
   MathClasses.theory.int_pow MathClasses.theory.nat_pow

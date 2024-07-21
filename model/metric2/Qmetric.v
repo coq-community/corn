@@ -24,7 +24,7 @@ Require Import CoRN.metric2.Prelength.
 Require Import CoRN.metric2.Classification.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qabs.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import MathClasses.implementations.stdlib_rationals.
 
@@ -444,7 +444,7 @@ Proof with auto.
  apply ball_sym...
 Qed.
 
-Require Import Coq.QArith.Qround.
+From Coq Require Import Qround.
 
 Lemma Qfloor_ball q:
   Qball (1#2) ((Qfloor q # 1) + (1#2)) q.

@@ -28,7 +28,7 @@ Require Import CoRN.reals.fast.CRstreams.
 Require Import CoRN.reals.fast.CRexp.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
-Require Import Coq.QArith.Qpower Coq.QArith.Qabs Coq.QArith.Qround.
+From Coq Require Import Qpower Qabs Qround.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.reals.Q_in_CReals.
 Require Import CoRN.model.metric2.Qmetric.

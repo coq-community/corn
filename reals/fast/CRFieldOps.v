@@ -25,7 +25,7 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.model.lattice.CRlattice.
 Require Import CoRN.model.totalorder.QMinMax.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qabs.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.metric2.ProductMetric.
 Require Import MathClasses.interfaces.canonical_names.

@@ -21,11 +21,11 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.metric2.Limit.
 Require Export CoRN.metric2.FinEnum.
-Require Import Coq.ZArith.Zpow_facts.
+From Coq Require Import Zpow_facts.
 Require Export CoRN.metric2.Complete.
 Require Import CoRN.logic.Classic.
-Require Import Coq.QArith.Qpower.
-Require Import Coq.QArith.Qround.
+From Coq Require Import Qpower.
+From Coq Require Import Qround.
 
 Set Implicit Arguments.
 

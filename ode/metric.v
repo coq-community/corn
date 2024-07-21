@@ -1,13 +1,13 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-  Coq.QArith.QArith
-  MathClasses.theory.setoids (* Equiv Prop *) MathClasses.theory.products
+From Coq Require Import QArith.
+Require Import MathClasses.theory.setoids (* Equiv Prop *) MathClasses.theory.products
   MathClasses.implementations.stdlib_rationals (*Qinf*) (*Qpossec QposInf QnonNeg*) MathClasses.interfaces.abstract_algebra MathClasses.implementations.QType_rationals MathClasses.interfaces.additional_operations.
 Require CoRN.model.structures.Qinf.
 (*Import (*QnonNeg.notations*) QArith.*)
-Require Import CoRN.tactics.Qauto Coq.QArith.QOrderedType.
+Require Import CoRN.tactics.Qauto.
+From Coq Require Import QOrderedType.
 (*Require Import orders.*)
 Require Import MathClasses.theory.rings MathClasses.theory.dec_fields MathClasses.orders.rings MathClasses.orders.dec_fields MathClasses.theory.nat_pow.
 Require Import MathClasses.interfaces.naturals MathClasses.interfaces.orders.

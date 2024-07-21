@@ -1,8 +1,8 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-  Coq.Program.Program Coq.QArith.QArith Coq.ZArith.ZArith Bignums.BigZ.BigZ Bignums.BigQ.BigQ 
+From Coq Require Import Program QArith ZArith.
+Require Import Bignums.BigZ.BigZ Bignums.BigQ.BigQ 
   CoRN.reals.fast.Compress CoRN.reals.faster.ARQ
   CoRN.metric2.MetricMorphisms CoRN.model.metric2.Qmetric CoRN.reals.faster.ARArith
   MathClasses.implementations.stdlib_rationals MathClasses.implementations.stdlib_binary_integers MathClasses.implementations.field_of_fractions

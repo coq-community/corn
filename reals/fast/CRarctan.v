@@ -34,7 +34,7 @@ Require Import CoRN.reals.fast.ContinuousCorrect.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.stdlib_omissions.Q.
 Require Import MathClasses.interfaces.abstract_algebra.
-Require Import Coq.micromega.Psatz.
+From Coq Require Import Psatz.
 
 (* Backwards compatibility for Hint Rewrite locality attributes *)
 Set Warnings "-unsupported-attributes".

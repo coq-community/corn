@@ -26,14 +26,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
    unnecessary concept of complemented set.
  *)
 
-Require Import Logic.ConstructiveEpsilon.
-Require Import QArith.
-Require Import ConstructiveReals.
-Require Import ConstructiveAbs.
-Require Import ConstructiveMinMax.
-Require Import ConstructiveSum.
-Require Import ConstructivePower.
-Require Import ConstructiveLimits.
+From Coq Require Import ConstructiveEpsilon.
+From Coq Require Import QArith.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveAbs.
+From Coq Require Import ConstructiveMinMax.
+From Coq Require Import ConstructiveSum.
+From Coq Require Import ConstructivePower.
+From Coq Require Import ConstructiveLimits.
 Require Import ConstructiveDiagonal.
 Require Import ConstructivePartialFunctions.
 

@@ -24,19 +24,19 @@ Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.reals.iso_CReals.
 Require Import CoRN.reals.Q_in_CReals.
-Require Import Coq.setoid_ring.ArithRing.
+From Coq Require Import ArithRing.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
 Require Import CoRN.reals.fast.CRabs.
-Require Import Coq.Bool.Bool.
+From Coq Require Import Bool.
 Require Import CoRN.algebra.COrdAbs.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Export CoRN.model.metric2.Qmetric.
 Require Import CoRN.reals.fast.LazyNat.
 Require Export CoRN.metric2.Limit.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import Coq.QArith.Qpower.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qpower.
+From Coq Require Import Qabs.
 Require Export MathClasses.theory.CoqStreams.
 Require Import CoRN.transc.PowerSeries.
 Require Import CoRN.tactics.CornTac.

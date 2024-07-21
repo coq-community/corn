@@ -19,9 +19,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
-Require Export Coq.ZArith.Zmin.
-Require Export Coq.ZArith.Zmax.
-Require Import Coq.ZArith.ZArith.
+From Coq Require Export Zmin.
+From Coq Require Export Zmax.
+From Coq Require Import ZArith.
 Require Import CoRN.order.TotalOrder.
 
 Opaque Z_lt_le_dec.

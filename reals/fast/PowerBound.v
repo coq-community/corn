@@ -22,9 +22,9 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import Coq.ZArith.ZArith.
-Require Import Coq.Program.Basics.
-Require Import Coq.QArith.Qpower.
+From Coq Require Import ZArith.
+From Coq Require Import Basics.
+From Coq Require Import Qpower.
 Require Import CoRN.stdlib_omissions.Z.
 
 Lemma Psize_Zlog2 (p: positive) :

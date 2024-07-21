@@ -12,14 +12,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 (** Proof that CoRN's fast reals implement the standard library's
     interface ConstructiveReals. *)
 
-Require Import Coq.Reals.Abstract.ConstructiveReals.
+From Coq Require Import ConstructiveReals.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.model.metric2.CRmetric.
 Require Import CoRN.reals.fast.CRFieldOps.
 Require Import CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRabs.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import Coq.Logic.ConstructiveEpsilon.
+From Coq Require Import ConstructiveEpsilon.
 
 Lemma CRltT_linear : @isLinearOrder (RegularFunction Qball) CRltT.
 Proof.

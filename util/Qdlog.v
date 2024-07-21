@@ -1,6 +1,6 @@
 (* Discrete logarithm with base 2 and 4 on [Q] *)
-Require Import 
-  Coq.ZArith.ZArith Coq.QArith.QArith Coq.QArith.Qround CoRN.stdlib_omissions.Q
+From Coq Require Import ZArith QArith Qround.
+Require Import CoRN.stdlib_omissions.Q
   MathClasses.interfaces.abstract_algebra MathClasses.interfaces.additional_operations MathClasses.interfaces.orders
   MathClasses.theory.int_pow MathClasses.orders.rationals MathClasses.implementations.stdlib_rationals MathClasses.implementations.positive_semiring_elements.
 

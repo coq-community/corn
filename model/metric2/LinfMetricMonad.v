@@ -29,9 +29,9 @@ Require Export CoRN.metric2.StepFunctionSetoid.
 Require Import CoRN.metric2.StepFunctionMonad.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.structures.OpenUnit.
-Require Import Coq.QArith.QArith.
+From Coq Require Import QArith.
 Require Import CoRN.model.totalorder.QMinMax.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qabs.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.metric2.Prelength.

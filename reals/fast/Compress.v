@@ -25,7 +25,7 @@ Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Export CoRN.model.metric2.CRmetric.
 Require Import CoRN.model.metric2.Qmetric.
-Require Import Coq.ZArith.Zdiv.
+From Coq Require Import Zdiv.
 
 Opaque CR.
 

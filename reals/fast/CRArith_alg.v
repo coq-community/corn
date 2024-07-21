@@ -23,11 +23,11 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import Coq.setoid_ring.Ring_theory.
-Require Import Coq.Setoids.Setoid.
-Require Import Coq.QArith.QArith.
-Require Import Coq.QArith.Qabs.
-Require Import Coq.QArith.Qround.
+From Coq Require Import Ring_theory.
+From Coq Require Import Setoid.
+From Coq Require Import QArith.
+From Coq Require Import Qabs.
+From Coq Require Import Qround.
 Require Export CoRN.model.reals.CRreal.
 Require Import CoRN.metric2.Complete.
 Require Export CoRN.reals.fast.CRFieldOps.
@@ -36,7 +36,7 @@ Require Import CoRN.algebra.CRing_Homomorphisms.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.logic.Stability.
-Require Import Coq.Logic.ConstructiveEpsilon.
+From Coq Require Import ConstructiveEpsilon.
 Require Import CoRN.util.Qdlog.
 Require Import MathClasses.interfaces.abstract_algebra.
 Require Import MathClasses.interfaces.orders.

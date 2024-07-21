@@ -1,8 +1,8 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
- Coq.QArith.Qabs CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs.
+From Coq Require Import Qabs.
+Require Import CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs.
 
 (** Balls with real radii instead of rational radii. *)
 

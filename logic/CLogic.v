@@ -44,11 +44,11 @@
 (** printing or %\ensuremath{\mathrel\vee}% *)
 (** printing and %\ensuremath{\mathrel\wedge}% *)
 
-Require Export Coq.Arith.Compare_dec.
+From Coq Require Export Compare_dec.
 Require Export CoRN.logic.CornBasics.
-Require Export Coq.ZArith.ZArith.
-Require Export Coq.setoid_ring.ZArithRing.
-Require Export Coq.Arith.Wf_nat.
+From Coq Require Export ZArith.
+From Coq Require Export ZArithRing.
+From Coq Require Export Wf_nat.
 From Coq Require Import Lia.
 
 

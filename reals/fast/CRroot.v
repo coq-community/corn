@@ -30,7 +30,7 @@ Require Import CoRN.reals.NRootIR.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.model.metric2.Qmetric.
-Require Import Coq.QArith.Qpower.
+From Coq Require Import Qpower.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.reals.fast.Compress.
 Require Import CoRN.reals.fast.PowerBound.

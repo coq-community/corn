@@ -5,10 +5,11 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.reals.CRreal.
-Require Import
- Coq.Unicode.Utf8 Coq.Program.Program
- CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs
- CoRN.tactics.Qauto Coq.QArith.Qround CoRN.model.metric2.Qmetric
+From Coq Require Import Utf8 Program.
+Require Import CoRN.reals.fast.CRArith CoRN.reals.fast.CRabs
+ CoRN.tactics.Qauto.
+From Coq Require Import Qround.
+Require Import CoRN.model.metric2.Qmetric
  CoRN.stdlib_omissions.P
  CoRN.stdlib_omissions.Z
  CoRN.stdlib_omissions.Q

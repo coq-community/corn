@@ -1,7 +1,8 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import Coq.ZArith.ZArith CoRN.reals.faster.ARArith.
+From Coq Require Import ZArith.
+Require Import CoRN.reals.faster.ARArith.
 
 Ltac AR_solve_pos_loop k :=
  (apply AR_epsilon_sign_dec_pos with k;

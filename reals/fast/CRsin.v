@@ -30,9 +30,9 @@ Require Import CoRN.reals.fast.CRexp.
 Require Import CoRN.reals.fast.CRpi.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRIR.
-Require Import Coq.QArith.Qpower Coq.QArith.Qabs.
+From Coq Require Import Qpower Qabs.
 Require Import CoRN.model.ordfields.Qordfield.
-Require Import Coq.QArith.Qround.
+From Coq Require Import Qround.
 Require Import CoRN.transc.Pi.
 Require Import CoRN.reals.fast.ModulusDerivative.
 Require Import CoRN.reals.fast.ContinuousCorrect.

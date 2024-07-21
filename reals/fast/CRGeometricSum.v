@@ -24,9 +24,9 @@ Require Import CoRN.reals.fast.CRAlternatingSum.
 Require Import CoRN.reals.fast.CRstreams.
 Require Import CoRN.model.totalorder.QposMinMax.
 Require Import CoRN.model.totalorder.QMinMax.
-Require Import Coq.QArith.Qpower.
-Require Import Coq.QArith.Qabs.
-Require Import Coq.ZArith.Zdiv.
+From Coq Require Import Qpower.
+From Coq Require Import Qabs.
+From Coq Require Import Zdiv.
 
 Set Implicit Arguments.
 
