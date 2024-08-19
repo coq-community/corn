@@ -86,6 +86,7 @@ CoRN includes the following parts:
 - Coq-community maintainer(s):
   - Bas Spitters ([**@spitters**](https://github.com/spitters))
   - Vincent Semeria ([**@vincentse**](https://github.com/vincentse))
+  - Xia Li-yao ([**@Lysxia**](https://github.com/Lysxia))
 - License: [GNU General Public License v2](LICENSE)
 - Compatible Coq versions: Coq 8.18 or greater
 - Additional dependencies:
