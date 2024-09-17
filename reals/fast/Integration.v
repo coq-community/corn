@@ -32,9 +32,9 @@ Require Import CoRN.model.structures.StepQsec.
 Require Import CoRN.model.structures.OpenUnit.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qabs.
 Require Import CoRN.tactics.Qauto.
-Require Import Coq.QArith.Qround.
+From Coq Require Import Qround.
 Require Import CoRN.model.metric2.L1metric.
 Require Import CoRN.model.metric2.LinfMetric.
 Require Import CoRN.model.ordfields.Qordfield.

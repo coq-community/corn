@@ -40,8 +40,8 @@
 (** printing nroot_minus_I %\ensuremath{\sqrt[n]{-\imath}}% *)
 
 Require Export CoRN.complex.CComplex.
-Require Export Coq.Arith.Wf_nat.
-Require Export Coq.setoid_ring.ArithRing.
+From Coq Require Export Wf_nat.
+From Coq Require Export ArithRing.
 Import CRing_Homomorphisms.coercions.
 
 (**

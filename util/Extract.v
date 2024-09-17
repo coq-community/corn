@@ -1,3 +1,4 @@
+From Coq Require Import Extraction.
 Require Import CoRN.reals.fast.CRtrans.
 
 Extraction Language Haskell.

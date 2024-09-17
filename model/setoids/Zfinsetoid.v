@@ -33,7 +33,7 @@
  * with this work; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
-Require Export Coq.ZArith.ZArith.
+From Coq Require Export ZArith.
 Require Import CoRN.algebra.CSetoids.
 
 (**

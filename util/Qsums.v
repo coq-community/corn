@@ -1,10 +1,9 @@
-Require Import
-  CoRN.stdlib_omissions.List
-  Coq.QArith.QArith Coq.QArith.Qabs
-  CoRN.model.totalorder.QposMinMax 
-  CoRN.model.metric2.Qmetric
-  Coq.Program.Program
-  CoRN.stdlib_omissions.N
+Require Import CoRN.stdlib_omissions.List.
+From Coq Require Import QArith Qabs.
+Require Import CoRN.model.totalorder.QposMinMax
+  CoRN.model.metric2.Qmetric.
+From Coq Require Import Program.
+Require Import CoRN.stdlib_omissions.N
   CoRN.stdlib_omissions.Z
   CoRN.stdlib_omissions.Q.
 

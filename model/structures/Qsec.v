@@ -41,10 +41,10 @@
 (** printing QFOUR %\ensuremath{4_\mathbb{Q}}% #4<sub>Q</sub># *)
 
 Require Export CoRN.logic.CLogic.
-Require Import Coq.Arith.Arith.
-Require Import Coq.Arith.Peano_dec.
+From Coq Require Import Arith.
+From Coq Require Import Peano_dec.
 Require Import CoRN.model.structures.Zsec.
-Require Export Coq.QArith.QArith.
+From Coq Require Export QArith.
 Require Import CoRN.stdlib_omissions.Q.
 
 Close Scope Q_scope.

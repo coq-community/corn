@@ -1,10 +1,12 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-  Coq.setoid_ring.Ring CoRN.stdlib_omissions.Z
+From Coq Require Import Ring.
+Require Import CoRN.stdlib_omissions.Z
   CoRN.model.totalorder.QposMinMax 
-  CoRN.metric2.Complete CoRN.model.metric2.Qmetric Coq.ZArith.ZArith CoRN.util.Qdlog
+  CoRN.metric2.Complete CoRN.model.metric2.Qmetric.
+From Coq Require Import ZArith.
+Require Import CoRN.util.Qdlog
   CoRN.reals.fast.CRroot
   CoRN.reals.faster.ARabs
   MathClasses.interfaces.abstract_algebra MathClasses.theory.shiftl MathClasses.theory.nat_pow MathClasses.theory.int_pow.

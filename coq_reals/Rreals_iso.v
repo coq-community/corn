@@ -17,22 +17,22 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Import Coq.QArith.QArith.
-Require Import Coq.QArith.Qreals.
-Require Import Coq.QArith.QArith_base.
+From Coq Require Import QArith.
+From Coq Require Import Qreals.
+From Coq Require Import QArith_base.
 Require Import CoRN.tactics.CornTac.
-Require Import Coq.Reals.RIneq.
-Require Import Coq.Reals.Rcomplete.
-Require Import Coq.Reals.Rlimit.
-Require Import Coq.Reals.Rbasic_fun.
+From Coq Require Import RIneq.
+From Coq Require Import Rcomplete.
+From Coq Require Import Rlimit.
+From Coq Require Import Rbasic_fun.
 Require Import CoRN.coq_reals.Rreals.
 Require Import CoRN.reals.iso_CReals.
 Require Import CoRN.reals.CauchySeq.
-Require Import Coq.Reals.Rtrigo_def.
+From Coq Require Import Rtrigo_def.
 Require Import CoRN.transc.PowerSeries.
-Require Import Coq.Logic.ConstructiveEpsilon.
-Require Import Coq.Reals.Rlogic.
-Require Export Coq.Reals.Reals.
+From Coq Require Import ConstructiveEpsilon.
+From Coq Require Import Rlogic.
+From Coq Require Export Reals.
 Require Import CoRN.transc.Pi.
 Require Import CoRN.transc.MoreArcTan.
 Require Import CoRN.logic.PropDecid.

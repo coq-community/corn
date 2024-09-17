@@ -48,7 +48,7 @@ Require Export CoRN.model.monoids.Nmonoid.
 Require Export CoRN.model.rings.Zring.
 Require Import CoRN.algebra.CRing_Homomorphisms.
 Require Import CoRN.algebra.Expon.
-Require Import Coq.QArith.Qpower.
+From Coq Require Import Qpower.
 Require Import CoRN.tactics.CornTac.
 
 Section Rational_sequence_prelogue.

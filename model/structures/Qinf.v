@@ -1,7 +1,6 @@
-Require Import
- CoRN.model.totalorder.QposMinMax
- Coq.Setoids.Setoid Coq.Arith.Arith
- CoRN.model.rings.Qring CoRN.model.structures.QposInf
+Require Import CoRN.model.totalorder.QposMinMax.
+From Coq Require Import Setoid Arith.
+Require Import CoRN.model.rings.Qring CoRN.model.structures.QposInf
  CoRN.stdlib_omissions.Q
  MathClasses.interfaces.abstract_algebra
  MathClasses.implementations.stdlib_rationals

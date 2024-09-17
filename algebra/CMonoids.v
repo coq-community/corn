@@ -36,7 +36,7 @@
 
 (** printing [0] %\ensuremath{\mathbf0}% #0# *)
 
-Require Export Coq.Arith.Euclid.
+From Coq Require Export Euclid.
 Require Export CoRN.model.Zmod.Cmod.
 Require Export CoRN.algebra.CSemiGroups.
 Require Export CoRN.tactics.csetoid_rewrite.

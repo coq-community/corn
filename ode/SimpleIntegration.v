@@ -10,15 +10,15 @@ Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require Import CoRN.model.reals.CRreal.
 Require Import
-  CoRN.stdlib_omissions.List Coq.Unicode.Utf8
-  Coq.QArith.QArith Coq.QArith.Qabs
-  CoRN.model.totalorder.QposMinMax CoRN.util.Qsums
+  CoRN.stdlib_omissions.List.
+From Coq Require Import Utf8 QArith Qabs.
+Require Import CoRN.model.totalorder.QposMinMax CoRN.util.Qsums
   CoRN.model.metric2.Qmetric CoRN.model.setoids.Qsetoid (* Needs imported for Q_is_Setoid to be a canonical structure *)
   CoRN.reals.fast.CRArith (*AbstractIntegration*)
   QnonNeg
-  CoRN.util.Qgcd
-  Coq.Program.Program
-  CoRN.reals.fast.uneven_CRplus
+  CoRN.util.Qgcd.
+From Coq Require Import Program.
+Require Import CoRN.reals.fast.uneven_CRplus
   CoRN.stdlib_omissions.P
   CoRN.stdlib_omissions.Z
   CoRN.stdlib_omissions.Q

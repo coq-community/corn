@@ -27,8 +27,8 @@ Require Export CoRN.metric2.LocatedSubset.
 Require Export CoRN.reals.fast.CRArith.
 Require Import CoRN.reals.fast.CRabs.
 Require Export CoRN.model.metric2.Qmetric.
-Require Import Coq.QArith.Qround.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qround.
+From Coq Require Import Qabs.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.logic.Classic.
 

@@ -23,8 +23,8 @@ Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.ProductMetric.
 Require Import CoRN.reals.fast.CRArith.
-Require Import Coq.QArith.Qpower.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qpower.
+From Coq Require Import Qabs.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.model.totalorder.QposMinMax. 

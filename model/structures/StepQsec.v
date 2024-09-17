@@ -1,9 +1,9 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.metric2.Qmetric.
-Require Export Coq.QArith.QArith.
+From Coq Require Export QArith.
 Require Export CoRN.metric2.StepFunctionSetoid.
-Require Import Coq.QArith.Qabs.
-Require Import Coq.Bool.Bool.
+From Coq Require Import Qabs.
+From Coq Require Import Bool.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.logic.CornBasics.
 Require Import CoRN.algebra.RSetoid.

@@ -1,6 +1,5 @@
-
-Require Import
-        Coq.QArith.QArith CoRN.model.Zmod.ZGcd
+From Coq Require Import QArith.
+Require Import CoRN.model.Zmod.ZGcd
         CoRN.model.totalorder.QposMinMax
         CoRN.stdlib_omissions.Q.
 

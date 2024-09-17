@@ -1,8 +1,8 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-        Coq.QArith.QArith CoRN.model.totalorder.QposMinMax
+From Coq Require Import QArith.
+Require Import CoRN.model.totalorder.QposMinMax
         CoRN.model.metric2.Qmetric CoRN.reals.fast.CRArith.
 
 (** The approximation function for CRplus results distributes a given error evenly

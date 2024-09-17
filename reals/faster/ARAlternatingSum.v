@@ -1,6 +1,5 @@
-Require Import 
-        Coq.QArith.Qabs
-        CoRN.util.Qdlog
+From Coq Require Import Qabs.
+Require Import CoRN.util.Qdlog
         CoRN.algebra.RSetoid
         CoRN.model.totalorder.QposMinMax
         CoRN.model.metric2.Qmetric

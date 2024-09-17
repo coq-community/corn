@@ -1,10 +1,10 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-  Coq.QArith.QArith
-  MathClasses.implementations.stdlib_rationals CoRN.model.structures.Qinf CoRN.model.structures.Qpossec CoRN.model.structures.QposInf CoRN.model.structures.QnonNeg MathClasses.interfaces.abstract_algebra MathClasses.implementations.QType_rationals MathClasses.interfaces.additional_operations.
-Require Import CoRN.tactics.Qauto Coq.QArith.QOrderedType.
+From Coq Require Import QArith.
+Require Import MathClasses.implementations.stdlib_rationals CoRN.model.structures.Qinf CoRN.model.structures.Qpossec CoRN.model.structures.QposInf CoRN.model.structures.QnonNeg MathClasses.interfaces.abstract_algebra MathClasses.implementations.QType_rationals MathClasses.interfaces.additional_operations.
+Require Import CoRN.tactics.Qauto.
+From Coq Require Import QOrderedType.
 Require Import MathClasses.theory.rings MathClasses.theory.dec_fields MathClasses.orders.rings MathClasses.orders.dec_fields MathClasses.theory.nat_pow.
 Require Import MathClasses.interfaces.naturals MathClasses.interfaces.orders.
 Import peano_naturals.

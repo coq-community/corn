@@ -3,11 +3,12 @@ Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 Require
   MathClasses.implementations.stdlib_rationals MathClasses.implementations.positive_semiring_elements.
-Require Import 
-  Coq.Program.Program
-  CoRN.model.totalorder.QposMinMax
+From Coq Require Import Program.
+Require Import CoRN.model.totalorder.QposMinMax
   MathClasses.misc.workaround_tactics
-  CoRN.stdlib_omissions.Q CoRN.util.Qdlog CoRN.model.metric2.Qmetric Coq.QArith.Qabs CoRN.classes.Qclasses CoRN.model.totalorder.QMinMax
+  CoRN.stdlib_omissions.Q CoRN.util.Qdlog CoRN.model.metric2.Qmetric.
+From Coq Require Import Qabs.
+Require Import CoRN.classes.Qclasses CoRN.model.totalorder.QMinMax
   CoRN.algebra.RSetoid CoRN.metric2.MetricMorphisms
   MathClasses.orders.minmax MathClasses.orders.dec_fields MathClasses.theory.abs MathClasses.theory.shiftl MathClasses.theory.int_pow.
 Require Export

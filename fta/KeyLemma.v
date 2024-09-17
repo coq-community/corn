@@ -34,8 +34,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *)
 
-Require Export Coq.ZArith.ZArith.
-Require Export Coq.Arith.Compare.
+From Coq Require Export ZArith.
+From Coq Require Export Compare.
 Require Export CoRN.reals.NRootIR.
 From Coq Require Import Lia.
 

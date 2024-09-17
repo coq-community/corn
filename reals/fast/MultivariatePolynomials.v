@@ -9,7 +9,7 @@ Require Import CoRN.model.totalorder.QMinMax.
 Require Import CoRN.tactics.CornTac.
 Require Import CoRN.tactics.Qauto.
 Require Import CoRN.model.metric2.Qmetric.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qabs.
 Require Import CoRN.reals.fast.CRabs.
 Require Import CoRN.reals.fast.ModulusDerivative.
 Require Import CoRN.reals.fast.CRArith.

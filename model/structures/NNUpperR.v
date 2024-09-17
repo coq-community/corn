@@ -1,7 +1,8 @@
 (* This module is designed to *not* be Import'ed, only Require'd. *)
 
-Require Import
-  Coq.QArith.Qabs CoRN.model.ordfields.Qordfield CoRN.model.structures.Qpossec Coq.QArith.Qminmax Coq.setoid_ring.Ring Coq.Program.Program.
+From Coq Require Import Qabs.
+Require Import CoRN.model.ordfields.Qordfield CoRN.model.structures.Qpossec.
+From Coq Require Import Qminmax Ring Program.
 
 Require CoRN.model.structures.QnonNeg.
 Import QnonNeg.notations QnonNeg.coercions.

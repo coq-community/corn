@@ -1,6 +1,5 @@
-Require Import
-  Coq.QArith.Qround Coq.QArith.Qpower 
-  MathClasses.interfaces.abstract_algebra 
+From Coq Require Import Qround Qpower.
+Require Import MathClasses.interfaces.abstract_algebra 
   MathClasses.theory.nat_pow
   MathClasses.theory.int_pow
   CoRN.algebra.RSetoid

@@ -27,9 +27,9 @@ Require Import CoRN.reals.fast.CRsin.
 Require Import CoRN.reals.fast.CRpi.
 Require Import CoRN.reals.fast.CRIR.
 Require Import CoRN.reals.fast.Compress.
-Require Import Coq.QArith.Qpower.
+From Coq Require Import Qpower.
 Require Import CoRN.model.ordfields.Qordfield.
-Require Import Coq.QArith.Qround.
+From Coq Require Import Qround.
 Require Import CoRN.transc.Pi.
 Require Import CoRN.reals.fast.ModulusDerivative.
 Require Import CoRN.reals.fast.ContinuousCorrect.

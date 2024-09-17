@@ -1,9 +1,8 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-  Coq.QArith.Qabs Coq.QArith.Qround
-  CoRN.model.metric2.Qmetric
+From Coq Require Import Qabs Qround.
+Require Import CoRN.model.metric2.Qmetric
   CoRN.metric2.ProductMetric
   CoRN.metric2.Prelength
   CoRN.metric2.Compact

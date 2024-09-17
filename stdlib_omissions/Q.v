@@ -1,7 +1,5 @@
-Require Import
-  Coq.QArith.QArith Coq.ZArith.ZArith Coq.NArith.NArith
-  Coq.QArith.Qpower Coq.QArith.Qround
-  Coq.QArith.Qround Coq.QArith.Qabs CoRN.stdlib_omissions.List.
+From Coq Require Import QArith ZArith NArith Qpower Qround Qround Qabs.
+Require Import CoRN.stdlib_omissions.List.
 
 Require CoRN.stdlib_omissions.Z.
 

@@ -1,7 +1,9 @@
 (* This module is designed to *not* be Import'ed, only Require'd. *)
 
-Require Import CoRN.model.totalorder.QposMinMax 
-        Coq.Program.Program CoRN.model.structures.QposInf Coq.QArith.Qminmax.
+Require Import CoRN.model.totalorder.QposMinMax.
+From Coq Require Import Program.
+Require Import CoRN.model.structures.QposInf.
+From Coq Require Import Qminmax.
 
 
 (* The data type and simple relations/constants: *)

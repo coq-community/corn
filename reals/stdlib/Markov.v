@@ -10,9 +10,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 (** Consequence of the Markov principle on constructive reals. *)
 
-Require Import Coq.QArith.QArith_base.
-Require Import Coq.Reals.Abstract.ConstructiveReals.
-Require Import Coq.Reals.Abstract.ConstructiveAbs.
+From Coq Require Import QArith_base.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveAbs.
 
 Local Open Scope ConstructiveReals.
 

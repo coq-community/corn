@@ -36,14 +36,14 @@
 
 (** printing Qpos $\mathbb{Q}^{+}$ #Q<SUP>+</SUP># *)
 
-Require Export Coq.QArith.QArith.
-Require Import Coq.QArith.Qpower.
+From Coq Require Export QArith.
+From Coq Require Import Qpower.
 Require Import CoRN.model.ordfields.Qordfield.
 Require Import CoRN.algebra.COrdFields2.
-Require Import Coq.Logic.Eqdep_dec.
+From Coq Require Import Eqdep_dec.
 Require Import CoRN.tactics.CornTac.
-Require Import Coq.QArith.Qround.
-Require Import Coq.QArith.Qabs.
+From Coq Require Import Qround.
+From Coq Require Import Qabs.
 Require Import CoRN.stdlib_omissions.Q.
 
 (* Backwards compatibility for Hint Rewrite locality attributes *)
@@ -137,7 +137,7 @@ Lemma positive_Z (z: Z): Z.lt 0 z -> sig (fun p: positive => Zpos p = z).
 Defined.
 
 (* todo: move this Qlt_uniq stuff elsewhere *)
-Require Coq.Logic.Eqdep_dec.
+From Coq Require Eqdep_dec.
 
 Definition comparison_eq_dec (a b: comparison): { a = b } + { a <> b}.
  destruct a, b; try (left; reflexivity); try (right; discriminate).

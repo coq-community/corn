@@ -35,7 +35,7 @@
  *)
 (* ZBasics.v, by Vince Barany *)
 
-Require Export Coq.ZArith.ZArith.
+From Coq Require Export ZArith.
 Require Export CoRN.logic.CLogic.
 From Coq Require Import Lia.
 

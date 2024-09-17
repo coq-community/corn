@@ -1,9 +1,8 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import 
-  Coq.Program.Program Coq.setoid_ring.Ring
-  Coq.QArith.Qabs CoRN.stdlib_omissions.Q MathClasses.misc.workaround_tactics
+From Coq Require Import Program Ring Qabs.
+Require Import CoRN.stdlib_omissions.Q MathClasses.misc.workaround_tactics
   CoRN.model.totalorder.QMinMax CoRN.model.totalorder.QposMinMax CoRN.util.Qdlog
   CoRN.metric2.Complete CoRN.metric2.Prelength CoRN.model.metric2.Qmetric CoRN.metric2.MetricMorphisms 
   CoRN.reals.fast.CRArith CoRN.reals.fast.CRpower

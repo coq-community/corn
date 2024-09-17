@@ -48,8 +48,8 @@
 From Coq Require Export ZArith.
 From Coq Require Import Lia.
 Require Export CoRN.stdlib_omissions.List.
-Require Import Coq.Logic.Eqdep_dec.
-Require Import Coq.Setoids.Setoid.
+From Coq Require Import Eqdep_dec.
+From Coq Require Import Setoid.
 
 Tactic Notation "apply" ":" constr(x) := pose proof x as HHH; first [
   refine HHH | 

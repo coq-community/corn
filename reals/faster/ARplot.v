@@ -1,4 +1,4 @@
-Require Import Coq.QArith.Qround.
+From Coq Require Import Qround.
 Require Import CoRN.reals.fast.Plot.
 Require Import CoRN.reals.faster.ARArith.
 Require Import CoRN.reals.faster.ARinterval.

@@ -1,9 +1,8 @@
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
-Require Import
-  Coq.QArith.Qabs
-  CoRN.model.metric2.Qmetric
+From Coq Require Import Qabs.
+Require Import CoRN.model.metric2.Qmetric
   CoRN.metric2.ProductMetric
   CoRN.model.totalorder.QposMinMax 
   CoRN.model.totalorder.QMinMax
