@@ -1,10 +1,6 @@
-Require Import
-  Program QArith ZArith Bignums.BigZ.BigZ Qpossec
-  MetricMorphisms Qmetric Qdlog ARArith
-  MathClasses.implementations.stdlib_rationals
-  MathClasses.implementations.stdlib_binary_integers
-  MathClasses.implementations.fast_integers
-  MathClasses.implementations.dyadics.
+Require Import Program QArith ZArith Bignums.BigZ.BigZ.
+From CoRN Require Import Qpossec MetricMorphisms Qmetric Qdlog ARArith.
+From MathClasses.implementations Require Import stdlib_rationals stdlib_binary_integers fast_integers dyadics.
 
 Add Field Q : (dec_fields.stdlib_field_theory Q).
 
@@ -31,7 +27,6 @@ Check ((1 _):(Z⁺)).
 
 Time Eval native_compute in (test (square x)). 
 
-
-Require Import ARbigD.
+From CoRN Require Import ARbigD.
 Time Eval vm_compute in (test (bigD_div (square x) x (10000%Z))).
-Require Import ApproximateRationals.
+From CoRN Require Import ApproximateRationals.
