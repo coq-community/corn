@@ -3,18 +3,18 @@
 (* I define the image of a path, a [Compact] subset of the plane.*)
 (* Finally, plot a hi-res Circle*)
 
-Require Import Plot RasterQ Qmetric.
+From CoRN Require Import Plot RasterQ Qmetric.
 Require Import CoRN.reals.fast.Interval.
 Require Import CoRN.metric2.MetricMorphisms.
 Require Import CoRN.reals.faster.ARArith.
-Require Import ARplot.
+From CoRN Require Import ARplot.
 Require Import CoRN.reals.faster.ARcos
         CoRN.reals.faster.ARsin
         CoRN.reals.faster.ARexp
         CoRN.reals.faster.ARbigD
         CoRN.reals.faster.ARinterval.
 Require Import CoRN.reals.fast.CRtrans.
-Require Import CoRN.dump.theories.Loader.
+Require Import CoRN.write_image.WritePPM.
 
 Local Open Scope uc_scope.
 
@@ -47,21 +47,19 @@ Definition Cos_faster : sparse_raster _ _
 
 End PlotCirclePath.
 
-(* 6 seconds *)
-Time Definition Circle_bigD : sparse_raster _ _
-  := Eval vm_compute in 
-      @Circle_faster bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
+Definition Circle_bigD : sparse_raster _ _
+  := @Circle_faster bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
 
-DumpGrayMap Circle_bigD.
-(* Now have a look at plot.pgm *)
+(* 3.7s on Apple M1 - this is mostly the creation of the sparse raster *)
+Time Elpi WritePPM "Circle.ppm" ( Circle_bigD ).
+(* Now have a look at Circle.ppm *)
 
-Time Definition Cos_bigD : sparse_raster _ _
-  := Eval vm_compute in 
-      @Cos_faster bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
+Definition Cos_bigD : sparse_raster _ _
+  := @Cos_faster bigD _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ bigD_appRat.
 
-DumpGrayMap Cos_bigD.
-(* Now have a look at plot.pgm *)
-
+(* 3.1s on Apple M1 *)
+Time Elpi WritePPM "Cos.ppm" ( Cos_bigD ).
+(* Now have a look at Cos.ppm *)
 
 Definition CircleFunction_aux
   : ProductMS Q_as_MetricSpace Q_as_MetricSpace --> ProductMS CR CR
@@ -70,20 +68,18 @@ Definition CircleFunction_aux
 Definition CirclePath : Q_as_MetricSpace --> Complete Q2:= 
   (uc_compose (uc_compose Couple CircleFunction_aux) (diag Q_as_MetricSpace)).
 (* The following hangs:
+   TODO this does not even compile
 Definition CirclePath': UCFunction Q R2:= 
-  ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)).*)
+  ucFunction (fun q:Q => Couple (cos_uc q, sin_uc q)). *)
 
 
-(* 20 seconds *)
-(* The raster must be evaluated before being plotted by DumpGrayMap,
-   here with vm_compute. *)
-Time Definition Circle : sparse_raster _ _
-  := Eval vm_compute in
-      (let (_,r) := Plot.PlotPath 0 7 (-(1)) 1 (reflexivity _)
+Definition Circle : sparse_raster _ _
+  := (let (_,r) := Plot.PlotPath 0 7 (-(1)) 1 (reflexivity _)
                              (-(1)) 1 (reflexivity _) 200 CirclePath
       in r). 
 
-DumpGrayMap Circle.
-(* Now have a look at plot.pgm *)
+(* 16.3 seconds on Apple M1 *)
+Time Elpi WritePPM "Circle2.ppm" ( Circle ).
+(* Now have a look at Circle2.ppm *)
 
 
