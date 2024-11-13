@@ -1,0 +1,7 @@
+-R theories CoRN.dump.theories
+-I src
+
+theories/Loader.v
+
+src/g_dump.mlg
+src/dump_plugin.mlpack

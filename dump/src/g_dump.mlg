@@ -1,0 +1,120 @@
+DECLARE PLUGIN "dump_plugin"
+
+{
+
+open Pp
+open Names
+open Printer
+open Globnames
+open Stdarg
+open Typeops
+open Constr
+
+exception Bad_list
+exception Bad_int
+
+let rec int_of_pos (p : Constr.t) : int =
+  if isApp p then
+    (let (constructorTag, args) = destApp p in
+     let (r,_) = destRef constructorTag in
+     match r with
+     | GlobRef.ConstructRef (_,r) -> (* r is the number of the constructor,
+                                        starting from 1. *)
+        (if r = 1 then 2*int_of_pos args.(0)+1 else 2*int_of_pos args.(0)) 
+     | _ -> raise Bad_int)
+  else 1
+
+let int_of_z (z : Constr.t) : int =
+  if isApp z then
+    (let (constructorTag, args) = destApp z in
+     let (r,_) = destRef constructorTag in
+     match r with
+     | GlobRef.ConstructRef (_,r) -> (* r is the number of the constructor,
+                                        starting from 1. *)
+        (if r = 2 then int_of_pos args.(0) else -int_of_pos args.(0)) 
+     | _ -> raise Bad_int)
+  else 0
+
+let pair_int_of_pair_z (zz : Constr.t) : int*int =
+  if isApp zz then
+    (let (constructorTag, args) = destApp zz in
+     (int_of_z args.(2), int_of_z args.(3)))
+  else raise Bad_int
+
+let rec process_constr_list (l : Constr.t) (f : Constr.t -> unit) : unit =
+  if isApp l then
+    (let (constructorTag, args) = destApp l in
+     if Array.length args = 3 then
+       (* args stores type, current element and tail *)
+       (f args.(1) ; process_constr_list args.(2) f)
+     else ()) (* empty list *)
+  else raise Bad_list
+
+let dump_bool_list (l : Constr.t) (oc : out_channel) : unit =
+  process_constr_list l
+    (fun b ->
+      (* b is either true of false, which are constructors of the type bool *)
+      let (r,_) = destRef b in
+        match r with
+        | GlobRef.ConstructRef (_,r) -> (* r is the number of the constructor,
+                                           starting from 1. *)
+           output_string oc (if r = 1 then "1 " else "0 ") 
+        | _ -> raise Bad_list) ;
+  output_string oc "\n"
+
+let dump_pgm (raster : Constr.t) (rastertype : Pp.t) =
+  let bufType = Buffer.create 1000 in
+  let fmtType = Format.formatter_of_buffer bufType in
+  pp_with fmtType rastertype; 
+  Format.pp_print_flush fmtType (); 
+  let (strType : string) = Buffer.contents bufType in 
+  if Str.string_match (Str.regexp "(sparse_raster \\([0-9]+\\) \\([0-9]+\\))")
+       strType 0 then
+    (let line_count = int_of_string (Str.matched_group 2 strType) in
+     let column_count = int_of_string (Str.matched_group 1 strType) in
+     let oc = open_out "plot.pgm" in
+     let pixels = Array.make_matrix line_count column_count false in
+     let (constructorTag, args) = destApp raster in
+     process_constr_list args.(2)
+       (fun zz -> let (i,j) = pair_int_of_pair_z zz in
+                  pixels.(i).(j) <- true);
+     (* P2 is the magic number for PGM ascii files.
+        Then come the dimensions of the image and 
+        the number of levels of gray, ie 1. *) 
+     output_string oc "P2\n";
+     output_string oc (string_of_int column_count);
+     output_string oc " ";
+     output_string oc (string_of_int line_count);
+     output_string oc "\n1\n";
+     (for i=0 to line_count-1 do
+        for j=0 to column_count-1 do
+          output_string oc (if pixels.(i).(j) then "1 " else "0 ")
+        done;
+        output_string oc "\n"
+      done);
+     close_out oc)
+  else failwith "Bad raster"
+
+(* Write the global term t to an ascii PGM file (portable gray map),
+   which is a format for grayscale matrices.
+   t should be already reduced, for example by
+   Definition t := Eval vm_compute in [some raster expression] *)
+let eval_and_dump_pgm (t : Libnames.qualid) = 
+  let env = Global.env () in
+  prerr_endline "dumping to plot.pgm";
+  let (tg : GlobRef.t) = Constrintern.intern_reference t in
+  let (tt : Constr.types) = fst (type_of_global_in_context env tg) in
+  let (c : Constr.constr) = printable_constr_of_global tg in
+  (* Delta-reduce c to unfold the name of the matrix of booleans
+     and get its contents. *)
+  let evalc = Reductionops.whd_delta env (Evd.from_env env) (EConstr.of_constr c) in
+  let evalt = Reductionops.nf_all env (Evd.from_env env) (EConstr.of_constr tt) in
+  dump_pgm (EConstr.to_constr (Evd.from_env env) evalc)
+    (pr_econstr_env env (Evd.from_env env) evalt)
+
+}
+
+VERNAC COMMAND EXTEND DumpGrayMap CLASSIFIED AS QUERY
+| [ "DumpGrayMap" global(a) ] -> { eval_and_dump_pgm a }
+END
+

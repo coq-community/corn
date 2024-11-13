@@ -4,7 +4,7 @@
 
 cp -f Make.in Make
 
-DIRECTORIES="algebra complex coq_reals fta ftc liouville logic metrics model raster reals tactics transc order metric2 stdlib_omissions util classes ode write_image"
+DIRECTORIES="algebra complex coq_reals fta ftc liouville logic metrics model raster reals tactics transc order metric2 stdlib_omissions util classes ode"
 
 find $DIRECTORIES -name "*.v" >>Make
 
