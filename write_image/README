@@ -1,0 +1,9 @@
+write_image writes a CoRN "sparse_raster" to a file in PPM (portable pixmap) format.
+
+Usage:
+
+Require Import CoRN.write_image.WritePPM.
+
+<create a sparse_raster object>
+
+Elpi WritePPM "<filename>.ppm" ( <sparse_raster object> ).
