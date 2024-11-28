@@ -164,5 +164,5 @@ Elpi Accumulate lp:{{
     close_out OSTREAM
   .
 }}.
-Elpi Typecheck.
+
 
