@@ -15,14 +15,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   definition which are subsets of X.
  *)
 
-Require Import List.
-Require Import QArith.
-Require Import ConstructiveReals.
-Require Import ConstructiveAbs.
-Require Import ConstructiveMinMax.
-Require Import ConstructiveSum.
-Require Import ConstructiveLimits.
-Require Import ConstructiveRcomplete.
+From Coq Require Import List.
+From Coq Require Import ZArith.
+From Coq Require Import QArith.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveAbs.
+From Coq Require Import ConstructiveMinMax.
+From Coq Require Import ConstructiveSum.
+From Coq Require Import ConstructiveLimits.
+From Coq Require Import ConstructiveRcomplete.
 
 Local Open Scope ConstructiveReals.
 
@@ -858,4 +859,3 @@ Proof.
            (fun x y => let (xD,xnz) := y in CRinv R (partialApply f x xD) xnz)).
   intros. destruct p,q. apply CRinv_morph, DomainProp.
 Defined.
-

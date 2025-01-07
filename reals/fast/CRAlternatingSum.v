@@ -21,6 +21,7 @@ CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 
 From Coq Require Import ArithRing.
 From Coq Require Import Bool.
+From Coq Require Import ZArith.
 From Coq Require Import Qpower Qabs.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.

@@ -12,14 +12,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 (* The diagonal bijection between nat^2 and nat, as well as convergence
    results for double series. *)
 
-Require Import QArith.
-Require Import PeanoNat.
-Require Import ArithRing.
-Require Import ConstructiveReals.
-Require Import ConstructiveAbs.
-Require Import ConstructiveSum.
-Require Import ConstructivePower.
-Require Import ConstructiveLimits.
+From Coq Require Import ZArith.
+From Coq Require Import QArith.
+From Coq Require Import PeanoNat.
+From Coq Require Import ArithRing.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveAbs.
+From Coq Require Import ConstructiveSum.
+From Coq Require Import ConstructivePower.
+From Coq Require Import ConstructiveLimits.
 
 Local Open Scope ConstructiveReals.
 

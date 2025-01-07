@@ -12,7 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 (** Proof that CoRN's fast reals implement the standard library's
     interface ConstructiveReals. *)
 
-From Coq Require Import ConstructiveReals.
+From Coq Require Import ZArith ConstructiveReals.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.model.metric2.CRmetric.
 Require Import CoRN.reals.fast.CRFieldOps.
@@ -372,4 +372,3 @@ Definition FastRealsConstructive : ConstructiveReals
        CRmult_inv_r_nlt CRinv_0_lt_compat
        CRlt_Qmid CRup CRabs CRabs_nlt
        CRcauchy_complete.
-

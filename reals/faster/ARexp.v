@@ -1,12 +1,13 @@
+From Coq Require Import ZArith.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.UniformContinuity.
 From Coq Require Import Program.
 Require Import MathClasses.misc.workaround_tactics
-  CoRN.model.totalorder.QposMinMax 
+  CoRN.model.totalorder.QposMinMax
   CoRN.model.totalorder.QMinMax.
 From Coq Require Import Qround Qabs.
-Require Import CoRN.util.Qdlog CoRN.stdlib_omissions.Q 
+Require Import CoRN.util.Qdlog CoRN.stdlib_omissions.Q
   CoRN.reals.fast.CRexp CoRN.reals.fast.CRstreams CoRN.reals.fast.CRAlternatingSum
   CoRN.reals.fast.Compress CoRN.reals.fast.CRpower
   CoRN.metric2.MetricMorphisms CoRN.reals.faster.ARAlternatingSum MathClasses.interfaces.abstract_algebra 

@@ -1,3 +1,4 @@
+From Coq Require Import ZArith.
 Require Import CoRN.stdlib_omissions.List.
 From Coq Require Import QArith Qabs.
 Require Import CoRN.model.totalorder.QposMinMax
