@@ -27,6 +27,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  *)
 
 From Coq Require Import ConstructiveEpsilon.
+From Coq Require Import ZArith.
 From Coq Require Import QArith.
 From Coq Require Import ConstructiveReals.
 From Coq Require Import ConstructiveAbs.

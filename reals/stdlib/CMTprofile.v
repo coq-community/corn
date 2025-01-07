@@ -25,13 +25,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     prove that this non-increasing limit of integrals exists.
  *)
 
-Require Import QArith_base Qabs.
-Require Import ConstructiveReals.
-Require Import ConstructiveSum.
-Require Import ConstructivePower.
-Require Import ConstructiveAbs.
-Require Import ConstructiveMinMax.
-Require Import ConstructiveLimits.
+From Coq Require Import ZArith QArith_base Qabs.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveSum.
+From Coq Require Import ConstructivePower.
+From Coq Require Import ConstructiveAbs.
+From Coq Require Import ConstructiveMinMax.
+From Coq Require Import ConstructiveLimits.
 Require Import ConstructiveUniformCont.
 Require Import ConstructivePartialFunctions.
 Require Import ConstructiveDiagonal.
@@ -40,7 +40,7 @@ Require Import CMTIntegrableFunctions.
 Require Import CMTIntegrableSets.
 Require Import CMTFullSets.
 Require Import CMTReals.
-Require Import Lia.
+From Coq Require Import Lia.
 
 Local Open Scope ConstructiveReals.
 

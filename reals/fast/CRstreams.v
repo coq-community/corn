@@ -20,9 +20,10 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
 
+From Coq Require Import ZArith.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.model.totalorder.QposMinMax.
-Require Import CoRN.model.metric2.Qmetric. 
+Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.metric2.Limit.
 From Coq Require Import Qabs.
 From Coq Require Import Arith.
@@ -817,4 +818,3 @@ Proof.
     destruct q. unfold Qopp; simpl.
     rewrite Z.opp_involutive. reflexivity.
 Qed.
-  

@@ -11,11 +11,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 (** Dirac measure at zero. *)
 
-Require Import QArith.
-Require Import ConstructiveReals.
-Require Import ConstructiveLimits.
-Require Import ConstructiveAbs.
-Require Import ConstructiveMinMax.
+From Coq Require Import ZArith.
+From Coq Require Import QArith.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveLimits.
+From Coq Require Import ConstructiveAbs.
+From Coq Require Import ConstructiveMinMax.
 Require Import ConstructivePartialFunctions.
 Require Import CMTbase.
 

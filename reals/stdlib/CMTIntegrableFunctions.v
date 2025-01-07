@@ -18,12 +18,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
    IScomplete is complete, in the sense that its integrable functions are
    already integrable functions of IS : no new functions are added. *)
 
-Require Import QArith.
-Require Import ConstructiveReals.
-Require Import ConstructiveAbs.
-Require Import ConstructiveMinMax.
-Require Import ConstructiveSum.
-Require Import ConstructiveLimits.
+From Coq Require Import ZArith.
+From Coq Require Import QArith.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveAbs.
+From Coq Require Import ConstructiveMinMax.
+From Coq Require Import ConstructiveSum.
+From Coq Require Import ConstructiveLimits.
 Require Import ConstructivePartialFunctions.
 Require Import CMTbase.
 

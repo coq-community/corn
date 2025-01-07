@@ -1,5 +1,5 @@
-From Coq Require Import Qround Qpower.
-Require Import MathClasses.interfaces.abstract_algebra 
+From Coq Require Import ZArith Qround Qpower.
+Require Import MathClasses.interfaces.abstract_algebra
   MathClasses.theory.nat_pow
   MathClasses.theory.int_pow
   CoRN.algebra.RSetoid
@@ -8,7 +8,7 @@ Require Import MathClasses.interfaces.abstract_algebra
   CoRN.metric2.UniformContinuity
   CoRN.model.totalorder.QMinMax
   CoRN.util.Qdlog
-  CoRN.stdlib_omissions.Q 
+  CoRN.stdlib_omissions.Q
   CoRN.reals.fast.CRsin
   CoRN.reals.fast.CRstreams
   CoRN.reals.fast.CRAlternatingSum
@@ -381,4 +381,3 @@ Lemma ARtoCR_preserves_sin x : ' ucFun ARsin x = ucFun sin_slow ('x).
 Proof. apply preserves_unary_complete_fun. Qed.
 
 End ARsin.
-

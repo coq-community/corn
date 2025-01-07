@@ -19,6 +19,7 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE PROOF OR THE USE OR OTHER DEALINGS IN THE PROOF.
 *)
+From Coq Require Import ZArith.
 Require Import CoRN.algebra.RSetoid.
 Require Import CoRN.metric2.Metric.
 Require Import CoRN.metric2.ProductMetric.
@@ -27,7 +28,7 @@ From Coq Require Import Qpower.
 From Coq Require Import Qabs.
 Require Import CoRN.model.metric2.Qmetric.
 Require Import CoRN.model.totalorder.QMinMax.
-Require Import CoRN.model.totalorder.QposMinMax. 
+Require Import CoRN.model.totalorder.QposMinMax.
 Require Import MathClasses.interfaces.canonical_names.
 Require Import MathClasses.interfaces.additional_operations.
 
@@ -581,4 +582,4 @@ Proof.
   rewrite Nnat.nat_of_Nplus.
   simpl.
   rewrite CRpower_N_correct. reflexivity.
-Qed. 
+Qed.

@@ -29,14 +29,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   of the values of the functions with zero.
  *)
 
-Require Import QArith Qminmax Qpower Qabs.
+From Coq Require Import ZArith QArith Qminmax Qpower Qabs.
 
-Require Import ConstructiveReals.
-Require Import ConstructiveAbs.
-Require Import ConstructiveMinMax.
-Require Import ConstructiveSum.
-Require Import ConstructivePower.
-Require Import ConstructiveLimits.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveAbs.
+From Coq Require Import ConstructiveMinMax.
+From Coq Require Import ConstructiveSum.
+From Coq Require Import ConstructivePower.
+From Coq Require Import ConstructiveLimits.
 Require Import ConstructiveDiagonal.
 Require Import ConstructivePartialFunctions.
 Require Import ConstructiveUniformCont.

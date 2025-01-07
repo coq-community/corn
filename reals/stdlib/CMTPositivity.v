@@ -12,12 +12,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 (* A lemma to simplify the proofs of Icontinuous in integration spaces.
    It looks classical because it does not need to give a convergence modulus. *)
 
-Require Import QArith.
-Require Import ConstructiveReals.
-Require Import ConstructiveAbs.
-Require Import ConstructiveSum.
-Require Import ConstructivePower.
-Require Import ConstructiveLimits.
+From Coq Require Import ZArith.
+From Coq Require Import QArith.
+From Coq Require Import ConstructiveReals.
+From Coq Require Import ConstructiveAbs.
+From Coq Require Import ConstructiveSum.
+From Coq Require Import ConstructivePower.
+From Coq Require Import ConstructiveLimits.
 Require Import ConstructiveDiagonal.
 Require Import ConstructivePartialFunctions.
 Require Import CMTbase.

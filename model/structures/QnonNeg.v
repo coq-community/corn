@@ -1,5 +1,6 @@
 (* This module is designed to *not* be Import'ed, only Require'd. *)
 
+From Coq Require Import ZArith.
 Require Import CoRN.model.totalorder.QposMinMax.
 From Coq Require Import Program.
 Require Import CoRN.model.structures.QposInf.
