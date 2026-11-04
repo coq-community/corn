@@ -783,7 +783,7 @@ Definition AQinv_pos_uc (c : AQ₊) := Build_UniformlyContinuousFunction (AQinv_
 Definition ARinv_pos (c : AQ₊) : AR --> AR := Cbind AQPrelengthSpace (AQinv_pos_uc c).
 
 Lemma ARtoCR_preserves_inv_pos_aux c (x : AR) : is_RegularFunction_noInf _
-   (λ γ, / Qmax (''c) ('approximate x (Qinv_modulus ('c) γ)) : Q_as_MetricSpace).
+   (λ γ, / Qmax ('('c)) ('approximate x (Qinv_modulus ('c) γ)) : Q_as_MetricSpace).
 Proof.
   intros ε1 ε2.
   apply_simplified (Qinv_pos_uc_prf ('c) (ε1 + ε2)%Qpos).
