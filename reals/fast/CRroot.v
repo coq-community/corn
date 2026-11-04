@@ -1249,8 +1249,8 @@ Proof.
   simpl. rewrite Qmult_1_r.
   now ring_simplify.
  intros n.
- setoid_replace ('((2#1) ^ (1 + n)) * rational_sqrt (a * (4#1) ^ -(1 + n)))%CR
-    with ('((2#1) ^ n) * scale (2#1) (rational_sqrt ((a * (4#1) ^ -n) / (4#1))))%CR.
+ setoid_replace ('((2#1) ^ (1 + n)) * rational_sqrt (a * (4#1) ^ (-(1 + n))))%CR
+    with ('((2#1) ^ n) * scale (2#1) (rational_sqrt ((a * (4#1) ^ (-n)) / (4#1))))%CR.
   assert (Pa1 : [0][<=](inj_Q IR (a * (4#1) ^ (- n)))).
    stepl (inj_Q IR 0); [| now (apply (inj_Q_nring IR 0))].
    apply inj_Q_leEq.

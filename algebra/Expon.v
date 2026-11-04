@@ -380,7 +380,7 @@ Definition zexp (x : R) x_ (n : Z) : R :=
 End Zexp_def.
 
 Arguments zexp [R].
-Notation "( x [//] Hx ) [^^] n" := (zexp x Hx n) (at level 0).
+Notation "( x [//] Hx ) [^^] n" := (zexp x Hx n) (at level 0, n at level 0).
 
 (**
 ** Properties of [zexp]

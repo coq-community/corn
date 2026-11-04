@@ -138,7 +138,7 @@ Proof with auto.
   now apply rings.flip_le_negate, semirings.le_2_4.
 Qed.
 
-Definition AQsqrt_mid_bounded_raw (n : N) := snd (AQsqrt_loop ('n)) ≪ -((1 + 'n)%mc : Z).
+Definition AQsqrt_mid_bounded_raw (n : N) := snd (AQsqrt_loop ('n)) ≪ (-((1 + 'n)%mc : Z)).
 
 Instance AQsqrt_mid_bounded_raw_proper: Proper ((=) ==> (=)) AQsqrt_mid_bounded_raw.
 Proof. intros x y E. change (x ≡ y) in E. now subst. Qed.
@@ -208,7 +208,7 @@ Proof.
 Qed.
 
 Lemma AQsqrt_mid_bounded_spec (n : N) : 
-  (AQsqrt_mid_bounded_raw n ^ (2%mc:N)) = a - fst (AQsqrt_loop ('n)) ≪ -(2 * 'n).
+  (AQsqrt_mid_bounded_raw n ^ (2%mc:N)) = a - fst (AQsqrt_loop ('n)) ≪ (-(2 * 'n)).
 Proof.
   unfold AQsqrt_mid_bounded_raw.
   rewrite shiftl_base_nat_pow, rings.preserves_2.

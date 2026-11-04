@@ -40,7 +40,7 @@ Section contents.
   Fixpoint divdiff_l (a: QPoint) (xs: list QPoint) {struct xs} : CR :=
     match xs with
     | nil => snd a
-    | cons b l => (divdiff_l a l - divdiff_l b l) * ' / (fst a - fst b)
+    | cons b l => (divdiff_l a l - divdiff_l b l) * ' (/ (fst a - fst b))
     end.
 
   Definition divdiff (l: ne_list QPoint): CR := divdiff_l (ne_list.head l) (ne_list.tail l).
@@ -49,9 +49,9 @@ Section contents.
     divdiff l = 
       match l with
       | ne_list.one a => snd a
-      | a ::: ne_list.one b => (snd a - snd b) * ' / (fst a - fst b)
+      | a ::: ne_list.one b => (snd a - snd b) * ' (/ (fst a - fst b))
       | a ::: b ::: l =>
-         (divdiff (ne_list.cons a l) - divdiff (ne_list.cons b l)) * ' / (fst a - fst b)
+         (divdiff (ne_list.cons a l) - divdiff (ne_list.cons b l)) * ' (/ (fst a - fst b))
       end.
   Proof. induction l as [|?[|]]; auto. Qed.
 
@@ -212,7 +212,7 @@ Section contents.
 
     Definition applied (x: Q) := @Σ CRasCMonoid (map (an_applied x) (ne_list.tails qpoints)).
 
-    Lemma apply x: (N ! ' x) [=] applied x.
+    Lemma apply x: (N ! (' x)) [=] applied x.
     Proof.
      unfold N, applied, an, an_applied.
      rewrite cm_Sum_apply, map_map.
